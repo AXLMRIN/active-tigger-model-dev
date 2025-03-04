@@ -1,3 +1,4 @@
 **/*test*
 __pycache__
-*active-tigger-archive/
+*active_tigger_archive/
+.DS_Store
