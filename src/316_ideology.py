@@ -44,8 +44,8 @@ def classifier_metrics(y_true : Tensor, y_pred : Tensor) -> dict[str:float]:
 # from torch.nn import Threshold; threshold : Threshold = Threshold(0.4,0)
 from torch import where as torch_where
 def threshold(probabilities : Tensor, thresh_value : float = 0.4) -> Tensor :
-    return torch_where(probabilities > 0.4,Tensor([1.0]),Tensor([0.0])).\
-            to(float_dtype)
+    return torch_where(probabilities > 0.4,Tensor([1.0]).to(device),
+                       Tensor([0.0]).to(device)).to(float_dtype)
 
 n_epoch : int = 2
 
