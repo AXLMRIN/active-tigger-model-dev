@@ -1,0 +1,12 @@
+{
+    "tokenizing" : {
+        "padding" : "max_length",
+        "truncation" : true,
+        "max_length" : 42,
+        "return_tensors" : "pt"
+    },
+    "DataLoader" : {
+        "batch_size" : 32,
+        "num_workers" : 0
+    }
+}
