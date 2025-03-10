@@ -25,7 +25,8 @@ train_record_save_filename : str = "316_ideological_book_corpus-IdeologySentence
 seed : int = 42
 
 model_name : str = "answerdotai/ModernBERT-base"; embedding_dim : int = 768
-att_implementation : str = "flash_attention_2" if gpu_available() else "sdpa"
+att_implementation : str = "sdpa"
+# TODO Demander pour flash_attention_2
 device = "cuda" if gpu_available() else "cpu"
 float_dtype = float32
 
