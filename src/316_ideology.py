@@ -20,7 +20,7 @@ from transformers.tokenization_utils_base import BatchEncoding
 from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-FILENAME : str = "../data/316_ideological_book_corpus/ibc.csv"
+FILENAME : str = "data/316_ideological_book_corpus/ibc.csv"
 train_record_save_filename : str = "316_ideological_book_corpus-IdeologySentenceClassifier-train.csv"
 seed : int = 42
 
@@ -50,7 +50,7 @@ n_epoch : int = 2
 
 # Load parameters saved as json #TODO is it really necessary ??
 import json
-with open("./316_ideology_sentence.json", "r") as file : 
+with open("configs/316_ideology_sentence.json", "r") as file : 
     parameters = json.load(file)
 
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
@@ -172,7 +172,6 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
             ]
         )   
         loss = loss_fn(probabilities, target)
-        print("Loss : ",loss)
         sum_loss += loss.item()
         metrics : dict[str:float] = classifier_metrics(target, prediction)
         for key in metrics : metrics_averaged[key] += metrics[key]
