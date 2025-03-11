@@ -146,7 +146,7 @@ base_model = ModernBertModel.from_pretrained(model_name,
                 num_labels = n_labels,
                 id2label = ID2LABEL,
                 label2id = LABEL2ID).\
-                to(device)
+                to("cpu")
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 # Load custom classifier - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 isc = IdeologySentenceClassifier(
@@ -185,7 +185,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Encode the input ON DEVICE
         encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
         # Move to DEVICE to use in base_model : 
-        encoded.to(device = device, non_blocking = True)
+        encoded.to(device = base_model.device, non_blocking = True)
         #The BaseModelOutput.last_hidden_state is a torch.Tensor of dimension
         # (batch_size, seq_lengthm, embedding_dim)
         # because it holds the embedding of the batch_size sentences, each of lenght 
@@ -243,7 +243,7 @@ def eval_loop(batch_iterable : DataLoader):
             # Encode the input ON DEVICE
             encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
             # Move to DEVICE to use in base_model : 
-            encoded.to(device = device, non_blocking = True)
+            encoded.to(device = base_model.device, non_blocking = True)
             # Embed on DEVICE
             embeddings : BaseModelOutput = base_model(**encoded).\
                     last_hidden_state[:,0,:].\
