@@ -145,7 +145,6 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         'f1': 0.,'roc_auc': 0.,'accuracy' : 0.
     }
     for batch in batch_iterable:
-        print("Batch device : ",batch.device)#TODELETE
         # Prepare the loop
         optimizer.zero_grad()
         
