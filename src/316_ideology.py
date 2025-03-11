@@ -196,7 +196,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Embed on DEVICE
         embeddings : BaseModelOutput = base_model(**encoded).\
                 last_hidden_state[:,0,:].\
-                view(parameters["DataLoader"]["batch_size"],embedding_dim )
+                view(-1,embedding_dim )
         # Proceed to the classification
         logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
         probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
@@ -247,7 +247,7 @@ def eval_loop(batch_iterable : DataLoader):
             # Embed on DEVICE
             embeddings : BaseModelOutput = base_model(**encoded).\
                     last_hidden_state[:,0,:].\
-                    view(parameters["DataLoader"]["batch_size"],embedding_dim )
+                    view(-1,embedding_dim )
             # Proceed to the classification
             logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
             probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
@@ -291,7 +291,7 @@ for epoch in tqdm(range(n_epoch)):
     record_train = train_loop(train_batch_iterable) 
     train_book[epoch] = record_train
     torch_synchronize()
-    
+
     isc.eval()
     record_eval = eval_loop(validation_batch_iterable)
     validation_book[epoch] = record_eval
