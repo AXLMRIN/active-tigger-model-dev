@@ -170,7 +170,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
             [
                 [j == logit for j in range(n_labels)]
                 for logit in batch["leaning"]
-            ]
+            ], device=device
         )   
         loss = loss_fn(probabilities, target)
         sum_loss += loss.item()
@@ -219,7 +219,7 @@ def eval_loop(batch_iterable):
                 [
                     [j == logit for j in range(n_labels)]
                     for logit in batch["leaning"]
-                ]
+                ], device=device
             )   
             loss = loss_fn(probabilities, target)
             sum_loss += loss.item()
