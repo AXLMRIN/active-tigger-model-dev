@@ -1,5 +1,9 @@
 # TODO Réaliser un bandeau
 
+# DEBUG FIXME
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
+
 # IMPORTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 # Third parties
 from datasets import load_dataset, DatasetDict
@@ -40,11 +44,10 @@ def threshold(probabilities : Tensor, thresh_value : float = 0.4) -> Tensor :
     probabilities is already on the cpu
     """
     return torch_where(
-        probabilities > 0.4,
+        probabilities > thresh_value,
         Tensor([1.0]),
-        Tensor([0.0]),
-        dtype = bool, device = "cpu"
-    )
+        Tensor([0.0])
+    ).to(dtype = bool, device = "cpu")
 
 def classifier_metrics(target : Tensor, probabilities : Tensor, 
                        thresh_value : float = 0.4) -> dict[str:float]:
@@ -165,7 +168,7 @@ def create_target(batch_leaning : Tensor, local_device : str = device,
                 [j == logit for j in range(n_labels)]
                 for logit in batch_leaning.to(local_device)
             ]
-        ).to(device = local_device, dtype = bool)   
+        ).to(device = local_device, dtype = dtype)   
 
 def train_loop(batch_iterable : DataLoader) -> list[dict] :
     iteration_start : float = time()
@@ -200,7 +203,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Evaluate the loss ON DEVICE
         loss = loss_fn(
             probabilities,
-            create_target(batch["leaning"], local_device = device)
+            create_target(batch["leaning"], local_device = device, dtype = float_dtype)
         )
         sum_loss += loss.detach().cpu().item() # ON CPU
 
@@ -216,6 +219,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
 
         # optimizer step
         optimizer.step()
+        break
 
     return {
         "iteration_time" : time() - iteration_start,
@@ -250,7 +254,7 @@ def eval_loop(batch_iterable : DataLoader):
             # Evaluate the loss ON DEVICE
             loss = loss_fn(
                 probabilities,
-                create_target(batch["leaning"], local_device = device)
+                create_target(batch["leaning"], local_device = device, dtype = float_dtype)
             )
             sum_loss += loss.detach().cpu().item() # ON CPU
 
@@ -260,6 +264,8 @@ def eval_loop(batch_iterable : DataLoader):
                 probabilities.detach().cpu())
             # Save the metrics
             for key in metrics : metrics_averaged[key] += metrics[key]
+
+            break
     return {
         "iteration_time" : time() - iteration_start,
         "loss" : sum_loss / len(batch_iterable),
