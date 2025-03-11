@@ -178,7 +178,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         'f1': 0.,'roc_auc': 0.,'accuracy' : 0.
     }
     # batch_iterable is on CPU
-    for batch in batch_iterable:
+    for batch in tqdm(batch_iterable):
         # Prepare the loop
         optimizer.zero_grad()
 
@@ -239,7 +239,7 @@ def eval_loop(batch_iterable : DataLoader):
     }
     # batch_iterable is on CPU
     with no_grad():
-        for batch in batch_iterable:
+        for batch in tqdm(batch_iterable):
             # Encode the input ON DEVICE
             encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
             # Move to DEVICE to use in base_model : 
@@ -286,7 +286,8 @@ train_book : dict[int:list[dict]] = {}
 validation_book : dict[int:list[dict]] = {}
 
 # Training loop :
-for epoch in tqdm(range(n_epoch)):
+for epoch in range(n_epoch):
+    print(f"Epoch : {epoch} / {n_epoch}")
     isc.train()
     record_train = train_loop(train_batch_iterable) 
     train_book[epoch] = record_train
