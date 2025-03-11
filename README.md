@@ -8,6 +8,10 @@ pip install -q transformers datasets
 conda install pytorch
 pip install 'accelerate>=0.26.0'
 ```
+Si sur GPU : 
+```
+pip install -U flash_attn
+```
 
 # Data
 ```python
