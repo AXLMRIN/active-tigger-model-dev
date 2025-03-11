@@ -4,8 +4,10 @@
 # Third parties
 from datasets import load_dataset, DatasetDict
 from pandas import read_csv, DataFrame
+from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 from time import time
 from torch import float32, Tensor, sigmoid, empty, no_grad
+from torch import where as torch_where
 from torch.cuda import is_available as gpu_available
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
@@ -30,10 +32,12 @@ att_implementation : str = "sdpa"
 device = "cuda" if gpu_available() else "cpu"
 float_dtype = float32
 
-from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
+#https://medium.com/biased-algorithms/mastering-pytorch-to-device-an-advanced-guide-for-efficient-device-management-0290b086f17e
+to_device = lambda x : x.to(device = device, dtype = float_dtype,non_blocking = True) 
+
 def classifier_metrics(y_true : Tensor, y_pred : Tensor) -> dict[str:float]:
-    y_true = y_true.to(bool, copy = True)
-    y_pred = y_pred.to(bool, copy = True)
+    y_true = y_true.to(dtype = bool, device = "cpu", copy = True)
+    y_pred = y_pred.to(dtype = bool, device = "cpu", copy = True)
     
     return {
         'f1': f1_score(y_true=y_true, y_pred=y_pred, average='micro'),
@@ -42,10 +46,14 @@ def classifier_metrics(y_true : Tensor, y_pred : Tensor) -> dict[str:float]:
     }
 
 # from torch.nn import Threshold; threshold : Threshold = Threshold(0.4,0)
-from torch import where as torch_where
+
 def threshold(probabilities : Tensor, thresh_value : float = 0.4) -> Tensor :
-    return torch_where(probabilities > 0.4,Tensor([1.0]).to(device),
-                       Tensor([0.0]).to(device)).to(float_dtype)
+    return torch_where(
+        probabilities > 0.4,
+        to_device(Tensor([1.0])),
+        to_device(Tensor([0.0]))
+    )
+
 
 n_epoch : int = 2
 
@@ -53,6 +61,7 @@ n_epoch : int = 2
 import json
 with open("configs/316_ideology_sentence.json", "r") as file : 
     parameters = json.load(file)
+
 
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -157,14 +166,14 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Although, we are classifying on the [CLS] token, so we only keep the first item
         # (Hence the [:,0,:]) and reshaping it to (batch_size, embedding_dim) for the
         # ics to accept it
-        embeddings : BaseModelOutput = base_model(**encoded).\
-                        last_hidden_state[:,0,:].\
-                        view(parameters["DataLoader"]["batch_size"],embedding_dim ).\
-                        to(float_dtype).to(device)
+        embeddings : BaseModelOutput = to_device(
+            base_model(**encoded).last_hidden_state[:,0,:].\
+                view(parameters["DataLoader"]["batch_size"],embedding_dim )
+        )
         # Proceed to the classification
         logits : Tensor = isc(embeddings) # (batch_size, n_labels)
         probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) NOTE à check parce que c'est pas impossible que le problème vienne d'ici
-        prediction : Tensor = threshold(probabilities)
+        prediction : Tensor = to_device(threshold(probabilities))
         # Evaluate the loss and metrics
         target : Tensor = Tensor(
             [
@@ -192,7 +201,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         }
     }
         
-def eval_loop(batch_iterable):
+def eval_loop(batch_iterable : DataLoader):
     # Prepare the loop
     iteration_start : float = time()
     sum_loss : float = 0.
@@ -205,14 +214,14 @@ def eval_loop(batch_iterable):
             # Embedd the input
             encoded : BatchEncoding = tokenizer(batch["sentence"], 
                                                 **parameters["tokenizing"])
-            embeddings : BaseModelOutput = base_model(**encoded).\
-                            last_hidden_state[:,0,:].\
-                            view(parameters["DataLoader"]["batch_size"],embedding_dim ).\
-                            to(float_dtype).to(device)
+            embeddings : BaseModelOutput = to_device(
+                base_model(**encoded).last_hidden_state[:,0,:].\
+                    view(parameters["DataLoader"]["batch_size"],embedding_dim )
+            )
 
             # Proceed to the classification
             probabilities : Tensor = sigmoid(isc(embeddings)) # (batch_size, n_labels)
-            prediction : Tensor = threshold(probabilities)
+            prediction : Tensor = to_device(threshold(probabilities))
 
             # Evaluate the loss and metrics
             target : Tensor = Tensor(
