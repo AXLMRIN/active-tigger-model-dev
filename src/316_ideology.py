@@ -13,6 +13,7 @@ from time import time
 from torch import float32, Tensor, sigmoid, empty, no_grad
 from torch import where as torch_where
 from torch.cuda import is_available as gpu_available
+from torch.cuda import synchronize as torch_synchronize
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader
@@ -47,7 +48,7 @@ def threshold(probabilities : Tensor, thresh_value : float = 0.4) -> Tensor :
         probabilities > thresh_value,
         Tensor([1.0]),
         Tensor([0.0])
-    ).to(dtype = bool, device = "cpu")
+    ).to(dtype = bool, device = "cpu", non_blocking=True)
 
 def classifier_metrics(target : Tensor, probabilities : Tensor, 
                        thresh_value : float = 0.4) -> dict[str:float]:
@@ -55,7 +56,7 @@ def classifier_metrics(target : Tensor, probabilities : Tensor,
     probabilities = probabilities.detach().cpu()
     target is already on the cpu and of dtype bool
     """
-    target.to(device = "cpu", dtype = bool) # just to make sure but shouldn't be necessary
+    target.to(device = "cpu", dtype = bool, non_blocking=True) # just to make sure but shouldn't be necessary
     y_pred = threshold(probabilities, thresh_value) # bool, on cpu
     
     return {
@@ -166,9 +167,9 @@ def create_target(batch_leaning : Tensor, local_device : str = device,
     return Tensor(
             [
                 [j == logit for j in range(n_labels)]
-                for logit in batch_leaning.to(local_device)
+                for logit in batch_leaning.to(local_device, non_blocking=True)
             ]
-        ).to(device = local_device, dtype = dtype)   
+        ).to(device = local_device, dtype = dtype, non_blocking=True)   
 
 def train_loop(batch_iterable : DataLoader) -> list[dict] :
     iteration_start : float = time()
@@ -184,7 +185,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Encode the input ON DEVICE
         encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
         # Move to DEVICE to use in base_model : 
-        encoded.to(device = device)
+        encoded.to(device = device, non_blocking = True)
         #The BaseModelOutput.last_hidden_state is a torch.Tensor of dimension
         # (batch_size, seq_lengthm, embedding_dim)
         # because it holds the embedding of the batch_size sentences, each of lenght 
@@ -242,7 +243,7 @@ def eval_loop(batch_iterable : DataLoader):
             # Encode the input ON DEVICE
             encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
             # Move to DEVICE to use in base_model : 
-            encoded.to(device = device)
+            encoded.to(device = device, non_blocking = True)
             # Embed on DEVICE
             embeddings : BaseModelOutput = base_model(**encoded).\
                     last_hidden_state[:,0,:].\
@@ -289,10 +290,12 @@ for epoch in tqdm(range(n_epoch)):
     isc.train()
     record_train = train_loop(train_batch_iterable) 
     train_book[epoch] = record_train
-
+    torch_synchronize()
+    
     isc.eval()
     record_eval = eval_loop(validation_batch_iterable)
     validation_book[epoch] = record_eval
+    torch_synchronize()
 
 
 # >>> Save the results
