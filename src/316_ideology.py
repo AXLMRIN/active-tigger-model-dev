@@ -156,7 +156,8 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
     for batch in batch_iterable:
         # Prepare the loop
         optimizer.zero_grad()
-        
+        for key in batch : batch[key] = to_device(batch[key])
+
         # Embedd the input
         encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
         #The BaseModelOutput.last_hidden_state is a torch.Tensor of dimension
