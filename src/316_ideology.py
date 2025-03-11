@@ -164,8 +164,8 @@ def create_target(batch_leaning : Tensor, local_device : str = device,
             [
                 [j == logit for j in range(n_labels)]
                 for logit in batch_leaning.to(local_device)
-            ], device=local_device, dtype = dtype
-        )   
+            ]
+        ).to(device = local_device, dtype = bool)   
 
 def train_loop(batch_iterable : DataLoader) -> list[dict] :
     iteration_start : float = time()
