@@ -33,26 +33,34 @@ device = "cuda" if gpu_available() else "cpu"
 float_dtype = float32
 
 #https://medium.com/biased-algorithms/mastering-pytorch-to-device-an-advanced-guide-for-efficient-device-management-0290b086f17e
-to_device = lambda x : x.to(device = device, dtype = float_dtype,non_blocking = True) 
-
-def classifier_metrics(y_true : Tensor, y_pred : Tensor) -> dict[str:float]:
-    y_true = y_true.to(dtype = bool, device = "cpu", copy = True)
-    y_pred = y_pred.to(dtype = bool, device = "cpu", copy = True)
-    
-    return {
-        'f1': f1_score(y_true=y_true, y_pred=y_pred, average='micro'),
-        'roc_auc': roc_auc_score(y_true, y_pred, average = 'micro').item(),
-        'accuracy': accuracy_score(y_true, y_pred)
-    }
-
-# from torch.nn import Threshold; threshold : Threshold = Threshold(0.4,0)
+# to_device = lambda x : x.to(device = device, dtype = float_dtype,non_blocking = True) 
 
 def threshold(probabilities : Tensor, thresh_value : float = 0.4) -> Tensor :
+    """Everything happens on the cpu
+    probabilities is already on the cpu
+    """
     return torch_where(
         probabilities > 0.4,
-        to_device(Tensor([1.0])),
-        to_device(Tensor([0.0]))
+        Tensor([1.0]),
+        Tensor([0.0]),
+        dtype = bool, device = "cpu"
     )
+
+def classifier_metrics(target : Tensor, probabilities : Tensor, 
+                       thresh_value : float = 0.4) -> dict[str:float]:
+    """Everything happens on the cpu
+    probabilities = probabilities.detach().cpu()
+    target is already on the cpu and of dtype bool
+    """
+    target.to(device = "cpu", dtype = bool) # just to make sure but shouldn't be necessary
+    y_pred = threshold(probabilities, thresh_value) # bool, on cpu
+    
+    return {
+        'f1': f1_score(y_true = target, y_pred = y_pred, average='micro'),
+        'roc_auc': roc_auc_score(target, y_pred, average = 'micro').item(),
+        'accuracy': accuracy_score(target, y_pred)
+    }
+
 
 
 n_epoch : int = 2
@@ -103,7 +111,8 @@ ds_temp2 = ds_temp["train"].train_test_split(train_size = 0.82,shuffle = True, s
 ds = DatasetDict({
     "train" : ds_temp2["train"],
     "validation" : ds_temp2["test"],
-    "test" : ds_temp["test"]
+    "test" : ds_temp["test"],
+
 })
 
 def proportion(name):
@@ -132,7 +141,8 @@ base_model = ModernBertModel.from_pretrained(model_name,
                 attn_implementation = att_implementation,
                 num_labels = n_labels,
                 id2label = ID2LABEL,
-                label2id = LABEL2ID)
+                label2id = LABEL2ID).\
+                to(device)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 # Load custom classifier - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 isc = IdeologySentenceClassifier(
@@ -147,19 +157,31 @@ print(">>> Load custom classifier - Done")
 loss_fn = BCEWithLogitsLoss()
 optimizer = Adam(isc.parameters(), lr = 1e-2)
 
+# Function creation
+def create_target(batch_leaning : Tensor, local_device : str = device,
+                  dtype = bool) -> Tensor:
+    return Tensor(
+            [
+                [j == logit for j in range(n_labels)]
+                for logit in batch_leaning.to(local_device)
+            ], device=local_device, dtype = dtype
+        )   
+
 def train_loop(batch_iterable : DataLoader) -> list[dict] :
     iteration_start : float = time()
     sum_loss : float = 0.
     metrics_averaged : dict[str:float] = {
         'f1': 0.,'roc_auc': 0.,'accuracy' : 0.
     }
+    # batch_iterable is on CPU
     for batch in batch_iterable:
         # Prepare the loop
         optimizer.zero_grad()
-        for key in batch : batch[key] = to_device(batch[key])
 
-        # Embedd the input
+        # Encode the input ON DEVICE
         encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
+        # Move to DEVICE to use in base_model : 
+        encoded.to(device = device)
         #The BaseModelOutput.last_hidden_state is a torch.Tensor of dimension
         # (batch_size, seq_lengthm, embedding_dim)
         # because it holds the embedding of the batch_size sentences, each of lenght 
@@ -167,24 +189,26 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Although, we are classifying on the [CLS] token, so we only keep the first item
         # (Hence the [:,0,:]) and reshaping it to (batch_size, embedding_dim) for the
         # ics to accept it
-        embeddings : BaseModelOutput = to_device(
-            base_model(**encoded).last_hidden_state[:,0,:].\
+        # Embed on DEVICE
+        embeddings : BaseModelOutput = base_model(**encoded).\
+                last_hidden_state[:,0,:].\
                 view(parameters["DataLoader"]["batch_size"],embedding_dim )
-        )
         # Proceed to the classification
-        logits : Tensor = isc(embeddings) # (batch_size, n_labels)
-        probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) NOTE à check parce que c'est pas impossible que le problème vienne d'ici
-        prediction : Tensor = to_device(threshold(probabilities))
-        # Evaluate the loss and metrics
-        target : Tensor = Tensor(
-            [
-                [j == logit for j in range(n_labels)]
-                for logit in batch["leaning"]
-            ], device=device
-        )   
-        loss = loss_fn(probabilities, target)
-        sum_loss += loss.item()
-        metrics : dict[str:float] = classifier_metrics(target, prediction)
+        logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
+        probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
+        
+        # Evaluate the loss ON DEVICE
+        loss = loss_fn(
+            probabilities,
+            create_target(batch["leaning"], local_device = device)
+        )
+        sum_loss += loss.detach().cpu().item() # ON CPU
+
+        # Evaluate the metrics ON CPU
+        metrics : dict[str:float] = classifier_metrics(
+            create_target(batch["leaning"], local_device = "cpu"),
+            probabilities.detach().cpu())
+        # Save the metrics
         for key in metrics : metrics_averaged[key] += metrics[key]
 
         # Back propagation
@@ -203,39 +227,39 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
     }
         
 def eval_loop(batch_iterable : DataLoader):
-    # Prepare the loop
     iteration_start : float = time()
     sum_loss : float = 0.
     metrics_averaged : dict[str:float] = {
         'f1': 0.,'roc_auc': 0.,'accuracy' : 0.
     }
-
+    # batch_iterable is on CPU
     with no_grad():
         for batch in batch_iterable:
-            # Embedd the input
-            encoded : BatchEncoding = tokenizer(batch["sentence"], 
-                                                **parameters["tokenizing"])
-            embeddings : BaseModelOutput = to_device(
-                base_model(**encoded).last_hidden_state[:,0,:].\
+            # Encode the input ON DEVICE
+            encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
+            # Move to DEVICE to use in base_model : 
+            encoded.to(device = device)
+            # Embed on DEVICE
+            embeddings : BaseModelOutput = base_model(**encoded).\
+                    last_hidden_state[:,0,:].\
                     view(parameters["DataLoader"]["batch_size"],embedding_dim )
-            )
-
             # Proceed to the classification
-            probabilities : Tensor = sigmoid(isc(embeddings)) # (batch_size, n_labels)
-            prediction : Tensor = to_device(threshold(probabilities))
+            logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
+            probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
+            
+            # Evaluate the loss ON DEVICE
+            loss = loss_fn(
+                probabilities,
+                create_target(batch["leaning"], local_device = device)
+            )
+            sum_loss += loss.detach().cpu().item() # ON CPU
 
-            # Evaluate the loss and metrics
-            target : Tensor = Tensor(
-                [
-                    [j == logit for j in range(n_labels)]
-                    for logit in batch["leaning"]
-                ], device=device
-            )   
-            loss = loss_fn(probabilities, target)
-            sum_loss += loss.item()
-            metrics : dict[str:float] = classifier_metrics(target, prediction)
+            # Evaluate the metrics ON CPU
+            metrics : dict[str:float] = classifier_metrics(
+                create_target(batch["leaning"], local_device = "cpu"),
+                probabilities.detach().cpu())
+            # Save the metrics
             for key in metrics : metrics_averaged[key] += metrics[key]
-
     return {
         "iteration_time" : time() - iteration_start,
         "loss" : sum_loss / len(batch_iterable),
