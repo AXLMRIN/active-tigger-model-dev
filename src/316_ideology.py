@@ -196,7 +196,8 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Embed on DEVICE
         embeddings : BaseModelOutput = base_model(**encoded).\
                 last_hidden_state[:,0,:].\
-                view(-1,embedding_dim )
+                view(-1,embedding_dim ).\
+                to(device)
         # Proceed to the classification
         logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
         probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
@@ -247,7 +248,8 @@ def eval_loop(batch_iterable : DataLoader):
             # Embed on DEVICE
             embeddings : BaseModelOutput = base_model(**encoded).\
                     last_hidden_state[:,0,:].\
-                    view(-1,embedding_dim )
+                    view(-1,embedding_dim ).\
+                    to(device)
             # Proceed to the classification
             logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
             probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
