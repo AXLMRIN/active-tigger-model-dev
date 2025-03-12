@@ -239,8 +239,10 @@ def eval_loop(batch_iterable : DataLoader):
     }
 print(">>> Loop functions creation - Done")
 # Train - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-train_batch_iterable : DataLoader = DataLoader(ds["train"], **PRS["DataLoader"])
-validation_batch_iterable : DataLoader = DataLoader(ds["validation"], **PRS["DataLoader"])
+train_batch_iterable : DataLoader = DataLoader(ds["train"],
+                        batch_size = PRS["batch_size"], **PRS["DataLoader"])
+validation_batch_iterable : DataLoader = DataLoader(ds["validation"],
+                        batch_size = PRS["batch_size"], **PRS["DataLoader"])
 
 # Record of all the metrics (time, iteration, train_loss, f1, accuracy and auc_roc)
 # for all epochs
