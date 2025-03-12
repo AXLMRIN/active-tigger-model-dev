@@ -38,7 +38,7 @@ with open("configs/316_ideology_sentence.json", "r") as file :
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ds : Dataset = Dataset.from_pandas(read_csv(
     PRS["filename_open"], storage_options = storage_options()
-))
+)).with_format("torch")
 
 LABEL : list[str] = list(set(ds["leaning"])); n_labels : int = len(LABEL)
 ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}
@@ -81,12 +81,11 @@ ds = ds.map(tokenizing_sentences, batched = True, batch_size = PRS["batch_size"]
 
 # Embed the sentences
 def embedding_sentences(batch_of_rows : dict):
-    batch_of_rows["embedding"] = base_model(
-        input_ids = batch_of_rows["input_ids"],
-        attention_mask = batch_of_rows["attention_mask"]
-    )
+    batch_of_rows["embedding"] = base_model(**{
+        "input_ids" : batch_of_rows["input_ids"],
+        "attention_mask" : batch_of_rows["attention_mask"]
+    }).last_hidden_state
     return batch_of_rows
 
-ds = ds.map(embedding_sentences, batched = True, batch_size = PRS["batch_size"])
-
 # Save the ds 
+ds = ds.map(embedding_sentences, batched = True, batch_size = PRS["batch_size"])
