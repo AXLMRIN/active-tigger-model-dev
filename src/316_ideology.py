@@ -8,10 +8,8 @@ torch._dynamo.config.suppress_errors = True
 # Third parties
 from datasets import load_dataset, DatasetDict
 from pandas import read_csv, DataFrame
-from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 from time import time
 from torch import float32, Tensor, sigmoid, empty, no_grad
-from torch import where as torch_where
 from torch.cuda import is_available as gpu_available
 from torch.cuda import synchronize as torch_synchronize
 from torch.nn import BCEWithLogitsLoss
@@ -25,60 +23,24 @@ from transformers.tokenization_utils_base import BatchEncoding
 
 # Custom
 from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
+from toolbox.metrics import classifier_metrics
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-FILENAME : str = "data/316_ideological_book_corpus/ibc.csv"
-train_record_save_filename : str = "316_ideological_book_corpus-IdeologySentenceClassifier-train.csv"
-seed : int = 42
-
-model_name : str = "answerdotai/ModernBERT-base"; embedding_dim : int = 768
 att_implementation : str = "sdpa"
 # TODO Demander pour flash_attention_2
 device = "cuda" if gpu_available() else "cpu"
 float_dtype = float32
 
-#https://medium.com/biased-algorithms/mastering-pytorch-to-device-an-advanced-guide-for-efficient-device-management-0290b086f17e
-# to_device = lambda x : x.to(device = device, dtype = float_dtype,non_blocking = True) 
-
-def threshold(probabilities : Tensor, thresh_value : float = 0.4) -> Tensor :
-    """Everything happens on the cpu
-    probabilities is already on the cpu
-    """
-    return torch_where(
-        probabilities > thresh_value,
-        Tensor([1.0]),
-        Tensor([0.0])
-    ).to(dtype = bool, device = "cpu", non_blocking=True)
-
-def classifier_metrics(target : Tensor, probabilities : Tensor, 
-                       thresh_value : float = 0.4) -> dict[str:float]:
-    """Everything happens on the cpu
-    probabilities = probabilities.detach().cpu()
-    target is already on the cpu and of dtype bool
-    """
-    target.to(device = "cpu", dtype = bool, non_blocking=True) # just to make sure but shouldn't be necessary
-    y_pred = threshold(probabilities, thresh_value) # bool, on cpu
-    
-    return {
-        'f1': f1_score(y_true = target, y_pred = y_pred, average='micro'),
-        'roc_auc': roc_auc_score(target, y_pred, average = 'micro').item(),
-        'accuracy': accuracy_score(target, y_pred)
-    }
-
-
-
-n_epoch : int = 2
-
 # Load parameters saved as json #TODO is it really necessary ??
 import json
 with open("configs/316_ideology_sentence.json", "r") as file : 
-    parameters = json.load(file)
+    PRS : dict = json.load(file)
 
 
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 #TODO Clean this is litteraly USELESS
-df = read_csv(FILENAME).\
+df = read_csv(PRS["filename_open"]).\
     astype({
         "sentence" : "str",
         "leaning" : "str"
@@ -106,11 +68,11 @@ print("-" * 88)
 
 del df, class_size, dot2f, div
 
-ds_original = load_dataset("csv", data_files = {"whole" :FILENAME})["whole"]
+ds_original = load_dataset("csv", data_files = {"whole" :PRS["filename_open"]})["whole"]
 # split the dateaset into (test) and (train, validation)
-ds_temp = ds_original.train_test_split(test_size = 0.15,shuffle = True, seed = seed)
+ds_temp = ds_original.train_test_split(test_size = 0.15,shuffle = True, seed = PRS["seed"])
 # split the dataset into (train) and (validation)
-ds_temp2 = ds_temp["train"].train_test_split(train_size = 0.82,shuffle = True, seed = seed)
+ds_temp2 = ds_temp["train"].train_test_split(train_size = 0.82,shuffle = True, seed = PRS["seed"])
 
 ds = DatasetDict({
     "train" : ds_temp2["train"],
@@ -141,16 +103,16 @@ def preprocess(row):
 ds = ds.map(preprocess)
 print(">>> Preprocess - Done")
 # Loading the model - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-base_model = ModernBertModel.from_pretrained(model_name,
+base_model = ModernBertModel.from_pretrained(PRS["model"]["name"],
                 attn_implementation = att_implementation,
                 num_labels = n_labels,
                 id2label = ID2LABEL,
                 label2id = LABEL2ID).\
                 to(device)
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(PRS["model"]["name"])
 # Load custom classifier - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 isc = IdeologySentenceClassifier(
-    in_features = embedding_dim,out_features = n_labels, 
+    in_features = PRS["model"]["dim"],out_features = n_labels, 
     hidden_layers = None, hidden_layers_size = None,
     device = device, dtype = float_dtype)
 print(isc)
@@ -183,7 +145,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         optimizer.zero_grad()
 
         # Encode the input ON DEVICE
-        encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
+        encoded : BatchEncoding = tokenizer(batch["sentence"], **PRS["tokenizing"])
         # Move to DEVICE to use in base_model : 
         encoded.to(device = device, non_blocking = True)
         #The BaseModelOutput.last_hidden_state is a torch.Tensor of dimension
@@ -196,7 +158,7 @@ def train_loop(batch_iterable : DataLoader) -> list[dict] :
         # Embed on DEVICE
         embeddings : BaseModelOutput = base_model(**encoded).\
                 last_hidden_state[:,0,:].\
-                view(-1,embedding_dim )
+                view(-1,PRS["model"]["dim"] )
         # Proceed to the classification
         logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
         probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
@@ -241,13 +203,13 @@ def eval_loop(batch_iterable : DataLoader):
     with no_grad():
         for batch in tqdm(batch_iterable):
             # Encode the input ON DEVICE
-            encoded : BatchEncoding = tokenizer(batch["sentence"], **parameters["tokenizing"])
+            encoded : BatchEncoding = tokenizer(batch["sentence"], **PRS["tokenizing"])
             # Move to DEVICE to use in base_model : 
             encoded.to(device = device, non_blocking = True)
             # Embed on DEVICE
             embeddings : BaseModelOutput = base_model(**encoded).\
                     last_hidden_state[:,0,:].\
-                    view(-1,embedding_dim )
+                    view(-1,PRS["model"]["dim"] )
             # Proceed to the classification
             logits : Tensor = isc(embeddings) # (batch_size, n_labels) ON DEVICE
             probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
@@ -277,8 +239,8 @@ def eval_loop(batch_iterable : DataLoader):
     }
 print(">>> Loop functions creation - Done")
 # Train - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-train_batch_iterable : DataLoader = DataLoader(ds["train"], **parameters["DataLoader"])
-validation_batch_iterable : DataLoader = DataLoader(ds["validation"], **parameters["DataLoader"])
+train_batch_iterable : DataLoader = DataLoader(ds["train"], **PRS["DataLoader"])
+validation_batch_iterable : DataLoader = DataLoader(ds["validation"], **PRS["DataLoader"])
 
 # Record of all the metrics (time, iteration, train_loss, f1, accuracy and auc_roc)
 # for all epochs
@@ -286,8 +248,8 @@ train_book : dict[int:list[dict]] = {}
 validation_book : dict[int:list[dict]] = {}
 
 # Training loop :
-for epoch in range(n_epoch):
-    print(f"Epoch : {epoch} / {n_epoch}")
+for epoch in range(PRS["n_epoch"]):
+    print(f"Epoch : {epoch} / {PRS["n_epoch"]}")
     isc.train()
     record_train = train_loop(train_batch_iterable) 
     train_book[epoch] = record_train
@@ -313,5 +275,5 @@ for epoch in validation_book :
         "epoch" : epoch,
         **validation_book[epoch]
     })
-DataFrame(df).to_csv(train_record_save_filename, index= False)
+DataFrame(df).to_csv(PRS["csv_train_save"], index= False)
 print(">>> Train and saving - Done")
