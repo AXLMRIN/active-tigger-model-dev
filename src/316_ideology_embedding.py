@@ -20,6 +20,7 @@ from transformers.tokenization_utils_base import BatchEncoding
 # Native
 
 # Custom
+from toolbox import storage_options
 from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -35,7 +36,9 @@ with open("configs/316_ideology_sentence.json", "r") as file :
 
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-ds : Dataset = load_from_disk(PRS["filename_open_indexed"])
+ds : Dataset = Dataset.from_pandas(read_csv(
+    PRS["filename_open"], storage_options = storage_options()
+))
 
 LABEL : list[str] = list(set(ds["leaning"])); n_labels : int = len(LABEL)
 ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}

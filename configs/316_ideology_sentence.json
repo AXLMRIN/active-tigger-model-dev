@@ -1,6 +1,6 @@
 {
     "seed" : 42,
-    "filename_open" : "data/316_ideological_book_corpus/ibc.csv",
+    "filename_open" : "s3://axmorin-ensae/316/ibc.csv",
     "filename_open_indexed" : "data/316_ideological_book_corpus/ibc-index",
     "csv_train_save" : "models/316_Ideology/316_ideological_book_corpus-IdeologySentenceClassifier-train.csv",
     "model" : {
