@@ -37,7 +37,7 @@ with open("configs/316_ideology_sentence.json", "r") as file :
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ds : Dataset = Dataset.from_pandas(read_csv(
-    PRS["filename_open"], storage_options = storage_options()
+    PRS["filename_open"]#, storage_options = storage_options()
 )).with_format("torch")
 
 LABEL : list[str] = list(set(ds["leaning"])); n_labels : int = len(LABEL)
@@ -48,7 +48,7 @@ print("Categories : " + ", ".join([cat for cat in LABEL]),"\n")
 # TODELETE 
 print(("WARNING : you are only selecting a fraction of the real dataset for dev"
        "purposes."))
-ds = ds.select(range(0,100))
+ds = ds.select(range(0,10))
 # --------
 print(">>> Load Dataset - Done")
 # Preprocess - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
