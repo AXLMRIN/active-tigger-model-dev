@@ -3,11 +3,12 @@ This repository is used to develop models to be used in [active tigger](https://
 
 # Env
 ```
-conda create -n VENV python=3.11.11
+conda create -n VENV python=3.11
 pip install -q transformers datasets
 conda install pytorch
 pip install 'accelerate>=0.26.0'
 conda install s3fs
+conda install scikit-learn
 ```
 Si sur GPU : 
 ```
