@@ -87,4 +87,6 @@ def embedding_sentences(batch_of_rows : dict):
     )
     return batch_of_rows
 
-ds = ds.map(tokenizing_sentences, batched = True, batch_size = PRS["batch_size"])
+ds = ds.map(embedding_sentences, batched = True, batch_size = PRS["batch_size"])
+
+# Save the ds 
