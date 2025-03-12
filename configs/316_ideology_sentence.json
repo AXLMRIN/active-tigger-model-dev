@@ -1,11 +1,13 @@
 {
     "seed" : 42,
     "filename_open" : "data/316_ideological_book_corpus/ibc.csv",
+    "filename_open_indexed" : "data/316_ideological_book_corpus/ibc-index",
     "csv_train_save" : "models/316_Ideology/316_ideological_book_corpus-IdeologySentenceClassifier-train.csv",
     "model" : {
         "name" : "answerdotai/ModernBERT-base",
         "dim" : 768
     },
+    "batch_size" : 32,
     "n_epoch" : 2,
     "tokenizing" : {
         "padding" : "max_length",
@@ -14,7 +16,6 @@
         "return_tensors" : "pt"
     },
     "DataLoader" : {
-        "batch_size" : 32,
         "num_workers" : 0,
         "pin_memory" : true
     }
