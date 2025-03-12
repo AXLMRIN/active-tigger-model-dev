@@ -1,5 +1,5 @@
 # TODO Réaliser un bandeau
-
+DEV_MODE : bool = True
 # IMPORTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 # Third parties
 from datasets import load_from_disk, DatasetDict, Dataset
@@ -24,20 +24,21 @@ from toolbox import storage_options
 from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-att_implementation : str = "sdpa"
-# TODO Demander pour flash_attention_2
-device = "cuda" if gpu_available() else "cpu"
 float_dtype = float32
-
-# Load parameters saved as json #TODO is it really necessary ??
+# Static parameters
 import json
 with open("configs/316_ideology_sentence.json", "r") as file : 
     PRS : dict = json.load(file)
 
+# Dynamic parameters
+att_implementation : str = "sdpa"
+# TODO Demander pour flash_attention_2
+device = "cuda" if gpu_available() else "cpu"
+print(f"Running on {device}.")
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ds : Dataset = Dataset.from_pandas(read_csv(
-    PRS["filename_open"]#, storage_options = storage_options()
+    PRS["filename_open"], storage_options = storage_options()
 )).with_format("torch")
 
 LABEL : list[str] = list(set(ds["leaning"])); n_labels : int = len(LABEL)
@@ -45,10 +46,11 @@ ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}
 LABEL2ID : dict[str:int] = {cat:i for i,cat in enumerate(LABEL)}
 print("Categories : " + ", ".join([cat for cat in LABEL]),"\n")
 
-# TODELETE 
-print(("WARNING : you are only selecting a fraction of the real dataset for dev"
-       "purposes."))
-ds = ds.select(range(0,10))
+
+if DEV_MODE:
+    print(("WARNING : you are only selecting a fraction of the real dataset for dev"
+        "purposes."))
+    ds = ds.select(range(0,10))
 # --------
 print(">>> Load Dataset - Done")
 # Preprocess - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -78,6 +80,7 @@ def tokenizing_sentences(batch_of_rows : dict):
     batch_of_rows["input_ids"] = tokenized["input_ids"]
     return batch_of_rows
 ds = ds.map(tokenizing_sentences, batched = True, batch_size = PRS["batch_size"])
+print(">>> Tokenizing - Done")
 
 # Embed the sentences
 def embedding_sentences(batch_of_rows : dict):
@@ -89,6 +92,8 @@ def embedding_sentences(batch_of_rows : dict):
     return batch_of_rows
 
 ds = ds.map(embedding_sentences, batched = True, batch_size = PRS["batch_size"])
+print(">>> Embedding - Done")
 
 # Save the ds 
 ds.save_to_disk(PRS["filename_open_embedd"])
+print(">>> Saving - Done")
