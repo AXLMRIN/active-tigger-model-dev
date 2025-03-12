@@ -7,6 +7,7 @@ conda create -n VENV python=3.11.11
 pip install -q transformers datasets
 conda install pytorch
 pip install 'accelerate>=0.26.0'
+conda install s3fs
 ```
 Si sur GPU : 
 ```
