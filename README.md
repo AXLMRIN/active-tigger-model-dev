@@ -15,9 +15,4 @@ Si sur GPU :
 pip install -U flash_attn
 ```
 
-# Data
-```python
-import pandas as pd
-
-df = pd.read_parquet("hf://datasets/nateraw/rap-lyrics-v2/data/train-00000-of-00001-0d87a5bc980f4999.parquet")
-```
+CAREFUL, this is not running properly on some GPUs — only god knows why.
