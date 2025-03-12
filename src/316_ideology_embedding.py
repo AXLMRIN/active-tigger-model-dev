@@ -81,11 +81,14 @@ ds = ds.map(tokenizing_sentences, batched = True, batch_size = PRS["batch_size"]
 
 # Embed the sentences
 def embedding_sentences(batch_of_rows : dict):
+    # TODO faire sur plusieurs lignes
     batch_of_rows["embedding"] = base_model(**{
         "input_ids" : batch_of_rows["input_ids"].to(device),
         "attention_mask" : batch_of_rows["attention_mask"].to(device)
     }).last_hidden_state
     return batch_of_rows
 
-# Save the ds 
 ds = ds.map(embedding_sentences, batched = True, batch_size = PRS["batch_size"])
+
+# Save the ds 
+ds.save_to_disk(PRS["filename_open_embedd"])
