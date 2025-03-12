@@ -3,4 +3,4 @@ __pycache__
 *active_tigger_archive/
 .DS_Store
 .ipynb_checkpoints
-models/
+models/2025-03-04-bert-base-uncased
