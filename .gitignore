@@ -4,3 +4,4 @@ __pycache__
 .DS_Store
 .ipynb_checkpoints
 models/2025-03-04-bert-base-uncased
+data/*
