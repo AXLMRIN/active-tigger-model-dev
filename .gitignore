@@ -5,3 +5,4 @@ __pycache__
 .ipynb_checkpoints
 models/2025-03-04-bert-base-uncased
 data/*
+.vscode/
