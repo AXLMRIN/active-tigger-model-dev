@@ -97,5 +97,5 @@ ds = ds.map(embedding_sentences, batched = True, batch_size = PRS["batch_size"])
 print(">>> Embedding - Done")
 
 # Save the ds 
-ds.save_to_disk(PRS["filename_open_embedd"])
+ds.save_to_disk(PRS["filename_open_embed"])
 print(">>> Saving - Done")
