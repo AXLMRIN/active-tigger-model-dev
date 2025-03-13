@@ -25,7 +25,7 @@ from toolbox import (
     get_label_label2id_id2label
 )
 from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
-
+from toolbox.Trainer import Trainer
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 device = "cuda" if gpu_available() else "cpu"
 float_dtype = float32
@@ -51,3 +51,20 @@ isc = IdeologySentenceClassifier(
     device = device, dtype = float_dtype)
 print(isc)
 print(">>> Load custom classifier - Done\n")
+
+# Load custom trainer and train - - - - - - - - - - - - - - - - - - - - - - - - 
+trainer = Trainer(isc,
+        optimizer=Adam(isc.parameters(), **PRS["optimizer"]),
+        loss_fn = BCEWithLogitsLoss(),
+        dev_mode = True
+)
+train_iterable : DataLoader = DataLoader(ds["train"],
+                            batch_size = PRS["batch_size"], **PRS["DataLoader"])
+validation_iterable : DataLoader = DataLoader(ds["train"],
+                            batch_size = PRS["batch_size"], **PRS["DataLoader"])
+
+print(">>> Start training\n")
+trainer.train(train_iterable,validation_iterable,PRS)
+print(">>> Training - Done\n")
+
+

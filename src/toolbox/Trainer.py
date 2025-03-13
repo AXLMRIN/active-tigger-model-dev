@@ -1,11 +1,13 @@
 from time import time
 import pandas as pd
-from torch import DataLoader, Tensor, sigmoid, no_grad
+from torch import Tensor, sigmoid, no_grad
 from torch.cuda import synchronize as torch_synchronize
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers.tokenization_utils_base import BatchEncoding
 
-from .general import create_target, classifier_metrics
+from .general import create_target
+from .metrics import classifier_metrics
 class Trainer:
     def __init__(self, model, optimizer, loss_fn, dev_mode : bool = True):
         self.__model = model
@@ -18,17 +20,21 @@ class Trainer:
         }
 
     def loop(self, batch_iterable : DataLoader, train_mode : bool) -> None :
+        mode : str = "train" if train_mode else "validation"
         iteration_start : float = time()
         sum_loss : float = 0.
         metrics_averaged : dict[str:float] = {
             'f1': 0.,'roc_auc': 0.,'accuracy' : 0.
         }
         # batch_iterable is on CPU
-        for batch in tqdm(batch_iterable):
+        for batch in tqdm(batch_iterable,mode):
             # Prepare the loop
             if train_mode: self.__optimizer.zero_grad()
 
             # Proceed to the classification
+            # batch["embedding"].shape = (batch_size, entry_length, model_embeding dimension)
+            embeddings = batch["embedding"][:,0,:].\
+                            view(-1, self.__model.in_features)
             logits : Tensor = self.__model(embeddings) # (batch_size, n_labels) ON DEVICE
             probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
             
@@ -37,6 +43,7 @@ class Trainer:
                 probabilities,
                 create_target(
                     batch["leaning"], 
+                    n_labels = self.__model.out_features,
                     local_device = self.__model.device, 
                     dtype = self.__model.dtype
                 )
@@ -45,8 +52,12 @@ class Trainer:
 
             # Evaluate the metrics ON CPU
             metrics : dict[str:float] = classifier_metrics(
-                create_target(batch["leaning"], local_device = "cpu"),
-                probabilities.detach().cpu())
+                create_target(
+                    batch["leaning"],
+                    n_labels = self.__model.out_features,
+                    local_device = "cpu"
+                ),probabilities.detach().cpu()
+            )
             # Save the metrics
             for key in metrics : metrics_averaged[key] += metrics[key]
 
@@ -58,7 +69,7 @@ class Trainer:
 
             if self.dev_mode : break
         
-        mode : str = "train" if train_mode else "validation"
+        
         self.history[mode].append({
             "iteration_time" : time() - iteration_start,
             "loss" : sum_loss / len(batch_iterable),
@@ -71,15 +82,15 @@ class Trainer:
     def train(self,train_iterable : DataLoader, validation_iterable : DataLoader,
               PRS : dict) -> None:
         for epoch in range(PRS["n_epoch"]):
-            print(f"Epoch : {epoch} / {PRS["n_epoch"]}")
+            print(f"Epoch : {epoch} / {PRS['n_epoch']}")
             self.__model.train() # training mode
             self.loop(train_iterable, train_mode = True) 
-            torch_synchronize()
+            if self.__model.device == "cuda": torch_synchronize()
 
             self.__model.eval() # evaluation mode
             with no_grad():
                 self.loop(validation_iterable, train_mode = False)
-                torch_synchronize()
+                if self.__model.device == "cuda": torch_synchronize()
 
     def save_history(self, filename : str) -> None:
         new_df = []
