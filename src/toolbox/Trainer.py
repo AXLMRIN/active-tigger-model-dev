@@ -71,10 +71,7 @@ class Trainer:
 
             # optimizer step
             if train_mode: self.__optimizer.step()
-
-            if self.dev_mode : break
-        
-        
+                
         self.history[mode].append({
             "iteration_time" : time() - iteration_start,
             "loss" : sum_loss / len(batch_iterable),
