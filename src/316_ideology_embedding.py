@@ -84,11 +84,12 @@ print(">>> Tokenizing - Done")
 
 # Embed the sentences
 def embedding_sentences(batch_of_rows : dict):
-    # TODO faire sur plusieurs lignes
-    batch_of_rows["embedding"] = base_model(**{
-        "input_ids" : batch_of_rows["input_ids"].to(device),
-        "attention_mask" : batch_of_rows["attention_mask"].to(device)
-    }).last_hidden_state
+    input_ids = batch_of_rows["input_ids"].to(device)
+    print(type(input_ids))
+    attention_mask = batch_of_rows["attention_mask"].to(device)
+    batch_of_rows["embedding"] = base_model(input_ids = input_ids, 
+                                            attention_mask = attention_mask).\
+                                            last_hidden_state
     return batch_of_rows
 
 ds = ds.map(embedding_sentences, batched = True, batch_size = PRS["batch_size"])
