@@ -66,5 +66,6 @@ validation_iterable : DataLoader = DataLoader(ds["train"],
 print(">>> Start training\n")
 trainer.train(train_iterable,validation_iterable,PRS)
 print(">>> Training - Done\n")
-
+trainer.save_history(PRS["csv_train_save"])
+print(">>> Saving - Done\n")
 
