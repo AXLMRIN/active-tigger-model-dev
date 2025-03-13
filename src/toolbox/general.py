@@ -4,6 +4,9 @@
 # Third parties
 from datasets import DatasetDict, Dataset
 
+# Native
+import os
+
 # FUNCTIONS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 def storage_options():
     return {
@@ -49,7 +52,7 @@ def split_test_train_valid(dataset : Dataset, proportion_train : float = 0.7,
         "validation" : ds_temp2["test"],
         "test" : ds_temp["test"],
     })
-    
+
     if print_proportions : print_datasetdict_proportions(ds)
     return ds
 
