@@ -75,11 +75,11 @@ def get_label_label2id_id2label(ds, print_labels : bool = False):
     if print_labels : print("Categories : " + ", ".join([cat for cat in LABEL]))
     return LABEL, n_labels, ID2LABEL, LABEL2ID
 
-def create_target(batch_leaning : Tensor, n_labels : int
+def create_target(batch_leaning : Tensor, n_labels : int,
                   local_device : str = "cpu", dtype = bool) -> Tensor:
     return Tensor(
-            [
-                [j == logit for j in range(n_labels)]
-                for logit in batch_leaning.to(local_device, non_blocking=True)
-            ]
-        ).to(device = local_device, dtype = dtype, non_blocking=True)   
+        [
+            [j == logit for j in range(n_labels)]
+            for logit in batch_leaning.to(local_device, non_blocking=True)
+        ]
+    ).to(device = local_device, dtype = dtype, non_blocking=True)   
