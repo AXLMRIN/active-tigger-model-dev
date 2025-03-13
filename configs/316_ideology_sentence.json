@@ -10,7 +10,7 @@
         "dim" : 768
     },
     "batch_size" : 32,
-    "n_epoch" : 2,
+    "n_epoch" : 40,
     "tokenizing" : {
         "padding" : "max_length",
         "truncation" : true,
