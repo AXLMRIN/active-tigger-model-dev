@@ -1,4 +1,5 @@
 {
+    "DEV_MODE" : true, 
     "seed" : 42,
     "filename_open" : "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data/ibc.csv", 
     "filename_open_indexed" : "data/316_ideological_book_corpus/ibc-index",

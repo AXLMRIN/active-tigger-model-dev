@@ -1,5 +1,4 @@
 # TODO Réaliser un bandeau
-DEV_MODE : bool = True
 # IMPORTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 # Third parties
 from datasets import load_from_disk, DatasetDict, Dataset
@@ -48,7 +47,7 @@ LABEL2ID : dict[str:int] = {cat:i for i,cat in enumerate(LABEL)}
 print("Categories : " + ", ".join([cat for cat in LABEL]),"\n")
 
 
-if DEV_MODE:
+if PRS["DEV_MODE"]:
     print(("WARNING : you are only selecting a fraction of the real dataset for dev"
         "purposes."))
     ds = ds.select(range(0,10))
