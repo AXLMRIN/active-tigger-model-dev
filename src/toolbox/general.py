@@ -68,7 +68,9 @@ def print_datasetdict_proportions(ds : DatasetDict):
     print(f'| {"Test":<15}|{len(ds["test"]):^10}|{proportion("test"):^14}| ')
 
 def get_label_label2id_id2label(ds, print_labels : bool = False):
-    LABEL : list[str] = list(set(ds["leaning"])); 
+    # because we are saving data as tensor, the list(set()) returns weird result 
+    # so we need to convert the tensor to a list
+    LABEL : list[str] = list(set(ds["leaning"].tolist())); 
     n_labels : int = len(LABEL)
     ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}
     LABEL2ID : dict[str:int] = {cat:i for i,cat in enumerate(LABEL)}
