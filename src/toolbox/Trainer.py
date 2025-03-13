@@ -27,7 +27,7 @@ class Trainer:
             'f1': 0.,'roc_auc': 0.,'accuracy' : 0.
         }
         # batch_iterable is on CPU
-        for batch in tqdm(batch_iterable,mode):
+        for batch in tqdm(batch_iterable,desc = mode, position = 1, leave = False):
             # Prepare the loop
             if train_mode: self.__optimizer.zero_grad()
 
@@ -83,8 +83,7 @@ class Trainer:
     
     def train(self,train_iterable : DataLoader, validation_iterable : DataLoader,
               PRS : dict) -> None:
-        for epoch in range(PRS["n_epoch"]):
-            print(f"Epoch : {epoch} / {PRS['n_epoch']}")
+        for epoch in tqdm(range(PRS["n_epoch"]), desc = "Epoch", position = 0):
             self.__model.train() # training mode
             self.loop(train_iterable, train_mode = True) 
             if self.__model.device == "cuda": torch_synchronize()
