@@ -1,5 +1,4 @@
 # TODO Réaliser un bandeau
-DEV_MODE : bool = True
 # IMPORTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 # Third parties
 from datasets import load_from_disk, DatasetDict, Dataset
@@ -21,7 +20,7 @@ from transformers.tokenization_utils_base import BatchEncoding
 import json
 
 # Custom
-from toolbox import storage_options
+from toolbox import storage_options, split_test_train_valid
 from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -33,3 +32,9 @@ with open("configs/316_ideology_sentence.json", "r") as file :
     PRS : dict = json.load(file)
 
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+ds_embed : Dataset = load_from_disk(PRS["filename_open_embed"])
+# keys : ['sentence', 'leaning', 'attention_mask', 'input_ids', 'embedding']
+
+# >>> Split dataframe :
+ds : DatasetDict = split_test_train_valid(ds_embed, print_proportions = True) 
+print(">>> Load Dataset - Done")
