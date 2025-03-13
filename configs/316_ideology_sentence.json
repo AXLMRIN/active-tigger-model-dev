@@ -4,7 +4,7 @@
     "filename_open" : "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data/ibc.csv", 
     "filename_open_indexed" : "data/316_ideological_book_corpus/ibc-index",
     "filename_open_embed" : "data/316_ideological_book_corpus/ibc-embedd",
-    "csv_train_save" : "models/316_Ideology/316_ideological_book_corpus-IdeologySentenceClassifier-train.csv",
+    "csv_train_save" : "models/316_ideological_book_corpus-IdeologySentenceClassifier-train.csv",
     "model" : {
         "name" : "answerdotai/ModernBERT-base",
         "dim" : 768
