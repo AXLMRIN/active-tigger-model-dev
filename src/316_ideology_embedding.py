@@ -18,6 +18,7 @@ from transformers import AutoTokenizer, ModernBertModel
 from transformers.modeling_outputs import BaseModelOutput
 from transformers.tokenization_utils_base import BatchEncoding
 # Native
+import json
 
 # Custom
 from toolbox import storage_options
@@ -26,7 +27,7 @@ from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 float_dtype = float32
 # Static parameters
-import json
+
 with open("configs/316_ideology_sentence.json", "r") as file : 
     PRS : dict = json.load(file)
 
