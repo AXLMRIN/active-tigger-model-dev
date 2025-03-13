@@ -20,7 +20,10 @@ from transformers.tokenization_utils_base import BatchEncoding
 import json
 
 # Custom
-from toolbox import storage_options, split_test_train_valid
+from toolbox import (
+    storage_options, split_test_train_valid,
+    get_label_label2id_id2label
+)
 from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -32,9 +35,19 @@ with open("configs/316_ideology_sentence.json", "r") as file :
     PRS : dict = json.load(file)
 
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-ds_embed : Dataset = load_from_disk(PRS["filename_open_embed"])
-# keys : ['sentence', 'leaning', 'attention_mask', 'input_ids', 'embedding']
+ds_embed : Dataset = load_from_disk(
+    PRS["filename_open_embed"],storage_options = storage_options()
+) # keys : ['sentence', 'leaning', 'attention_mask', 'input_ids', 'embedding']
+LABEL, n_labels, ID2LABEL, LABEL2ID = get_label_label2id_id2label(ds_embed)
 
 # >>> Split dataframe :
 ds : DatasetDict = split_test_train_valid(ds_embed, print_proportions = True) 
-print(">>> Load Dataset - Done")
+print(">>> Load Dataset - Done\n")
+
+# Load custom classifier - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+isc = IdeologySentenceClassifier(
+    in_features = PRS["model"]["dim"],out_features = n_labels, 
+    hidden_layers = None, hidden_layers_size = None,
+    device = device, dtype = float_dtype)
+print(isc)
+print(">>> Load custom classifier - Done\n")

@@ -3,6 +3,7 @@
 # IMPORTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 # Third parties
 from datasets import DatasetDict, Dataset
+from torch import Tensor
 
 # Native
 import os
@@ -65,3 +66,20 @@ def print_datasetdict_proportions(ds : DatasetDict):
     print(f'| {"Train":<15}|{len(ds["train"]):^10}|{proportion("train"):^14}|')
     print(f'| {"Validation":<15}|{len(ds["validation"]):^10}|{proportion("validation"):^14}|')
     print(f'| {"Test":<15}|{len(ds["test"]):^10}|{proportion("test"):^14}| ')
+
+def get_label_label2id_id2label(ds, print_labels : bool = False):
+    LABEL : list[str] = list(set(ds["leaning"])); 
+    n_labels : int = len(LABEL)
+    ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}
+    LABEL2ID : dict[str:int] = {cat:i for i,cat in enumerate(LABEL)}
+    if print_labels : print("Categories : " + ", ".join([cat for cat in LABEL]))
+    return LABEL, n_labels, ID2LABEL, LABEL2ID
+
+def create_target(batch_leaning : Tensor, n_labels : int
+                  local_device : str = "cpu", dtype = bool) -> Tensor:
+    return Tensor(
+            [
+                [j == logit for j in range(n_labels)]
+                for logit in batch_leaning.to(local_device, non_blocking=True)
+            ]
+        ).to(device = local_device, dtype = dtype, non_blocking=True)   
