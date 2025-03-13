@@ -34,7 +34,12 @@ class Trainer:
             # Proceed to the classification
             # batch["embedding"].shape = (batch_size, entry_length, model_embeding dimension)
             embeddings = batch["embedding"][:,0,:].\
-                            view(-1, self.__model.in_features)
+                            view(-1, self.__model.in_features).\
+                            to(
+                                device = self.__model.device, 
+                                dtype = self.__model.dtype,
+                                non_blocking=True
+                            )
             logits : Tensor = self.__model(embeddings) # (batch_size, n_labels) ON DEVICE
             probabilities : Tensor = sigmoid(logits) # (batch_size, n_labels) ON DEVICE
             
