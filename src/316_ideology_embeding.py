@@ -86,7 +86,6 @@ print(">>> Tokenizing - Done")
 # Embed the sentences
 def embedding_sentences(batch_of_rows : dict):
     input_ids : Tensor = batch_of_rows["input_ids"].to(device)
-    print(type(input_ids))
     attention_mask : Tensor = batch_of_rows["attention_mask"].to(device)
     batch_of_rows["embedding"] = base_model(input_ids = input_ids, 
                                             attention_mask = attention_mask).\
