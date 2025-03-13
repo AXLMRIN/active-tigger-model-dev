@@ -12,7 +12,7 @@ class IdeologySentenceClassifier(nn.Module):
         self.__out_features : int = out_features
         self.__hidden_layers : int|None = hidden_layers
         self.__hidden_layers_size : int|None = hidden_layers_size
-        self.__device : str = device
+        self.device : str = device
         self.__dtype : torch_dtype = dtype
 
         self.__with_hidden_layers = isinstance(self.__hidden_layers, int) &\
@@ -21,16 +21,16 @@ class IdeologySentenceClassifier(nn.Module):
         if self.__with_hidden_layers : 
             self.FirstLayer = nn.Linear(in_features=self.__in_features, 
                 out_features= self.__hidden_layers_size, bias = True, 
-                device = self.__device, dtype = self.__dtype)
+                device = self.device, dtype = self.__dtype)
             self.HiddenLayers = [
                 nn.Linear(in_features = self.__hidden_layers_size, 
                     out_features= self.__hidden_layers_size, bias = True, 
-                    device = self.__device, dtype = self.__dtype
+                    device = self.device, dtype = self.__dtype
                 ) for _ in range(self.__hidden_layers)
             ]
             self.LastLayer = nn.Linear(in_features = self.__hidden_layers_size, 
                 out_features= self.__out_features, bias = True, 
-                device = self.__device, dtype = self.__dtype)
+                device = self.device, dtype = self.__dtype)
             
             self.__n_parameters : int = 0 +\
                 (self.__in_features + 1) * self.__hidden_layers_size +\
@@ -41,7 +41,7 @@ class IdeologySentenceClassifier(nn.Module):
         else : 
             self.FirstLayer = nn.Linear(in_features=self.__in_features, 
                 out_features= self.__out_features, bias = True, 
-                device = self.__device, dtype = self.__dtype)
+                device = self.device, dtype = self.__dtype)
             
             self.__n_parameters : int = (self.__in_features + 1) * self.__out_features
 
@@ -57,7 +57,7 @@ class IdeologySentenceClassifier(nn.Module):
     def __str__(self) -> str : 
         return (
             f"IdeologySentenceClassifier(nn.Module) :\n"
-            f"On {self.__device}, type : {self.__dtype}\n"
+            f"On {self.device}, type : {self.__dtype}\n"
             f"\t- dimension of  input : {self.__in_features}\n"
             f"\t- dimension of output : {self.__out_features}\n"
             f"\t- with {self.__hidden_layers} hidden layers of dimension {self.__hidden_layers_size}\n"
