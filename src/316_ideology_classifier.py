@@ -47,7 +47,7 @@ print(">>> Load Dataset - Done\n")
 # Load custom classifier - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 isc = IdeologySentenceClassifier(
     in_features = PRS["model"]["dim"],out_features = n_labels, 
-    hidden_layers = 3, hidden_layers_size = 20,
+    hidden_layers = 3, hidden_layers_size = [PRS["model"]["dim"] // 2 , PRS["model"]["dim"] // 4],
     device = device, dtype = float_dtype)
 print(isc)
 print(">>> Load custom classifier - Done\n")
