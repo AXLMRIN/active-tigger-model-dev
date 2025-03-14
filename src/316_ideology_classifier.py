@@ -31,9 +31,7 @@ device = "cuda" if gpu_available() else "cpu"
 float_dtype = float32
 
 
-with open("configs/316_ideology_sentence.json", "r") as file : 
-    PRS : dict = json.load(file)
-
+from configs import c316; PRS = c316
 # Load Dataset - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 ds_embed : Dataset = load_from_disk(
     PRS["filename_open_embed"],storage_options = storage_options()

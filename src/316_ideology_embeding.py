@@ -27,8 +27,7 @@ from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
 float_dtype = float32
 # Static parameters
 
-with open("configs/316_ideology_sentence.json", "r") as file : 
-    PRS : dict = json.load(file)
+from configs import c316; PRS = c316
 
 # Dynamic parameters
 att_implementation : str = "sdpa"
