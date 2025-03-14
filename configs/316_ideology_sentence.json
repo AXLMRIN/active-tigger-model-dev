@@ -9,7 +9,7 @@
         "name" : "answerdotai/ModernBERT-base",
         "dim" : 768
     },
-    "batch_size" : 32,
+    "batch_size" : 64,
     "n_epoch" : 40,
     "tokenizing" : {
         "padding" : "max_length",
