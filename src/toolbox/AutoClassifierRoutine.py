@@ -31,7 +31,7 @@ class AutoClassifierRoutine:
             print("Dataset loaded locally")
 
         # Retrieve the labels
-        self.label : list[str] = list(set(self.ds["leaning"])); 
+        self.label : list[str] = list(set(self.ds[self.config.label_col])); 
         self.n_labels : int = len(self.label)
         self.id2label : dict[int:str] = {i : cat for i,cat in enumerate(self.label)}
         self.label2id : dict[str:int] = {cat:i for i,cat in enumerate(self.label)}
