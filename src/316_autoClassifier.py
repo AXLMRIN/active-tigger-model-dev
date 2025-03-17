@@ -79,6 +79,10 @@ model = AutoModelForSequenceClassification.from_pretrained(
     id2label = ID2LABEL, label2id = LABEL2ID
 ).to(device)
 
+for name, param in model.named_parameters():
+    if name.startswith("classifier") : param.requires_grad = True
+    else : param.requires_grad = False
+
 # Train the model - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 batch_size = 8
 metric_name = "f1"
@@ -110,6 +114,7 @@ trainer = Trainer(model, training_args,
                   compute_metrics = compute_metrics
 )
 
+
 print(">>> Start training")
-trainer.train()
+# trainer.train()
 print(">>> Training - Done")
