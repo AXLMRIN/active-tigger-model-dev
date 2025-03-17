@@ -13,6 +13,9 @@ class AutoClassifierRoutineConfig:
         batch_size : int = 32, 
         only_train_classifier : bool = False, 
         dev_mode : bool = False ) -> None:
+        """
+        Config for AutoClassifierRoutine
+        """
         # Routine functions related : 
         self.dev_mode = dev_mode
         self.only_train_classifier = only_train_classifier
@@ -23,9 +26,11 @@ class AutoClassifierRoutineConfig:
         if "open_local" in files: 
             self.filename_open_local : str = files["open_local"]
         else : self.filename_open_local = None
-        
+
         self.sentence_col : str = sentence_col
         self.label_col : str = label_col
+        # Batch related
+        self.batch_size : int = batch_size
         # Model Related
         self.model_name = "answerdotai/ModernBERT-base"
         self.device : str = "cuda" if gpu_available() else "cpu"
@@ -43,8 +48,6 @@ class AutoClassifierRoutineConfig:
             per_device_eval_batch_size=self.batch_size,
             weight_decay=0.01,
         ) # TODO continue digging the parameters
-        # Batch related
-        self.batch_size : int = batch_size
         # Tokenizer related
         self.tokenizer_settings : dict = {
             "padding" : "max_length",
