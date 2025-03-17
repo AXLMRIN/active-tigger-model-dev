@@ -12,6 +12,7 @@ class AutoClassifierRoutineConfig:
         sentence_col : str, 
         label_col : str, 
         batch_size : int = 32, 
+        num_train_epochs : int = 10,
         only_train_classifier : bool = False, 
         dev_mode : bool = False,
         **kwargs) -> None:
@@ -42,7 +43,7 @@ class AutoClassifierRoutineConfig:
             # Parameters that are customisable
             "output_dir" : files["output_dir"],
             "save_strategy" : "no" if self.dev_mode else "epoch",
-            "num_train_epochs" : 1 if self.dev_mode else 10,
+            "num_train_epochs" : 1 if self.dev_mode else num_train_epochs,
             # Fixed parameters
             "overwrite_output_dir" : True,
             "eval_strategy" : "epoch",
