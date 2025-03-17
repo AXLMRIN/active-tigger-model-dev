@@ -107,6 +107,8 @@ class AutoClassifierRoutine:
         print(">>> Model loading - Done")
     
     def __subsetting_ds(self) -> None:
+        print(("WARNING for dev purposes you are only using a subset of the "
+               "dataset you loaded"))
         self.encoded_dataset["train"] = self.encoded_dataset["train"].\
                                             select(range(0,20))
         self.encoded_dataset["validation"] = self.encoded_dataset["validation"].\
