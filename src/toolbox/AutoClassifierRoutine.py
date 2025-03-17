@@ -104,6 +104,7 @@ class AutoClassifierRoutine:
             for name, param in self.model.named_parameters():
                 if name.startswith("classifier") : param.requires_grad = True
                 else : param.requires_grad = False
+        print(">>> Model loading - Done")
     
     def __subsetting_ds(self) -> None:
         self.encoded_dataset["train"] = self.encoded_dataset["train"].\
@@ -117,7 +118,7 @@ class AutoClassifierRoutine:
             self.config.training_args,
             train_dataset = self.encoded_dataset["train"],
             eval_dataset = self.encoded_dataset["validation"],
-            preprocessing_class = self.tokenizer,
+            processing_class = self.tokenizer,
             compute_metrics = compute_metrics
         )
         trainer.train()
@@ -128,5 +129,6 @@ class AutoClassifierRoutine:
         self.split_ds()
         self.tokenize_data()
         if self.config.dev_mode : self.__subsetting_ds()
+        self.load_model()
         self.train()
 
