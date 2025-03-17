@@ -1,6 +1,7 @@
 from toolbox import (
     AutoClassifierRoutineConfig, AutoClassifierRoutine
 )
+from mergedeep import merge
 
 args = {
     "files" : {
