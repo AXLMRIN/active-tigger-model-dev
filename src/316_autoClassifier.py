@@ -97,7 +97,7 @@ encoded_dataset["validation"] = encoded_dataset["validation"].select(range(0,20)
 trainer = Trainer(model, training_args,
                   train_dataset = encoded_dataset["train"],
                   eval_dataset = encoded_dataset["validation"],
-                  tokenizer = tokenizer,
+                  processing_class = tokenizer,
                   compute_metrics = compute_metrics
 )
 
