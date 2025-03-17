@@ -36,7 +36,7 @@ ds : Dataset = Dataset.from_pandas(read_csv(
         'secret': os.environ["AWS_SECRET_ACCESS_KEY"],
         'token': os.environ["AWS_SESSION_TOKEN"]
     }
-)).with_format("torch")
+))
 
 LABEL : list[str] = list(set(ds["leaning"])); n_labels : int = len(LABEL)
 ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}
