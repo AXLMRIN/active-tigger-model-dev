@@ -70,7 +70,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
     "answerdotai/ModernBERT-base",
     problem_type = "multi_label_classification", num_labels = len(LABEL),
     id2label = ID2LABEL, label2id = LABEL2ID
-)
+).to(device)
 
 # Train the model - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 batch_size = 8
