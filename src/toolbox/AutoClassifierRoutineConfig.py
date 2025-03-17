@@ -17,8 +17,13 @@ class AutoClassifierRoutineConfig:
         self.dev_mode = dev_mode
         self.only_train_classifier = only_train_classifier
         # Dataset related
-        self.filename_open_s3 : str = "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data/ibc.csv", 
-        self.filename_open_local : str = "data/316_ideological_book_corpus/ibc.csv"
+        if "open_s3" in files: 
+            self.filename_open_s3 : str = files["open_s3"]
+        else: self.filename_open_s3 = None
+        if "open_local" in files: 
+            self.filename_open_local : str = files["open_local"]
+        else : self.filename_open_local = None
+        
         self.sentence_col : str = sentence_col
         self.label_col : str = label_col
         # Model Related

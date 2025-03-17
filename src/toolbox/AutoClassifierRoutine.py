@@ -25,7 +25,9 @@ class AutoClassifierRoutine:
             ))
             print("Dataset loaded with s3")
         except:
-            self.ds : Dataset = Dataset.from_pandas(read_csv(config.filename_open_local))
+            self.ds : Dataset = Dataset.from_pandas(read_csv(
+                self.config.filename_open_local
+            ))
             print("Dataset loaded locally")
 
         # Retrieve the labels
@@ -119,11 +121,12 @@ class AutoClassifierRoutine:
             compute_metrics = compute_metrics
         )
         trainer.train()
-        
+
     def run(self):
         self.open_file()
         self.preprocess_data()
         self.split_ds()
         self.tokenize_data()
         if self.config.dev_mode : self.__subsetting_ds()
+        self.train()
 
