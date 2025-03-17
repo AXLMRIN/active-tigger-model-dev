@@ -1,5 +1,6 @@
 from datasets import Dataset
 from pandas import read_csv
+import torch
 from torch import float32
 from torch.cuda import is_available as gpu_available
 from transformers import (
@@ -24,6 +25,8 @@ att_implementation : str = "sdpa"
 # TODO Demander pour flash_attention_2
 device = "cuda" if gpu_available() else "cpu"
 print(f"Running on {device}.")
+
+if device == "cuda" : torch.set_float32_matmul_precision('high')
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 ds : Dataset = Dataset.from_pandas(read_csv(
     "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data/ibc.csv", 
