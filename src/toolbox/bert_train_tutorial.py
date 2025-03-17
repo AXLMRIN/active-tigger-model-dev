@@ -8,11 +8,12 @@ from transformers.tokenization_utils_base import BatchEncoding
 from transformers.models.bert.tokenization_bert_fast import BertTokenizerFast
 
 def preprocess_data(batch_of_rows : LazyBatch, tokenizer : BertTokenizerFast,
-         labels : list[int], label2id : dict[str:int]) -> BatchEncoding:
+         labels : list[int], label2id : dict[str:int],
+         sentence_column : str = "Tweet",) -> BatchEncoding:
     # Takes in a batch of rows (as a : LazyBatch ~ dataframe ish) 
     
     # collect the text and tokenize it 
-    text = batch_of_rows["Tweet"]
+    text = batch_of_rows[sentence_column]
     encoding : BatchEncoding = tokenizer(
         text, padding = "max_length", truncation = True, max_length = 128 
     )
