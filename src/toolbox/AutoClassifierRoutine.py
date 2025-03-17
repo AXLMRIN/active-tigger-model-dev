@@ -99,16 +99,24 @@ class AutoClassifierRoutine:
         ).to(self.config.device)
 
         if self.config.only_train_classifier : 
-            print(("WARNING : You are only training the classifier, the embedding"
-                   "model is frozen"))
+            print(("\n"
+                "=============\n"
+                "WARNING : You are only training the classifier, the embedding"
+                "model is frozen\n"
+                "=============\n"
+            ))
             for name, param in self.model.named_parameters():
                 if name.startswith("classifier") : param.requires_grad = True
                 else : param.requires_grad = False
         print(">>> Model loading - Done")
     
     def __subsetting_ds(self) -> None:
-        print(("WARNING for dev purposes you are only using a subset of the "
-               "dataset you loaded"))
+        print(("\n"
+            "=============\n"
+            "WARNING for dev purposes you are only using a subset of the "
+            "dataset you loaded\n"
+            "=============\n"
+        ))
         self.encoded_dataset["train"] = self.encoded_dataset["train"].\
                                             select(range(0,20))
         self.encoded_dataset["validation"] = self.encoded_dataset["validation"].\
