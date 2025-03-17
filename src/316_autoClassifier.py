@@ -78,7 +78,9 @@ model = AutoModelForSequenceClassification.from_pretrained(
     problem_type = "multi_label_classification", num_labels = len(LABEL),
     id2label = ID2LABEL, label2id = LABEL2ID
 ).to(device)
-
+print("="*50)
+print(model.device)
+print("="*50)
 # Train the model - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 batch_size = 8
 metric_name = "f1"
