@@ -25,7 +25,7 @@ file_args = {
         "label_col" : "Stance",
         "files" : {
             "open_local" : "data/319_semeval_stance/semeval_stance.csv",
-            "open_s3" : "s3/projet-datalab-axel-morin/model_benchmarking/319_stance/data.csv", 
+            "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/319_stance/data.csv", 
             "output_dir" : "2025-03-17-autoClassifier-test-319"
         }
     },
@@ -34,7 +34,7 @@ file_args = {
         "label_col" : "bias_text",
         "files" : {
             "open_local" : "data/333_media_ideology/media_ideology.csv",
-            "open_s3" : "s3/projet-datalab-axel-morin/model_benchmarking/333_ideology/data.csv", 
+            "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/333_ideology/data.csv", 
             "output_dir" : "2025-03-17-autoClassifier-test-333"
         }
     },
@@ -43,7 +43,7 @@ file_args = {
         "label_col" : "TropesHuman",
         "files" : {
             "open_local" : "data/334_tropes/tropes.csv",
-            "open_s3" : "s3/projet-datalab-axel-morin/model_benchmarking/334_roles/data.csv", 
+            "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/334_roles/data.csv", 
             "output_dir" : "2025-03-17-autoClassifier-test-334"
         }
     }
