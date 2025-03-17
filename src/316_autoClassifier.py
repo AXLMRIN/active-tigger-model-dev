@@ -28,15 +28,22 @@ print(f"Running on {device}.")
 
 if device == "cuda" : torch.set_float32_matmul_precision('high')
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
-ds : Dataset = Dataset.from_pandas(read_csv(
-    "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data/ibc.csv", 
-    storage_options = {
-        'client_kwargs': {'endpoint_url': 'https://minio-simple.lab.groupe-genes.fr'},
-        'key': os.environ["AWS_ACCESS_KEY_ID"],
-        'secret': os.environ["AWS_SECRET_ACCESS_KEY"],
-        'token': os.environ["AWS_SESSION_TOKEN"]
-    }
-))
+try :
+    ds : Dataset = Dataset.from_pandas(read_csv(
+        "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data/ibc.csv", 
+        storage_options = {
+            'client_kwargs': {'endpoint_url': 'https://minio-simple.lab.groupe-genes.fr'},
+            'key': os.environ["AWS_ACCESS_KEY_ID"],
+            'secret': os.environ["AWS_SECRET_ACCESS_KEY"],
+            'token': os.environ["AWS_SESSION_TOKEN"]
+        }
+    ))
+    print("ds loaded with s3")
+except:
+    ds : Dataset = Dataset.from_pandas(read_csv(
+        "data/316_ideological_book_corpus/ibc.csv"
+    ))
+    print("ds loaded on local")
 
 LABEL : list[str] = list(set(ds["leaning"])); n_labels : int = len(LABEL)
 ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}
