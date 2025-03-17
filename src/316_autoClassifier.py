@@ -116,5 +116,5 @@ trainer = Trainer(model, training_args,
 
 
 print(">>> Start training")
-# trainer.train()
+trainer.train()
 print(">>> Training - Done")
