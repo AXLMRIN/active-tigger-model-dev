@@ -13,7 +13,7 @@ if __name__ == "__main__" :
     model_name = "bert-base-uncased" # FIXME
     dataset = load_dataset("csv", data_files = {
         "train" : "data/bert_train_tuto/train.csv",
-        "test" : "data/bert_train_tuto/test.csv",
+        "test" : "data/bert_train_tuto/t_est.csv",
         "validation" : "data/bert_train_tuto/validation.csv"
     })
 
@@ -42,7 +42,7 @@ if __name__ == "__main__" :
         learning_rate=2e-5,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
-        num_train_epochs=5,
+        num_train_epochs=1,
         weight_decay=0.01,
         load_best_model_at_end=True,
         metric_for_best_model=metric_name,
