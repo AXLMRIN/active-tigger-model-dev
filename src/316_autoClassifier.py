@@ -12,6 +12,7 @@ from configs import c316; PRS = c316
 from toolbox.bert_train_tutorial import (
     preprocess_data, compute_metrics
 )
+import os
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 float_dtype = float32
 # Static parameters
@@ -24,7 +25,15 @@ att_implementation : str = "sdpa"
 device = "cuda" if gpu_available() else "cpu"
 print(f"Running on {device}.")
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
-ds : Dataset = Dataset.from_pandas(read_csv("data/316_ideological_book_corpus/ibc.csv"))
+ds : Dataset = Dataset.from_pandas(read_csv(
+    "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data/ibc.csv", 
+    storage_options = {
+        'client_kwargs': {'endpoint_url': 'https://minio-simple.lab.groupe-genes.fr'},
+        'key': os.environ["AWS_ACCESS_KEY_ID"],
+        'secret': os.environ["AWS_SECRET_ACCESS_KEY"],
+        'token': os.environ["AWS_SESSION_TOKEN"]
+    }
+)).with_format("torch")
 
 LABEL : list[str] = list(set(ds["leaning"])); n_labels : int = len(LABEL)
 ID2LABEL : dict[int:str] = {i : cat for i,cat in enumerate(LABEL)}
