@@ -63,5 +63,5 @@ class AutoClassifierRoutineConfig:
         self.tokenizer_settings : dict = {
             "padding" : "max_length",
             "truncation" : True,
-            "max_length" : 128
+            "max_length" : 128 if "tokenizer_max_length" not in kwargs else kwargs["tokenizer_max_length"]
         }
