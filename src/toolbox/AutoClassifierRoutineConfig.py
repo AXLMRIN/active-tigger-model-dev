@@ -43,7 +43,7 @@ class AutoClassifierRoutineConfig:
             # Parameters that are customisable
             "output_dir" : files["output_dir"],
             "logging_dir" : files["output_dir"] + "_log", 
-            "save_strategy" : "epoch",
+            "save_strategy" : "no",
             "num_train_epochs" : 1 if self.dev_mode else num_train_epochs,
             # Fixed parameters
             "overwrite_output_dir" : True,
@@ -52,8 +52,8 @@ class AutoClassifierRoutineConfig:
             "per_device_train_batch_size" : self.batch_size,
             "per_device_eval_batch_size" : self.batch_size,
             "weight_decay" : 0.01,
-            "logging_first_step":True,
-            "logging_strategy":"steps",
+            "logging_first_step":False,
+            "logging_strategy":"epoch",
             "save_safetensors" : False
         }
         if "training_args" in kwargs:
