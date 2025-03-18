@@ -34,17 +34,18 @@ file_args = {
         },
         "tokenizer_max_length" : 60
     },
-    "333" : {
-        "batch_size" : 8,
-        "sentence_col" : "content",
-        "label_col" : "bias_text",
-        "files" : {
-            "open_local" : "data/333_media_ideology/media_ideology.csv",
-            "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/333_ideology/data.csv", 
-            "output_dir" : "2025-03-17-autoClassifier-test-333"
-        },
-        "tokenizer_max_length" : 2745
-    },
+    # FIXME Not running
+    # "333" : {
+    #     "batch_size" : 8,
+    #     "sentence_col" : "content",
+    #     "label_col" : "bias_text",
+    #     "files" : {
+    #         "open_local" : "data/333_media_ideology/media_ideology.csv",
+    #         "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/333_ideology/data.csv", 
+    #         "output_dir" : "2025-03-17-autoClassifier-test-333"
+    #     },
+    #     "tokenizer_max_length" : 2745
+    # },
     # FIXME might not be used 
     # "334" : {
     #     "sentence_col" : "Quotes",
