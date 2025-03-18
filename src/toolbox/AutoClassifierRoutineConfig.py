@@ -42,7 +42,8 @@ class AutoClassifierRoutineConfig:
         training_args : dict = {
             # Parameters that are customisable
             "output_dir" : files["output_dir"],
-            "save_strategy" : "no" if self.dev_mode else "epoch",
+            "logging_dir" : files["output_dir"] + "_log", 
+            "save_strategy" : "epoch",
             "num_train_epochs" : 1 if self.dev_mode else num_train_epochs,
             # Fixed parameters
             "overwrite_output_dir" : True,
@@ -51,6 +52,9 @@ class AutoClassifierRoutineConfig:
             "per_device_train_batch_size" : self.batch_size,
             "per_device_eval_batch_size" : self.batch_size,
             "weight_decay" : 0.01,
+            "logging_first_step":True,
+            "logging_strategy":"steps",
+            "save_safetensors" : False
         }
         if "training_args" in kwargs:
             training_args = merge(training_args, kwargs["training_args"])

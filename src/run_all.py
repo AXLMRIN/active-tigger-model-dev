@@ -38,15 +38,16 @@ file_args = {
             "output_dir" : "2025-03-17-autoClassifier-test-333"
         }
     },
-    "334" : {
-        "sentence_col" : "Quotes",
-        "label_col" : "TropesHuman",
-        "files" : {
-            "open_local" : "data/334_tropes/tropes.csv",
-            "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/334_roles/data.csv", 
-            "output_dir" : "2025-03-17-autoClassifier-test-334"
-        }
-    }
+    # FIXME the preprocess is stuck
+    # "334" : {
+    #     "sentence_col" : "Quotes",
+    #     "label_col" : "TropesHuman",
+    #     "files" : {
+    #         "open_local" : "data/334_tropes/tropes.csv",
+    #         "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/334_roles/data.csv", 
+    #         "output_dir" : "2025-03-17-autoClassifier-test-334"
+    #     }
+    # }
 }
 
 for test_id in file_args : 
