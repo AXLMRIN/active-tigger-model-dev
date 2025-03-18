@@ -3,9 +3,11 @@ from toolbox import (
 )
 from mergedeep import merge
 from copy import deepcopy
+from logging import getLogger, DEBUG, basicConfig
+from datetime import datetime
 
 general_args = {
-    "batch_size" : 16,
+    "batch_size" : 64,
     "num_train_epochs" : 10,
     "only_train_classifier" : False,
     "dev_mode" : True
@@ -33,6 +35,7 @@ file_args = {
         "tokenizer_max_length" : 60
     },
     "333" : {
+        "batch_size" : 8,
         "sentence_col" : "content",
         "label_col" : "bias_text",
         "files" : {
@@ -53,7 +56,9 @@ file_args = {
     #     }
     # }
 }
-
+logger = getLogger(f"GENERAL_LOGGER - {datetime.today().strftime('%d-%m-%Y; %H:%M')}")
+basicConfig(filename='general_logger.log', encoding='utf-8', level= DEBUG)
+logger.info("PROCESS STARTED")
 for test_id in file_args : 
     print(("\n"
         f"Running test number {test_id} =================\n\n"
@@ -61,4 +66,4 @@ for test_id in file_args :
     args = merge(deepcopy(general_args), file_args[test_id])
     config = AutoClassifierRoutineConfig(**args)
     routine = AutoClassifierRoutine(config)
-    #routine.run()
+    routine.run()

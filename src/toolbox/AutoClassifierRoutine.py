@@ -8,6 +8,10 @@ from transformers import (
     AutoModelForSequenceClassification, AutoTokenizer, Trainer
 )
 from transformers.tokenization_utils_base import BatchEncoding
+from datetime import datetime
+# Native
+from logging import getLogger
+from time import time
 # Custom
 from .AutoClassifierRoutineConfig import AutoClassifierRoutineConfig
 from .general import storage_options, split_test_train_valid, compute_metrics
@@ -16,27 +20,29 @@ from .general import storage_options, split_test_train_valid, compute_metrics
 class AutoClassifierRoutine: 
     def __init__(self, config : AutoClassifierRoutineConfig) -> None:
         self.config = config
+        self.logger = getLogger("GENERAL_LOGGER")
 
     def open_file(self):
         # Open file :
+        start = time()
         try : 
             self.ds : Dataset = Dataset.from_pandas(read_csv(
                 self.config.filename_open_s3, storage_options = storage_options()
             ))
-            print("Dataset loaded with s3")
+            self.logger.info("Dataset loaded with s3")
         except:
             self.ds : Dataset = Dataset.from_pandas(read_csv(
                 self.config.filename_open_local
             ))
-            print("Dataset loaded locally")
-
+            self.logger.info("Dataset loaded locally")
+        end = time()
         # Retrieve the labels
         self.label : list[str] = list(set(self.ds[self.config.label_col])); 
         self.n_labels : int = len(self.label)
         self.id2label : dict[int:str] = {i : cat for i,cat in enumerate(self.label)}
         self.label2id : dict[str:int] = {cat:i for i,cat in enumerate(self.label)}
         print("Categories : " + ", ".join([cat for cat in self.label]),"\n")
-        print(">>> Data loading - Done")
+        self.logger.info(f">>> Data loading - Done ({end - start :.2f})")
     
     def __preprocess_function(self,batch_of_rows : dict) -> dict:
         """To make sure the format will fit with the model expectations,
@@ -53,13 +59,15 @@ class AutoClassifierRoutine:
         return batch_of_rows_out
 
     def preprocess_data(self) -> None : 
+        start = time()
         self.ds = self.ds.map(
             lambda batch_of_rows : self.__preprocess_function(batch_of_rows), 
             batched = True, batch_size = self.config.batch_size
         )
+        end = time()
         # The ds should only have n_label + 1 columns, ie one column for each 
         # label (list of bool) and one column (sentence) for the sentence (list of str)
-        print(">>> Preprocess - Done")
+        self.logger.info(f">>> Preprocess - Done ({end - start :.2f})")
 
     def split_ds(self) -> None:
         #Split the dataset in test, train, and valid dataset
@@ -80,16 +88,20 @@ class AutoClassifierRoutine:
 
     def tokenize_data(self) -> None:
         # Tokenize
+        start = time()
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
-        print(">>> Tokenizer loading - Done")
-
+        end = time()
+        self.logger.info(f">>> Tokenizer loading - Done ({end - start :.2f})")
+        start = time()
         self.encoded_dataset = self.ds.map(
             lambda batch_of_rows : self.__encoding_data_function(batch_of_rows),
             batched = True, batch_size = self.config.batch_size
         )
-        print(">>> Tokenization - Done")
+        end = time()
+        self.logger.info(f">>> Tokenization - Done ({end - start:.2f})")
 
     def load_model(self) -> None :
+        start = time()
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.config.model_name,
             problem_type = "multi_label_classification", 
@@ -97,25 +109,21 @@ class AutoClassifierRoutine:
             id2label = self.id2label, 
             label2id = self.label2id
         ).to(self.config.device)
+        end = time()
 
         if self.config.only_train_classifier : 
-            print(("\n"
-                "=============\n"
-                "WARNING : You are only training the classifier, the embedding"
-                "model is frozen\n"
-                "=============\n"
+            self.logger.warn(("You are only training the classifier, the "
+                              "embeddingmodel is frozen"
             ))
             for name, param in self.model.named_parameters():
                 if name.startswith("classifier") : param.requires_grad = True
                 else : param.requires_grad = False
-        print(">>> Model loading - Done")
+        self.logger.info(f">>> Model loading - Done ({end - start :.2f})")
     
     def __subsetting_ds(self) -> None:
-        print(("\n"
-            "=============\n"
-            "WARNING for dev purposes you are only using a subset of the "
-            "dataset you loaded\n"
-            "=============\n"
+        self.logger.warn((
+            "for dev purposes you are only using a subset of the "
+            "dataset you loaded"
         ))
         self.encoded_dataset["train"] = self.encoded_dataset["train"].\
                                             select(range(0,20))
@@ -131,7 +139,15 @@ class AutoClassifierRoutine:
             processing_class = self.tokenizer,
             compute_metrics = compute_metrics
         )
-        trainer.train()
+        self.logger.info(f">>> Training start {datetime.today().strftime('%d-%m-%Y; %H:%M')}")
+        start = time()
+        try : 
+            trainer.train()
+        except:
+            self.logger.error(f">>> Training stopped abruptely {datetime.today().strftime('%d-%m-%Y; %H:%M')}")
+        finally:
+            end = time()
+            self.logger.info(f">>> Training - Done ({end - start:.2f})")
 
     def run(self):
         self.open_file()
