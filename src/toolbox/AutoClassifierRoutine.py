@@ -42,7 +42,7 @@ class AutoClassifierRoutine:
         """To make sure the format will fit with the model expectations,
         we destroy the current dataset and rebuild one from scratch
         """
-        batch_of_rows_out = dict = {}
+        batch_of_rows_out : dict = {}
         batch_of_rows_out["sentence"] = [
             sentence.lower() for sentence in batch_of_rows[self.config.sentence_col]
         ]
