@@ -6,4 +6,4 @@ __pycache__
 models/2025-03-04-bert-base-uncased
 data/*
 .vscode/
-.log
+*.log
