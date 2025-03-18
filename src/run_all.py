@@ -60,9 +60,7 @@ logger = getLogger(f"GENERAL_LOGGER - {datetime.today().strftime('%d-%m-%Y; %H:%
 basicConfig(filename='general_logger.log', encoding='utf-8', level= DEBUG)
 logger.info("PROCESS STARTED")
 for test_id in file_args : 
-    print(("\n"
-        f"Running test number {test_id} =================\n\n"
-    ))
+    logger.info(f"Running test number {test_id} =================")
     args = merge(deepcopy(general_args), file_args[test_id])
     config = AutoClassifierRoutineConfig(**args)
     routine = AutoClassifierRoutine(config)
