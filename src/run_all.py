@@ -65,3 +65,4 @@ for test_id in file_args :
     config = AutoClassifierRoutineConfig(**args)
     routine = AutoClassifierRoutine(config)
     routine.run()
+    break
