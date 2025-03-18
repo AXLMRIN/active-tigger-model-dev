@@ -3,7 +3,7 @@
 # Third parties
 from datasets import Dataset
 import numpy as np
-from pandas import read_csv
+from pandas import read_csv, DataFrame
 from transformers import (
     AutoModelForSequenceClassification, AutoTokenizer, Trainer
 )
@@ -143,11 +143,21 @@ class AutoClassifierRoutine:
         start = time()
         try : 
             trainer.train()
-        except:
+            self.trainer_log_history = trainer.state.log_history
+        except :
             self.logger.error(f">>> Training stopped abruptely {datetime.today().strftime('%d-%m-%Y; %H:%M')}")
         finally:
             end = time()
             self.logger.info(f">>> Training - Done ({end - start:.2f})")
+
+        try : 
+            # TODO dig deeper
+            log_filename = self.config.training_args.to_dict()["output_dir"] + "/" +\
+                        self.config.training_args.to_dict()["logging_dir"] + ".csv"
+            DataFrame(self.trainer_log_history).to_csv(log_filename)
+            self.logger.info(f">>> Saving Training Logs - Done")
+        except : 
+            self.logger.error("Couldn't save the logs")
 
     def run(self):
         self.open_file()
