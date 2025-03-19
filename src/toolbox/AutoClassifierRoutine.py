@@ -179,10 +179,15 @@ class AutoClassifierRoutine:
         f1 = 0
         start = time()
         for batch in test_data_loader : 
+            self.log.INFO(f'#### batch batch["input_ids"].device :  {batch["input_ids"].device}')
+            self.log.INFO(f'#### batch batch["attention_mask"].device :  {batch["attention_mask"].device}')
+            self.log.INFO(f'#### model.device :  {self.model.device}')
             output = self.model(**{
                 'input_ids' : batch["input_ids"],
                 'attention_mask' : batch['attention_mask']
             })
+            self.log.INFO(f'#### output.logits.device :  {output.logits.device}')
+            self.log.INFO(f'#### batch["labels"].device :  {batch["labels"].device}')
             f1 += multi_label_metrics(output.logits, batch["labels"])
         end = time()
         self.logger.info((
