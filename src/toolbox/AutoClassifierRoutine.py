@@ -112,8 +112,9 @@ class AutoClassifierRoutine:
         end = time()
 
         if self.config.only_train_classifier : 
-            self.logger.warn(("You are only training the classifier, the "
-                              "embeddingmodel is frozen"
+            self.logger.info(("--WARNING--\n"
+                "You are only training the classifier, the "
+                "embeddingmodel is frozen"
             ))
             for name, param in self.model.named_parameters():
                 if name.startswith("classifier") : param.requires_grad = True
@@ -121,7 +122,8 @@ class AutoClassifierRoutine:
         self.logger.info(f">>> Model loading - Done ({end - start :.2f})")
     
     def __subsetting_ds(self) -> None:
-        self.logger.warn((
+        self.info.info((
+            "--WARNING--\n"
             "for dev purposes you are only using a subset of the "
             "dataset you loaded"
         ))
