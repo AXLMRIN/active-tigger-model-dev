@@ -193,7 +193,32 @@ class AutoClassifierRoutine:
             f"--RESULT TEST DATASET ({end-start:.2f})--\n"
             f"{f1 / len(test_data_loader)}"
         ))
-            
+
+    def test_f1(self) -> None:
+        test_dataset = Dataset.from_dict({
+            'input_ids' : self.encoded_dataset["test"]["input_ids"],
+            'attention_mask' : self.encoded_dataset["test"]["attention_mask"],
+            'labels' : self.encoded_dataset["test"]["labels"]
+        }).with_format("torch")
+        
+        test_dataloader = DataLoader(test_dataset, batch_size = self.config.batch_size)
+        f1 = 0
+        start = time()
+        for batch in test_dataloader:
+            output = self.model(**{
+                'input_ids' : batch["input_ids"].to(device = self.model.device),
+                'attention_mask' : batch["attention_mask"].to(device = self.model.device)
+            })
+            metrics = multi_label_metrics(
+                output.logits.to(device = "cpu"),
+                batch["labels"].to(device = "cpu")
+            )
+            f1 += metrics["f1"]
+        end = time()
+        self.logger.info((
+            f"--RESULTS TEST F1 ({end - start :.2})--"
+            f"{f1 / len(test_dataloader)}"
+        ))
 
     def run(self):
         self.open_file()
