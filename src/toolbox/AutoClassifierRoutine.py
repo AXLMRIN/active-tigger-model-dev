@@ -4,6 +4,7 @@
 from datasets import Dataset
 import numpy as np
 from pandas import read_csv, DataFrame
+from torch.utils.data import DataLoader
 from transformers import (
     AutoModelForSequenceClassification, AutoTokenizer, Trainer
 )
@@ -14,7 +15,9 @@ from logging import getLogger
 from time import time
 # Custom
 from .AutoClassifierRoutineConfig import AutoClassifierRoutineConfig
-from .general import storage_options, split_test_train_valid, compute_metrics
+from .general import (
+    storage_options, split_test_train_valid, compute_metrics,multi_label_metrics
+)
 
 # SCRIPT --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 class AutoClassifierRoutine: 
@@ -161,6 +164,33 @@ class AutoClassifierRoutine:
         except : 
             self.logger.error("Couldn't save the logs")
 
+    def test_f1(self) -> None:
+        current_ds : Dataset= self.encoded_dataset["test"]
+        col_to_keep : list[str] = ["input_ids", "attention_mask", "labels"]
+        cols_to_remove : list[str] = [col
+            for col in current_ds.column_names if col not in col_to_keep
+        ]
+        test_data_loader = DataLoader(
+            self.encoded_dataset["test"].\
+                remove_columns(cols_to_remove).\
+                with_format("torch"),
+            batch_size = self.config.batch_size
+        )
+        f1 = 0
+        start = time()
+        for batch in test_data_loader : 
+            output = self.model(**{
+                'input_ids' : batch["input_ids"],
+                'attention_mask' : batch['attention_mask']
+            })
+            f1 += multi_label_metrics(output.logits, batch["labels"])
+        end = time()
+        self.logger.info((
+            f"--RESULT TEST DATASET ({end-start:.2f})--\n"
+            f"{f1 / len(test_data_loader)}"
+        ))
+            
+
     def run(self):
         self.open_file()
         self.preprocess_data()
@@ -169,4 +199,5 @@ class AutoClassifierRoutine:
         if self.config.dev_mode : self.__subsetting_ds()
         self.load_model()
         self.train()
+        self.test_f1()
 
