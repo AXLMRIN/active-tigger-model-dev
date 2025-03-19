@@ -203,6 +203,7 @@ class AutoClassifierRoutine:
         
         test_dataloader = DataLoader(test_dataset, batch_size = self.config.batch_size)
         f1 = 0
+        self.logger.info(">>> Evaluating the F1 test - Start")
         start = time()
         for batch in test_dataloader:
             output = self.model(**{
@@ -214,6 +215,7 @@ class AutoClassifierRoutine:
                 batch["labels"].to(device = "cpu")
             )
             f1 += metrics["f1"]
+        self.logger.info(">>> Evaluating the F1 test - Done")
         end = time()
         self.logger.info((
             f"--RESULTS TEST F1 ({end - start :.2})--"
