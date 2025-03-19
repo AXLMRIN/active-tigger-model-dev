@@ -122,7 +122,7 @@ class AutoClassifierRoutine:
         self.logger.info(f">>> Model loading - Done ({end - start :.2f})")
     
     def __subsetting_ds(self) -> None:
-        self.info.info((
+        self.logger.info((
             "--WARNING--\n"
             "for dev purposes you are only using a subset of the "
             "dataset you loaded"
