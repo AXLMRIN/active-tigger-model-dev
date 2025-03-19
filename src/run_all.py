@@ -3,7 +3,7 @@ from toolbox import (
 )
 from mergedeep import merge
 from copy import deepcopy
-from logging import getLogger, DEBUG, basicConfig
+from logging import getLogger, INFO, basicConfig
 from datetime import datetime
 
 general_args = {
@@ -58,7 +58,7 @@ file_args = {
     # }
 }
 logger = getLogger(f"GENERAL_LOGGER - {datetime.today().strftime('%d-%m-%Y; %H:%M')}")
-basicConfig(filename='general_logger.log', encoding='utf-8', level= DEBUG)
+basicConfig(filename='general_logger.log', encoding='utf-8', level= INFO)
 logger.info("PROCESS STARTED")
 for test_id in file_args : 
     logger.info(f"Running test number {test_id} =================")
@@ -66,4 +66,3 @@ for test_id in file_args :
     config = AutoClassifierRoutineConfig(**args)
     routine = AutoClassifierRoutine(config)
     routine.run()
-    break
