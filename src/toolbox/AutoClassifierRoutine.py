@@ -218,30 +218,28 @@ class AutoClassifierRoutine:
         f1 = 0
         self.logger.info(">>> Evaluating the F1 test - Start")
         start = time()
-        try:
-            for batch in test_dataloader:
-                output = self.model(**{
-                    'input_ids' : batch["input_ids"].to(device = self.model.device),
-                    'attention_mask' : batch["attention_mask"].to(device = self.model.device)
-                })
-                metrics = multi_label_metrics(
-                    output.logits.to(device = "cpu"),
-                    batch["labels"].to(device = "cpu")
-                )
-                f1 += metrics["f1"]
-            self.logger.info(">>> Evaluating the F1 test - Done")
-        except :
-            self.logger.info("### ERROR ### evaluating the test dataset failed")
-        finally:
-            end = time()
-            self.logger.info((
-                f"--RESULTS TEST F1 ({end - start :.2})--"
-                f"{f1 / len(test_dataloader)}"
-            ))
-            del test_dataset, test_dataloader, batch
-            gc.collect()
-            if self.config.device == "cuda" : 
-                synchronize();empty_cache();ipc_collect()
+
+        for batch in test_dataloader:
+            output = self.model(**{
+                'input_ids' : batch["input_ids"].to(device = self.model.device),
+                'attention_mask' : batch["attention_mask"].to(device = self.model.device)
+            })
+            metrics = multi_label_metrics(
+                output.logits.to(device = "cpu"),
+                batch["labels"].to(device = "cpu")
+            )
+            f1 += metrics["f1"]
+        self.logger.info(">>> Evaluating the F1 test - Done")
+
+        end = time()
+        self.logger.info((
+            f"--RESULTS TEST F1 ({end - start :.2})--"
+            f"{f1 / len(test_dataloader)}"
+        ))
+        del test_dataset, test_dataloader, batch
+        gc.collect()
+        if self.config.device == "cuda" : 
+            synchronize();empty_cache();ipc_collect()
 
 
     def clean(self):
