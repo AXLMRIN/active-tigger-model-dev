@@ -49,6 +49,7 @@ class AutoClassifierRoutineConfig:
             # Fixed parameters
             "overwrite_output_dir" : True,
             "eval_strategy" : "epoch",
+            "save_strategy" : "epoch",
             "learning_rate" : 2e-5,
             "per_device_train_batch_size" : self.batch_size,
             "per_device_eval_batch_size" : self.batch_size,
