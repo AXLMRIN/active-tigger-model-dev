@@ -12,6 +12,7 @@ class AutoClassifierRoutineConfig:
         sentence_col : str, 
         label_col : str, 
         batch_size : int = 32, 
+        preprocess_batch_size : int = 200, 
         num_train_epochs : int = 10,
         only_train_classifier : bool = False, 
         dev_mode : bool = False,
@@ -34,6 +35,7 @@ class AutoClassifierRoutineConfig:
         self.label_col : str = label_col
         # Batch related
         self.batch_size : int = batch_size
+        self.preprocess_batch_size : int = preprocess_batch_size
         # Model Related
         self.model_name = "answerdotai/ModernBERT-base"
         self.device : str = "cuda" if gpu_available() else "cpu"
