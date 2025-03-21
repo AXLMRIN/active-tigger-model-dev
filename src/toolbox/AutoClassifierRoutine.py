@@ -11,6 +11,7 @@ from transformers import (
 )
 from transformers.tokenization_utils_base import BatchEncoding
 from datetime import datetime
+from tqdm import tqdm
 # Native
 from logging import getLogger
 from time import time
@@ -26,6 +27,9 @@ class AutoClassifierRoutine:
     def __init__(self, config : AutoClassifierRoutineConfig) -> None:
         self.config = config
         self.logger = getLogger("GENERAL_LOGGER")
+        self.model = None
+        self.ds = None
+        self.tokenizer = None
 
     def open_file(self):
         # Open file :
@@ -64,15 +68,25 @@ class AutoClassifierRoutine:
         return batch_of_rows_out
 
     def preprocess_data(self) -> None : 
-        start = time()
-        self.ds = self.ds.map(
-            lambda batch_of_rows : self.__preprocess_function(batch_of_rows), 
-            batched = True, batch_size = self.config.batch_size
+        dataloader = DataLoader(
+            self.ds, batch_size = 200,shuffle = True
         )
+        new_ds = {}
+        start = time()
+        for batch in tqdm(dataloader, desc = "Preprocess data"): 
+            batch_result = self.__preprocess_function(batch)
+
+            for key in batch_result : 
+                if key not in new_ds.keys(): new_ds[key] = []
+                new_ds[key].extend(batch_result[key])
         end = time()
+        self.ds = Dataset.from_dict(new_ds)
         # The ds should only have n_label + 1 columns, ie one column for each 
         # label (list of bool) and one column (sentence) for the sentence (list of str)
         self.logger.info(f">>> Preprocess - Done ({end - start :.2f})")
+
+        del dataloader, batch, batch_result, new_ds
+        gc.collect()
 
     def split_ds(self) -> None:
         #Split the dataset in test, train, and valid dataset
@@ -226,12 +240,13 @@ class AutoClassifierRoutine:
             self.preprocess_data()
             self.split_ds()
             self.tokenize_data()
+            assert 1==2
             if self.config.dev_mode : self.__subsetting_ds()
             self.load_model()
             self.train()
             self.test_f1()
         except : 
-            self.logger("### ERROR ### something messed up")
+            self.logger.info("### ERROR ### something messed up")
         finally :
             self.clean()
 
