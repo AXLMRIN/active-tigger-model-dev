@@ -21,7 +21,7 @@ file_args = {
         "files" : {
             "open_local" : "data/316_ideological_book_corpus/ibc.csv",
             "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data.csv", 
-            "output_dir" : (f"saves_model/{datetime.today().strftime('%d-%m-%Y')}"
+            "output_dir" : (f"saves_model/{datetime.today().strftime('%Y-%m-%d')}"
                             "-autoClassifier-test-316")
         },
         "tokenizer_max_length" : 100
