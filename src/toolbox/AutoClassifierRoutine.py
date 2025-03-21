@@ -253,18 +253,14 @@ class AutoClassifierRoutine:
         gc.collect()
 
     def run(self):
-        try :
-            self.open_file()
-            self.preprocess_data()
-            self.split_ds()
-            self.tokenize_data()
-            if self.config.dev_mode : self.__subsetting_ds()
-            self.load_model()
-            self.train()
-            self.test_f1()
-        except : 
-            self.logger.info("### ERROR ### something messed up")
-        finally :
-            self.clean()
+        self.open_file()
+        self.preprocess_data()
+        self.split_ds()
+        self.tokenize_data()
+        if self.config.dev_mode : self.__subsetting_ds()
+        self.load_model()
+        self.train()
+        self.test_f1()
+        self.clean()
 
 
