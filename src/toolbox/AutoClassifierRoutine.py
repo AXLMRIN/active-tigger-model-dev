@@ -1,7 +1,7 @@
 # TODO write a banner
 # IMPORTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 # Third parties
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
 import numpy as np
 from pandas import read_csv, DataFrame
 from torch.utils.data import DataLoader
@@ -68,8 +68,9 @@ class AutoClassifierRoutine:
         return batch_of_rows_out
 
     def preprocess_data(self) -> None : 
-        dataloader = DataLoader(
-            self.ds, batch_size = 200,shuffle = True
+        print("Start preprocess")# TODELETE
+        dataloader = DataLoader(self.ds, 
+            batch_size = self.config.preprocess_batch_size, shuffle = True
         )
         new_ds = {}
         start = time()
@@ -111,12 +112,29 @@ class AutoClassifierRoutine:
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
         end = time()
         self.logger.info(f">>> Tokenizer loading - Done ({end - start :.2f})")
+
+        encoded_dataset = {}
         start = time()
-        self.encoded_dataset = self.ds.map(
-            lambda batch_of_rows : self.__encoding_data_function(batch_of_rows),
-            batched = True, batch_size = self.config.batch_size
-        )
+        for split_name in ["train", "test", "validation"] :
+            encoded_dataset[split_name] = {}
+            dataloader = DataLoader(self.ds[split_name], 
+                batch_size = self.config.preprocess_batch_size, shuffle = True
+            )
+
+            for batch in tqdm(dataloader,desc=f"Tokenize {split_name}"): 
+                encoding_output = self.__encoding_data_function(batch)
+                for key in encoding_output:
+                    if key not in encoded_dataset[split_name].keys():
+                        encoded_dataset[split_name][key] = []
+                    encoded_dataset[split_name][key].extend(
+                        encoding_output[key]
+                    )
         end = time()
+        self.encoded_dataset = DatasetDict({
+            "train" : Dataset.from_dict(encoded_dataset["train"]),
+            "test" : Dataset.from_dict(encoded_dataset["test"]),
+            "validation" : Dataset.from_dict(encoded_dataset["validation"])
+        })
         self.logger.info(f">>> Tokenization - Done ({end - start:.2f})")
 
     def load_model(self) -> None :
@@ -240,7 +258,6 @@ class AutoClassifierRoutine:
             self.preprocess_data()
             self.split_ds()
             self.tokenize_data()
-            assert 1==2
             if self.config.dev_mode : self.__subsetting_ds()
             self.load_model()
             self.train()
