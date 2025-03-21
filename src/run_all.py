@@ -21,7 +21,7 @@ file_args = {
         "files" : {
             "open_local" : "data/316_ideological_book_corpus/ibc.csv",
             "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/316_ideology/data.csv", 
-            "output_dir" : (f"checkpoints/{datetime.today().strftime('%d-%m-%Y')}"
+            "output_dir" : (f"saves_model/{datetime.today().strftime('%d-%m-%Y')}"
                             "2025-03-17-autoClassifier-test-316")
         },
         "tokenizer_max_length" : 100
@@ -32,7 +32,7 @@ file_args = {
         "files" : {
             "open_local" : "data/319_semeval_stance/semeval_stance.csv",
             "open_s3" : "s3://projet-datalab-axel-morin/model_benchmarking/319_stance/data.csv", 
-            "output_dir" : (f"checkpoints/{datetime.today().strftime('%d-%m-%Y')}"
+            "output_dir" : (f"saves_model/{datetime.today().strftime('%d-%m-%Y')}"
                             "2025-03-17-autoClassifier-test-319")
         },
         "tokenizer_max_length" : 60
