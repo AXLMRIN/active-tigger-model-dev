@@ -251,7 +251,7 @@ class AutoClassifierRoutine:
         if self.config.dev_mode : self.__subsetting_ds()
         self.load_model()
         self.train()
-        self.test_f1()
+        #self.test_f1()
         self.clean()
 
 
