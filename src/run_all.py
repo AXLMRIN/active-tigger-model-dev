@@ -5,6 +5,7 @@ from mergedeep import merge
 from copy import deepcopy
 from logging import getLogger, INFO, basicConfig
 from datetime import datetime
+import gc
 
 general_args = {
     "batch_size" : 64,
@@ -66,3 +67,6 @@ for test_id in file_args :
     config = AutoClassifierRoutineConfig(**args)
     routine = AutoClassifierRoutine(config)
     routine.run()
+
+    del config, routine
+    gc.collect()

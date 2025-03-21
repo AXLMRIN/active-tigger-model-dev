@@ -5,6 +5,7 @@ from datasets import Dataset
 import numpy as np
 from pandas import read_csv, DataFrame
 from torch.utils.data import DataLoader
+from torch.cuda import synchronize, ipc_collect, empty_cache
 from transformers import (
     AutoModelForSequenceClassification, AutoTokenizer, Trainer
 )
@@ -13,6 +14,7 @@ from datetime import datetime
 # Native
 from logging import getLogger
 from time import time
+import gc
 # Custom
 from .AutoClassifierRoutineConfig import AutoClassifierRoutineConfig
 from .general import (
@@ -159,6 +161,11 @@ class AutoClassifierRoutine:
             end = time()
             self.logger.info(f">>> Training - Done ({end - start:.2f})")
 
+            del trainer
+            gc.collect()
+            if self.config.device == "cuda": 
+                synchronize();empty_cache();ipc_collect()
+
         try : 
             # TODO dig deeper
             log_filename = self.config.training_args.to_dict()["output_dir"] + "/" +\
@@ -167,32 +174,6 @@ class AutoClassifierRoutine:
             self.logger.info(f">>> Saving Training Logs - Done")
         except : 
             self.logger.error("Couldn't save the logs")
-
-    def test_f1(self) -> None:
-        current_ds : Dataset= self.encoded_dataset["test"]
-        col_to_keep : list[str] = ["input_ids", "attention_mask", "labels"]
-        cols_to_remove : list[str] = [col
-            for col in current_ds.column_names if col not in col_to_keep
-        ]
-        test_data_loader = DataLoader(
-            self.encoded_dataset["test"].\
-                remove_columns(cols_to_remove).\
-                with_format("torch"),
-            batch_size = self.config.batch_size
-        )
-        f1 = 0
-        start = time()
-        for batch in test_data_loader : 
-            output = self.model(**{
-                'input_ids' : batch["input_ids"],
-                'attention_mask' : batch['attention_mask']
-            })
-            f1 += multi_label_metrics(output.logits, batch["labels"])
-        end = time()
-        self.logger.info((
-            f"--RESULT TEST DATASET ({end-start:.2f})--\n"
-            f"{f1 / len(test_data_loader)}"
-        ))
 
     def test_f1(self) -> None:
         test_dataset = Dataset.from_dict({
@@ -205,30 +186,53 @@ class AutoClassifierRoutine:
         f1 = 0
         self.logger.info(">>> Evaluating the F1 test - Start")
         start = time()
-        for batch in test_dataloader:
-            output = self.model(**{
-                'input_ids' : batch["input_ids"].to(device = self.model.device),
-                'attention_mask' : batch["attention_mask"].to(device = self.model.device)
-            })
-            metrics = multi_label_metrics(
-                output.logits.to(device = "cpu"),
-                batch["labels"].to(device = "cpu")
-            )
-            f1 += metrics["f1"]
-        self.logger.info(">>> Evaluating the F1 test - Done")
-        end = time()
-        self.logger.info((
-            f"--RESULTS TEST F1 ({end - start :.2})--"
-            f"{f1 / len(test_dataloader)}"
-        ))
+        try:
+            for batch in test_dataloader:
+                output = self.model(**{
+                    'input_ids' : batch["input_ids"].to(device = self.model.device),
+                    'attention_mask' : batch["attention_mask"].to(device = self.model.device)
+                })
+                metrics = multi_label_metrics(
+                    output.logits.to(device = "cpu"),
+                    batch["labels"].to(device = "cpu")
+                )
+                f1 += metrics["f1"]
+            self.logger.info(">>> Evaluating the F1 test - Done")
+        except :
+            self.logger.info("### ERROR ### evaluating the test dataset failed")
+        finally:
+            end = time()
+            del test_dataset, test_dataloader, batch
+            gc.collect()
+            if self.config.device == "cuda" : 
+                synchronize();empty_cache();ipc_collect()
+
+            self.logger.info((
+                f"--RESULTS TEST F1 ({end - start :.2})--"
+                f"{f1 / len(test_dataloader)}"
+            ))
+
+    def clean(self):
+        del (
+            self.model,
+            self.ds,
+            self.tokenizer
+        )
+        gc.collect()
 
     def run(self):
-        self.open_file()
-        self.preprocess_data()
-        self.split_ds()
-        self.tokenize_data()
-        if self.config.dev_mode : self.__subsetting_ds()
-        self.load_model()
-        self.train()
-        self.test_f1()
+        try :
+            self.open_file()
+            self.preprocess_data()
+            self.split_ds()
+            self.tokenize_data()
+            if self.config.dev_mode : self.__subsetting_ds()
+            self.load_model()
+            self.train()
+            self.test_f1()
+        except : 
+            self.logger("### ERROR ### something messed up")
+        finally :
+            self.clean()
+
 
