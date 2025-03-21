@@ -68,7 +68,6 @@ class AutoClassifierRoutine:
         return batch_of_rows_out
 
     def preprocess_data(self) -> None : 
-        print("Start preprocess")# TODELETE
         dataloader = DataLoader(self.ds, 
             batch_size = self.config.preprocess_batch_size, shuffle = True
         )

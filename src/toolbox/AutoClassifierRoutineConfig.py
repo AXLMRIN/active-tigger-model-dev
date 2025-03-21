@@ -45,7 +45,6 @@ class AutoClassifierRoutineConfig:
             # Parameters that are customisable
             "output_dir" : files["output_dir"],
             "logging_dir" : files["output_dir"] + "_log", 
-            "save_strategy" : "no",
             "num_train_epochs" : 1 if self.dev_mode else num_train_epochs,
             # Fixed parameters
             "overwrite_output_dir" : True,
@@ -56,7 +55,10 @@ class AutoClassifierRoutineConfig:
             "weight_decay" : 0.01,
             "logging_first_step":False,
             "logging_strategy":"epoch",
-            "save_safetensors" : False
+            "save_safetensors" : True,
+            "load_best_model_at_end" : True,
+            "save_total_limit" : 1,
+            "metric_for_best_model" : "eval_f1"
         }
         if "training_args" in kwargs:
             training_args = merge(training_args, kwargs["training_args"])
