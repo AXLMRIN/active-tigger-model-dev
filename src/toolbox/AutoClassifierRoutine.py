@@ -234,15 +234,15 @@ class AutoClassifierRoutine:
             self.logger.info("### ERROR ### evaluating the test dataset failed")
         finally:
             end = time()
+            self.logger.info((
+                f"--RESULTS TEST F1 ({end - start :.2})--"
+                f"{f1 / len(test_dataloader)}"
+            ))
             del test_dataset, test_dataloader, batch
             gc.collect()
             if self.config.device == "cuda" : 
                 synchronize();empty_cache();ipc_collect()
 
-            self.logger.info((
-                f"--RESULTS TEST F1 ({end - start :.2})--"
-                f"{f1 / len(test_dataloader)}"
-            ))
 
     def clean(self):
         del (
