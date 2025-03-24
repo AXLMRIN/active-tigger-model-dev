@@ -9,7 +9,7 @@ conda install pytorch
 pip install 'accelerate>=0.26.0'
 conda install s3fs
 conda install scikit-learn
-conda install mergedeep
+pip install mergedeep
 ```
 Si sur GPU : 
 ```
