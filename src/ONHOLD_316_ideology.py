@@ -22,7 +22,7 @@ from transformers.tokenization_utils_base import BatchEncoding
 # Native
 
 # Custom
-from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
+from src.toolbox.ABORTED_IdeologySentenceClassifier import IdeologySentenceClassifier
 from toolbox.metrics import classifier_metrics
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---

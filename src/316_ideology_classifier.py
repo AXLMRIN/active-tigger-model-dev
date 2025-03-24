@@ -24,7 +24,7 @@ from toolbox import (
     storage_options, split_test_train_valid,
     get_label_label2id_id2label
 )
-from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
+from src.toolbox.ABORTED_IdeologySentenceClassifier import IdeologySentenceClassifier
 from toolbox.Trainer import Trainer
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 device = "cuda" if gpu_available() else "cpu"

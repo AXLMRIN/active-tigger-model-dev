@@ -21,7 +21,7 @@ import json
 
 # Custom
 from toolbox import storage_options
-from toolbox.IdeologySentenceClassifier import IdeologySentenceClassifier
+from src.toolbox.ABORTED_IdeologySentenceClassifier import IdeologySentenceClassifier
 
 # PARAMETERS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 float_dtype = float32
