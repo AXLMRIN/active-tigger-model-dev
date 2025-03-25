@@ -41,7 +41,7 @@ class CustomModel:
                 momentum = self.config.model_train_embedding_momentum,
                 weight_decay = self.config.model_train_embedding_weight_decay
             )
-            
+
         if self.config.model_train_classifier_optimizer == "Adam":
             self.optimizer_classifier = Adam(
                 self.classifier.parameters(),
@@ -56,7 +56,8 @@ class CustomModel:
                 weight_decay = self.config.model_train_classifier_weight_decay
             )
 
-        self.loss_function = CrossEntropyLoss()
+        self.loss_function_train = CrossEntropyLoss(reduction = "mean")
+        self.loss_function_validation = CrossEntropyLoss(reduction = "sum")
     
     def predict(self, entries : list[str], eval_grad : bool = False):
         if eval_grad:
@@ -77,7 +78,7 @@ class CustomModel:
             self.optimizer_embedding.zero_grad()
 
             prediction_logits = self.predict(batch["text"], eval_grad = True)
-            loss = self.loss_function(
+            loss = self.loss_function_train(
                 prediction_logits.to(device = "cpu"), 
                 batch["label"])
             self.history.append_loss_train(epoch, loss.item())
@@ -104,10 +105,10 @@ class CustomModel:
         for batch in tqdm(loader, 
                           desc = "Testing loop", leave = False, position = 1):
             prediction_logits = self.predict(batch["text"], eval_grad = False)
-            loss = self.loss_function(
+            loss = self.loss_function_validation(
                 prediction_logits.to(device = "cpu"), 
                 batch["label"]
-            ) #FIXME reduction
+            )
             loss_value += loss.item()
             batch_metrics = self.evaluator(
                 prediction_logits.to(device = "cpu"), 
