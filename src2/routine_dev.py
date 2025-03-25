@@ -31,6 +31,7 @@ print(embedder)
 model = CustomModel(config, embedder, classifier)
 
 model.train(
-    dataset.ds["train"],
+    dataset.ds["test"],
     dataset.ds["validation"]
 )
+model.history.plot_all()
