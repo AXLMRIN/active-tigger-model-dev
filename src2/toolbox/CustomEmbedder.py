@@ -16,6 +16,7 @@ class CustomEmbedder:
         self.model = AutoModel.from_pretrained(
             self.config.embeddingmodel_name
         ).to(self.config.device)
+        self.config.embeddingmodel_dim = self.model.config.hidden_size
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.config.embeddingmodel_name

@@ -24,7 +24,7 @@ class Config:
         self.dataset_n_labels = None
         #Custom classifier settings
         # TODO Implement dynamic
-        self.classifier_hiddenlayer_dim = 300
+        self.classifier_hiddenlayer_dim = 10
         self.classifier_threshold = 0.3
         # Tokenizer 
         self.tokennizer_settings : dict = {
@@ -34,9 +34,8 @@ class Config:
             "return_tensors" : "pt"
         }
         # Embedding model
-        # TODO Implement dynamic
         self.embeddingmodel_name = "google-bert/bert-base-uncased"
-        self.embeddingmodel_dim = 768
+        self.embeddingmodel_dim = None
         self.embeddingmodel_output = "last_hidden_state"
         
         # Model
