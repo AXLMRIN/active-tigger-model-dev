@@ -55,7 +55,7 @@ class History:
 
     def save_metrics(self):
         # UPGRADE Make it better
-        pd.Dataframe(self.metrics_save).to_csv("metrics_save")
+        pd.DataFrame(self.metrics_save).to_csv("metrics_save")
 
     def __str__(self) -> str:
         return (
