@@ -9,6 +9,7 @@ from .Config import Config
 from .CustomEmbedder import CustomEmbedder
 from .CustomClassifier import CustomClassifier
 from .History import History
+from .general import Evaluator
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class CustomModel:
     def __init__(self, config : Config, embedder : CustomEmbedder, 
@@ -17,6 +18,10 @@ class CustomModel:
         self.embedder = embedder
         self.classifier = classifier
         self.history = History()
+        self.evaluator = Evaluator(
+            self.config.dataset_n_labels,
+            self.config.classifier_threshold
+        )
     
     def predict(self, entries : list[str]):
         embeddings : Tensor = self.embedder(entries) # shape(batch x config.embeddingmodel_dim)
