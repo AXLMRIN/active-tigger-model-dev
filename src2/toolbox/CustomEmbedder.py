@@ -2,8 +2,10 @@
 # Third parties
 from transformers import AutoModel, AutoTokenizer
 from torch import Tensor
+from torch.cuda import synchronize, ipc_collect, empty_cache
 # Native
 from time import time
+import gc
 # Custom
 from .Config import Config
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -31,3 +33,10 @@ class CustomEmbedder:
         else:
             return output.last_hidden_state[:,0,:]
         
+    def clean(self):
+        del self.model, self.tokenizer
+        gc.collect()
+        if self.config.device == "cuda":
+            synchronize()
+            empty_cache()
+            ipc_collect()
