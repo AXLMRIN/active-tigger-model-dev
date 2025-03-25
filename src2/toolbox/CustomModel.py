@@ -5,7 +5,7 @@ from torch import Tensor, no_grad
 from torch.cuda import synchronize, ipc_collect, empty_cache
 from torch.optim import Adam
 from torch.utils.data import DataLoader
-from torch.nn.functional import nll_loss
+from torch.nn import CrossEntropyLoss
 # Native
 import gc
 from tqdm import tqdm
@@ -37,7 +37,7 @@ class CustomModel:
             lr = self.config.model_train_learning_rate_classifier,
             weight_decay = self.config.train_weight_decay
         )
-        self.loss_function = nll_loss
+        self.loss_function = CrossEntropyLoss()
     
     def predict(self, entries : list[str], eval_grad : bool = False):
         if eval_grad:
@@ -87,7 +87,8 @@ class CustomModel:
             prediction_logits = self.predict(batch["text"], eval_grad = False)
             loss = self.loss_function(
                 prediction_logits.to(device = "cpu"), 
-                batch["label"],reduction = "sum")
+                batch["label"]
+            ) #FIXME reduction
             loss_value += loss.item()
             batch_metrics = self.evaluator(
                 prediction_logits.to(device = "cpu"), 
