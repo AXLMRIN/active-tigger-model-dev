@@ -21,7 +21,7 @@ class CustomModel:
                  classifier : CustomClassifier) -> None:
         self.config = config
         self.embedder = embedder
-        self.classifier = classifier
+        self.classifier = classifier.to(self.config.device)
         self.history = History()
         self.evaluator = Evaluator(
             self.config.dataset_n_labels,
