@@ -40,12 +40,16 @@ class Config:
         self.embeddingmodel_output = "last_hidden_state"
         
         # Model
-        self.model_train_batchsize = 4
-        self.model_train_n_epoch = 1
-        self.model_train_learning_rate_embedding = 1e-5
-        self.model_train_learning_rate_classifier = 1e-3
-        self.model_train_momentum = 0.9 # NOTE not used with Adam
-        self.train_weight_decay = 0.01
+        self.model_train_batchsize = 32
+        self.model_train_n_epoch = 5
+        self.model_train_embedding_optimizer = "Adam"
+        self.model_train_embedding_learning_rate = 1e-5
+        self.model_train_embedding_momentum = 0.9 # NOTE not used with Adam
+        self.model_train_embedding_weight_decay = 0.01
+        self.model_train_classifier_optimizer = "SGD"
+        self.model_train_classifier_learning_rate = 1e-3
+        self.model_train_classifier_momentum = 0.9 # NOTE not used with Adam
+        self.model_train_classifier_weight_decay = 0.01
 
     def force_cpu(self) -> None: self.device = "cpu"
     def force_gpu(self) -> None: self.device = "cuda"

@@ -3,7 +3,7 @@
 from datasets import Dataset
 from torch import Tensor, no_grad
 from torch.cuda import synchronize, ipc_collect, empty_cache
-from torch.optim import Adam
+from torch.optim import Adam, SGD
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
 # Native
@@ -27,16 +27,35 @@ class CustomModel:
             self.config.dataset_n_labels,
             self.config.classifier_threshold
         )
-        self.optimizer_embedding = Adam(
-            self.embedder.model.parameters(),
-            lr = self.config.model_train_learning_rate_embedding,
-            weight_decay = self.config.train_weight_decay 
-        )
-        self.optimizer_classifier = Adam(
-            self.classifier.parameters(),
-            lr = self.config.model_train_learning_rate_classifier,
-            weight_decay = self.config.train_weight_decay
-        )
+
+        if self.config.model_train_embedding_optimizer == "Adam":
+            self.optimizer_embedding = Adam(
+                self.embedder.model.parameters(),
+                lr = self.config.model_train_embedding_learning_rate,
+                weight_decay = self.config.model_train_embedding_weight_decay 
+            )
+        elif self.config.model_train_embedding_optimizer == "SGD":
+            self.optimizer_embedding = SGD(
+                self.embedder.model.parameters(),
+                lr = self.config.model_train_embedding_learning_rate,
+                momentum = self.config.model_train_embedding_momentum,
+                weight_decay = self.config.model_train_embedding_weight_decay
+            )
+            
+        if self.config.model_train_classifier_optimizer == "Adam":
+            self.optimizer_classifier = Adam(
+                self.classifier.parameters(),
+                lr = self.config.model_train_classifier_learning_rate,
+                weight_decay = self.config.model_train_classifier_weight_decay 
+            )
+        elif self.config.model_train_classifier_optimizer == "SGD":
+            self.optimizer_classifier = SGD(
+                self.classifier.parameters(),
+                lr = self.config.model_train_classifier_learning_rate,
+                momentum = self.config.model_train_classifier_momentum,
+                weight_decay = self.config.model_train_classifier_weight_decay
+            )
+
         self.loss_function = CrossEntropyLoss()
     
     def predict(self, entries : list[str], eval_grad : bool = False):
