@@ -63,7 +63,7 @@ class CustomModel:
     def validation_loop(self, loader : DataLoader, epoch : int) -> None:
         loss_value : float = 0
         for batch in tqdm(loader, 
-                          desc = "Testing loop", leave = False, positin = 1):
+                          desc = "Testing loop", leave = False, position = 1):
             prediction_logits = self.predict(batch["text"])
             loss = self.loss_function(
                 prediction_logits.to(device = "cpu"), 
