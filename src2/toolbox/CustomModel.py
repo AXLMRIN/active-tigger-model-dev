@@ -1,9 +1,9 @@
 # IMPORTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Third parties
 from datasets import Dataset
-from torch import Tensor
+from torch import Tensor, no_grad
 from torch.cuda import synchronize, ipc_collect, empty_cache
-from torch.optim import SGD
+from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torch.nn.functional import nll_loss
 # Native
@@ -27,21 +27,26 @@ class CustomModel:
             self.config.dataset_n_labels,
             self.config.classifier_threshold
         )
-        self.optimizer_embedding = SGD(
+        self.optimizer_embedding = Adam(
             self.embedder.model.parameters(),
-            lr = self.config.model_train_learning_rate,
-            momentum = self.config.model_train_momentum
+            lr = self.config.model_train_learning_rate_embedding,
+            weight_decay = self.config.train_weight_decay 
         )
-        self.optimizer_classifier = SGD(
+        self.optimizer_classifier = Adam(
             self.classifier.parameters(),
-            lr = self.config.model_train_learning_rate,
-            momentum = self.config.model_train_momentum
+            lr = self.config.model_train_learning_rate_classifier,
+            weight_decay = self.config.train_weight_decay
         )
         self.loss_function = nll_loss
     
-    def predict(self, entries : list[str]):
-        embeddings : Tensor = self.embedder(entries) # shape(batch x config.embeddingmodel_dim)
-        logits = self.classifier(embeddings)
+    def predict(self, entries : list[str], eval_grad : bool = False):
+        if eval_grad:
+            embeddings : Tensor = self.embedder(entries) # shape(batch x config.embeddingmodel_dim)
+            logits = self.classifier(embeddings)
+        else :
+            with no_grad():
+                embeddings : Tensor = self.embedder(entries) # shape(batch x config.embeddingmodel_dim)
+                logits = self.classifier(embeddings)
         return logits
 
     def train_loop(self, loader : DataLoader, epoch : int) -> None: 
@@ -52,7 +57,7 @@ class CustomModel:
             self.optimizer_classifier.zero_grad()
             self.optimizer_embedding.zero_grad()
 
-            prediction_logits = self.predict(batch["text"])
+            prediction_logits = self.predict(batch["text"], eval_grad = True)
             loss = self.loss_function(
                 prediction_logits.to(device = "cpu"), 
                 batch["label"])
@@ -79,7 +84,7 @@ class CustomModel:
         metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
         for batch in tqdm(loader, 
                           desc = "Testing loop", leave = False, position = 1):
-            prediction_logits = self.predict(batch["text"])
+            prediction_logits = self.predict(batch["text"], eval_grad = False)
             loss = self.loss_function(
                 prediction_logits.to(device = "cpu"), 
                 batch["label"],reduction = "sum")
