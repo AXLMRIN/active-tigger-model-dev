@@ -21,7 +21,7 @@ class CustomModel:
                  classifier : CustomClassifier) -> None:
         self.config = config
         self.embedder = embedder
-        self.classifier = classifier.to(self.config.device)
+        self.classifier = classifier.to(device = self.config.device)
         self.history = History()
         self.evaluator = Evaluator(
             self.config.dataset_n_labels,
@@ -51,7 +51,9 @@ class CustomModel:
             self.optimizer_embedding.zero_grad()
 
             prediction_logits = self.predict(batch["text"])
-            loss = self.loss_function(prediction_logits, batch["label"])
+            loss = self.loss_function(
+                prediction_logits.to(device = "cpu"), 
+                batch["label"])
             self.history.append_loss_train(epoch, loss.item())
             loss.backward()
 
