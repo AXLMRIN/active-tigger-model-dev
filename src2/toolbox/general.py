@@ -1,7 +1,10 @@
 # IMPORTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Third parties
 from datasets import Dataset, DatasetDict
-
+import numpy as np
+from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
+from torch import Tensor
+from torch.nn import Sigmoid
 # Native
 
 # Custom
@@ -44,3 +47,40 @@ def split_test_train_valid(dataset : Dataset, proportion_train : float = 0.7,
     })
 
     return ds
+
+class Evaluator:
+    def __init__(self, n_label : int, threshold : float = 0.5):
+        self.threshold = threshold
+        self.n_label = n_label
+        self.device = "cpu"
+
+    def create_target(self,labels : list[int]) -> Tensor:
+        return Tensor(
+            [
+                [col == logit for col in range(self.n_label)]
+                for logit in labels
+            ]
+        ).to(device = self.device, dtype = bool, non_blocking=True)   
+    
+    def __call__(self, result_logits : Tensor, labels : list[int]) -> dict:
+        """EVERYTHING HAPPENS ON CPU
+        labels are only the id of the labels"""
+        # first, apply sigmoid on predictions which are of shape (batch_size, num_labels)
+        sigmoid = Sigmoid()
+        probs = sigmoid(result_logits)
+        # next, use threshold to turn them into integer predictions
+        y_pred = np.zeros(probs.shape)
+        y_pred[np.where(probs >= self.threshold)] = 1
+        # finally, compute metrics
+        y_true = self.create_target(labels)
+        f1_micro_average = f1_score(
+            y_true=y_true, 
+            y_pred=y_pred, 
+            average='micro'
+        )
+        roc_auc = roc_auc_score(y_true, y_pred, average = 'micro').item()
+        accuracy = accuracy_score(y_true, y_pred)
+        # return as dictionary
+        return {'f1': f1_micro_average,
+                'roc_auc': roc_auc,
+                'accuracy': accuracy}
