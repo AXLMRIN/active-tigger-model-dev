@@ -10,6 +10,7 @@ pip install 'accelerate>=0.26.0'
 conda install s3fs
 conda install scikit-learn
 pip install mergedeep
+conda install plotly
 ```
 Si sur GPU : 
 ```
