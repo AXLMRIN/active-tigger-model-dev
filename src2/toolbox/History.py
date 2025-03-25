@@ -1,5 +1,6 @@
 # IMPORTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Third parties
+import pandas as pd
 import plotly.graph_objects as go
 # Native
 
@@ -51,6 +52,10 @@ class History:
 
     def plot_all(self):
         self.plot_loss_train()
+
+    def save_metrics(self):
+        # UPGRADE Make it better
+        pd.Dataframe(self.metrics_save).to_csv("metrics_save")
 
     def __str__(self) -> str:
         return (
