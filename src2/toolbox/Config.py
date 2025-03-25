@@ -11,7 +11,7 @@ class Config:
         self.seed : int = 2306406
         self.device = "cuda" if cuda_available() else "cpu"
         # Dataset parameters
-        self.dataset_filename : str = "data/316_ideological_book_corpus/ibc.csv" # UPGRADE make it editable 
+        self.dataset_filename : str = "dataUNSAFE/ibc.csv" # UPGRADE make it editable 
         self.dataset_label_col : str = "leaning"
         self.dataset_text_col : str = "sentence"
         self.dataset_split_parameters : dict = {
