@@ -2,13 +2,17 @@ class History:
     def __init__(self):
         self.train_loss_per_epoch : dict[int:list[float]] = {}
         self.train_loss_global : list[float] = []
+        self.validation_loss : dict[int:float] = {}
 
-    def append_loss_train(self, epoch : int, loss_value) -> None:
+    def append_loss_train(self, epoch : int, loss_value : float) -> None:
         self.train_loss_global.append(loss_value)
         
         if epoch not in self.train_loss_per_epoch:
             self.train_loss_per_epoch[epoch] = []
         self.train_loss_per_epoch[epoch].append(loss_value)
+    
+    def append_loss_validation(self, epoch : int, loss_value : float) -> None :
+        self.validation_loss[epoch] = loss_value
 
     def __str__(self) -> str:
         return (

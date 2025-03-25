@@ -59,17 +59,35 @@ class CustomModel:
 
             self.optimizer_classifier.step()
             self.optimizer_embedding.step()
+
+    def validation_loop(self, loader : DataLoader, epoch : int) -> None:
+        loss_value : float = 0
+        for batch in tqdm(loader, 
+                          desc = "Testing loop", leave = False, positin = 1):
+            prediction_logits = self.predict(batch["text"])
+            loss = self.loss_function(
+                prediction_logits.to(device = "cpu"), 
+                batch["label"],reduction = "sum")
+            loss_value += loss.item()
+        loss_value = loss_value / len(loader.dataset)
+        self.history.append_loss_validation(epoch, loss_value = loss_value)
+
     
-    def train(self, train_dataset : Dataset) -> None:
-        loader = DataLoader(
+    def train(self, train_dataset : Dataset, validation_dataset : Dataset) -> None:
+        train_loader = DataLoader(
             train_dataset, 
+            shuffle = True, 
+            batch_size = self.config.model_train_batchsize
+        )
+        validation_loader = DataLoader(
+            validation_dataset, 
             shuffle = True, 
             batch_size = self.config.model_train_batchsize
         )
         for epoch in tqdm(range(self.config.model_train_n_epoch),
                           desc = "Train Epoch", leave = True, position = 0):
-            self.train_loop(loader, epoch)
-            
+            self.train_loop(train_loader, epoch)
+            self.validation_loop(validation_loader, epoch)
 
     def __str__(self) -> str:
         return (
