@@ -13,6 +13,8 @@ from .general import (
 
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class CustomDataset:
+    #TODO Add logger
+    #TODO implement saving strategy
     def __init__(self, config : Config) -> None:
         self.config = config
         self.ds : None | DatasetDict = None
