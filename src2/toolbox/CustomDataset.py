@@ -50,6 +50,8 @@ class CustomDataset:
         self.n_labels = len(self.labels)
         self.label2id = {label : i for i,label in enumerate(self.labels)}
         self.id2label = {i : label for i,label in enumerate(self.labels)}
+        # Save to config to be used elsewhere
+        self.config.dataset_n_labels = self.n_labels
     
     def preprocess_data(self,preprocess_function_text, 
         preprocess_function_label)->None:
