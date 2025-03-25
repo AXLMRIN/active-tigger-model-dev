@@ -38,6 +38,7 @@ class History:
         self.metrics_save["accuracy"].append(metrics["accuracy"])
 
     def plot_loss_train(self):
+        # UPGRADE MAKE IT BETTER
         go.Figure(
             data = [
                 go.Scatter(
@@ -46,7 +47,7 @@ class History:
                     name = "Train Loss"
                 )
             ],
-        ).show()
+        ).write_image("train_loss.png")
 
     def plot_all(self):
         self.plot_loss_train()
