@@ -11,6 +11,7 @@ conda install s3fs
 conda install scikit-learn
 pip install mergedeep
 conda install plotly
+pip install -U kaleido
 ```
 Si sur GPU : 
 ```
