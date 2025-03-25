@@ -69,8 +69,8 @@ class Evaluator:
         sigmoid = Sigmoid()
         probs = sigmoid(result_logits)
         # next, use threshold to turn them into integer predictions
-        y_pred = np.zeros(probs.shape)
-        y_pred[np.where(probs >= self.threshold)] = 1
+        y_pred = np.zeros(log_probs.shape)
+        y_pred[np.where(log_probs >= self.log_threshold)] = 1
         # finally, compute metrics
         y_true = self.create_target(labels)
         f1_micro_average = f1_score(
