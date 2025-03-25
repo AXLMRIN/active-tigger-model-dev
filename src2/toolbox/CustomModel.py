@@ -1,9 +1,14 @@
 # IMPORTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Third parties
+from datasets import Dataset
 from torch import Tensor
 from torch.cuda import synchronize, ipc_collect, empty_cache
+from torch.optim import SGD
+from torch.utils.data import DataLoader
+from torch.nn.functional import nll_loss
 # Native
 import gc
+from tqdm import tqdm
 # Custom
 from .Config import Config
 from .CustomEmbedder import CustomEmbedder
@@ -22,11 +27,47 @@ class CustomModel:
             self.config.dataset_n_labels,
             self.config.classifier_threshold
         )
+        self.optimizer_embedding = SGD(
+            self.embedder.model.parameters(),
+            lr = self.config.model_train_learning_rate,
+            momentum = self.config.model_train_momentum
+        )
+        self.optimizer_classifier = SGD(
+            self.classifier.parameters(),
+            lr = self.config.model_train_learning_rate,
+            momentum = self.config.model_train_momentum
+        )
+        self.loss_function = nll_loss
     
     def predict(self, entries : list[str]):
         embeddings : Tensor = self.embedder(entries) # shape(batch x config.embeddingmodel_dim)
         logits = self.classifier(embeddings)
         return logits
+
+    def train_loop(self, loader : DataLoader, epoch : int) -> None: 
+        for batch in tqdm(loader, 
+                          desc = "Training loop", leave = False, position = 1):
+            self.optimizer_classifier.zero_grad()
+            self.optimizer_embedding.zero_grad()
+
+            prediction_logits = self.predict(batch["text"])
+            loss = self.loss_function(prediction_logits, batch["label"])
+            self.history.append_loss_train(epoch, loss.item())
+            loss.backward()
+
+            self.optimizer_classifier.step()
+            self.optimizer_embedding.step()
+    
+    def train(self, train_dataset : Dataset) -> None:
+        loader = DataLoader(
+            train_dataset, 
+            shuffle = True, 
+            batch_size = self.config.model_train_batchsize
+        )
+        for epoch in tqdm(range(self.config.model_train_n_epoch),
+                          desc = "Train Epoch", leave = True, position = 0):
+            self.train_loop(loader, epoch)
+            
 
     def __str__(self) -> str:
         return (

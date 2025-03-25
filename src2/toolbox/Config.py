@@ -39,6 +39,12 @@ class Config:
         self.embeddingmodel_dim = 768
         self.embeddingmodel_output = "last_hidden_state"
         
+        # Model
+        self.model_train_batchsize = 16
+        self.model_train_n_epoch = 2
+        self.model_train_learning_rate = 1e-4
+        self.model_train_momentum = 0.9
+
     def force_cpu(self) -> None: self.device = "cpu"
     def force_gpu(self) -> None: self.device = "cuda"
 
