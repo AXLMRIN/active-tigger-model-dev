@@ -50,7 +50,7 @@ def split_test_train_valid(dataset : Dataset, proportion_train : float = 0.7,
 
 class Evaluator:
     def __init__(self, n_label : int, threshold : float = 0.5):
-        self.threshold = threshold
+        self.log_threshold = np.log(threshold)
         self.n_label = n_label
         self.device = "cpu"
 
@@ -62,12 +62,11 @@ class Evaluator:
             ]
         ).to(device = self.device, dtype = bool, non_blocking=True)   
     
-    def __call__(self, result_logits : Tensor, labels : list[int]) -> dict:
+    def __call__(self, log_probs : Tensor, labels : list[int]) -> dict:
         """EVERYTHING HAPPENS ON CPU
-        labels are only the id of the labels"""
-        # first, apply sigmoid on predictions which are of shape (batch_size, num_labels)
-        sigmoid = Sigmoid()
-        probs = sigmoid(result_logits)
+        labels are only the id of the labels
+        The results are coming out of the log_softmax activation function
+        """
         # next, use threshold to turn them into integer predictions
         y_pred = np.zeros(log_probs.shape)
         y_pred[np.where(log_probs >= self.log_threshold)] = 1
