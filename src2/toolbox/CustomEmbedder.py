@@ -26,7 +26,7 @@ class CustomEmbedder:
             key : tokenized[key].to(device = self.model.device)
             for key in tokenized
         })
-        print(output.keys())
+        
         if (self.config.embeddingmodel_output == "pooler_output")&\
            ("pooler_output" in output.keys()) : 
             return output.pooler_output
