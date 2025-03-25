@@ -25,7 +25,7 @@ class Config:
         #Custom classifier settings
         # TODO Implement dynamic
         self.classifier_hiddenlayer_dim = 300
-        self.classifier_threshold = 0.5
+        self.classifier_threshold = 0.3
         # Tokenizer 
         self.tokennizer_settings : dict = {
             "padding" : "max_length",
