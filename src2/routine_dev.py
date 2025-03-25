@@ -30,4 +30,4 @@ print(embedder)
 
 model = CustomModel(config, embedder, classifier)
 
-model.train(dataset.ds["test"])
+#model.train(dataset.ds["test"])
