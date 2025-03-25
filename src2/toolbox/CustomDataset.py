@@ -35,7 +35,7 @@ class CustomDataset:
             })
             # Split dataset into 3 Datasets (train, test, validation)
             self.ds = split_test_train_valid(ds_config["whole"],
-                        **self.config.split_parameters
+                        **self.config.dataset_split_parameters
             )
             self.open_status = True
     def find_labels(self) -> None: 
