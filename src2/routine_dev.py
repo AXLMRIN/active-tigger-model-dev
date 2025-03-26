@@ -36,5 +36,5 @@ model.train(
     dataset.ds["validation"]
 )
 model.history.plot_all()
-model.history.save_metrics()
+model.history.save_all("./testing-save")
 model.clean()

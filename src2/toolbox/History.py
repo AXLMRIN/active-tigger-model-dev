@@ -3,7 +3,8 @@
 import pandas as pd
 import plotly.graph_objects as go
 # Native
-
+import os
+import shutil
 # Custom
 
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -52,10 +53,14 @@ class History:
 
     def plot_all(self):
         self.plot_loss_train()
+    def save_all(self, foldername):
+        if os.path.exists(foldername):
+            shutil.rmtree(foldername)
+        os.makedirs(foldername)
 
-    def save_metrics(self):
-        # UPGRADE Make it better
-        pd.DataFrame(self.metrics_save).to_csv("metrics_save.csv")
+        pd.DataFrame(self.metrics_save).to_csv(foldername + "/metrics_save.csv")
+        pd.DataFrame(self.train_loss_global).to_csv(foldername + "/loss_train.csv")
+        pd.DataFrame(self.validation_loss).to_csv(foldername + "/validation_loss.csv")
 
     def __str__(self) -> str:
         return (
