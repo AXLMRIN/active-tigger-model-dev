@@ -50,6 +50,9 @@ class Config:
         self.model_train_classifier_momentum = 0.9 # NOTE not used with Adam
         self.model_train_classifier_weight_decay = 0.01
 
+        #History
+        self.history_foldersave : str = "./HISTORY_SAVE"
+        
     def force_cpu(self) -> None: self.device = "cpu"
     def force_gpu(self) -> None: self.device = "cuda"
 
