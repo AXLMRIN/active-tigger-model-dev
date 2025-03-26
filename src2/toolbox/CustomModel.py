@@ -103,7 +103,7 @@ class CustomModel:
         loss_value : float = 0
         metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
         for batch in tqdm(loader, 
-                          desc = "Testing loop", leave = False, position = 1):
+                          desc = "Validation loop", leave = False, position = 1):
             prediction_logits = self.predict(batch["text"], eval_grad = False)
             loss = self.loss_function_validation(
                 prediction_logits.to(device = "cpu"), 
