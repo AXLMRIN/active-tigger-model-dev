@@ -23,10 +23,11 @@ dataset.preprocess_data(
 del LABEL2ID
 print(dataset)
 
-classifier = CustomClassifier(config)
-print(classifier)
 embedder = CustomEmbedder(config)
 print(embedder)
+
+classifier = CustomClassifier(config)
+print(classifier)
 
 model = CustomModel(config, embedder, classifier)
 
