@@ -73,7 +73,7 @@ class CustomModel:
         # UPGRADE the metrics are averages of averages, which is very bad
         metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
         for batch in tqdm(loader, 
-                          desc = "Training loop", leave = False, position = 1):
+                          desc = "Training loop", leave = False, position = 2):
             self.optimizer_classifier.zero_grad()
             self.optimizer_embedding.zero_grad()
 
@@ -103,7 +103,7 @@ class CustomModel:
         loss_value : float = 0
         metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
         for batch in tqdm(loader, 
-                          desc = "Validation loop", leave = False, position = 1):
+                          desc = "Validation loop", leave = False, position = 2):
             prediction_logits = self.predict(batch["text"], eval_grad = False)
             loss = self.loss_function_validation(
                 prediction_logits.to(device = "cpu"), 
@@ -137,7 +137,7 @@ class CustomModel:
             batch_size = self.config.model_train_batchsize
         )
         for epoch in tqdm(range(self.config.model_train_n_epoch),
-                          desc = "Train Epoch", leave = True, position = 0):
+                          desc = "Train Epoch", leave = False, position = 1):
             self.train_loop(train_loader, epoch)
             self.validation_loop(validation_loader, epoch)
 

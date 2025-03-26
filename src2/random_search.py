@@ -38,7 +38,7 @@ test_loader = DataLoader(
 num_attempts = 2
 
 for n_attempt in tqdm(range(num_attempts), 
-                      desc = "Attempt", position = 2, leave = True):
+                      desc = "Attempt", position = 0, leave = True):
     # pick random parameters
     config.model_train_classifier_learning_rate = choice(
         [1e-2 * (.5**i) for i in range(10)]
@@ -61,7 +61,7 @@ for n_attempt in tqdm(range(num_attempts),
     # evaluate on test data
     metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
     for batch in tqdm(test_loader, 
-                      desc = "Testing loop", leave = False, position = 1):
+                      desc = "Testing loop", leave = False, position = 2):
         prediction_logits = model.predict(batch["text"], eval_grad = False)
         loss = model.loss_function_validation(
             prediction_logits.to(device = "cpu"), 

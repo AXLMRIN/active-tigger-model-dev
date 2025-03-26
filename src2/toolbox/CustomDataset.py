@@ -57,13 +57,13 @@ class CustomDataset:
         preprocess_function_label)->None:
 
         for split in tqdm(["train", "test", "validation"], desc = "Preprocess",
-                            leave = True, position = 0): 
+                            leave = False, position = 1): 
             loader = DataLoader(self.ds[split])
             new_ds = {
                 "text" : [],
                 "label" : []
             }
-            for batch in tqdm(loader, desc = split, leave = False, position = 1): 
+            for batch in tqdm(loader, desc = split, leave = False, position = 2): 
                 new_ds["text"].extend(preprocess_function_text(batch))
                 new_ds["label"].extend(preprocess_function_label(batch))
             
