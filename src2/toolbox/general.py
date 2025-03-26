@@ -68,8 +68,12 @@ class Evaluator:
         The results are coming out of the log_softmax activation function
         """
         # next, use threshold to turn them into integer predictions
-        y_pred = np.zeros(log_probs.shape)
-        y_pred[np.where(log_probs >= self.log_threshold)] = 1
+        y_pred = np.array([
+            [element == max(row) for element in row]
+            for row in log_probs
+        ])
+        # y_pred = np.zeros(log_probs.shape)
+        # y_pred[np.where(log_probs >= self.log_threshold)] = 1
         # finally, compute metrics
         y_true = self.create_target(labels)
         f1_micro_average = f1_score(
