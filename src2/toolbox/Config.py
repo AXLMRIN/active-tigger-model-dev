@@ -2,11 +2,12 @@
 # Third parties
 from torch.cuda import is_available as cuda_available
 # Native
+import json 
 
 # Custom
 
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-class Config:
+class Config(object):
     def __init__(self):
         self.seed : int = 2306406
         self.device = "cuda" if cuda_available() else "cpu"
@@ -56,6 +57,11 @@ class Config:
     def force_cpu(self) -> None: self.device = "cpu"
     def force_gpu(self) -> None: self.device = "cuda"
 
+    def __getattr__(self, item):return super(Config, self).__setattr__(item, 'orphan')
+
+    def save(self) : 
+        with open(self.history_foldersave + "/config.json", "w") as file:
+            json.dump(self.__dict__, file, sort_keys = True, indent = 4)
     def __str__(self):
         return (
             "Config object"
