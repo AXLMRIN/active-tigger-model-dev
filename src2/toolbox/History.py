@@ -58,7 +58,7 @@ class History:
             shutil.rmtree(foldername)
         os.makedirs(foldername)
 
-        pd.Series(self.train_loss_global).to_csv(foldername + "/loss_train.csv")
+        pd.Series(self.train_loss_global).to_csv(foldername + "/loss_train.csv") 
         pd.DataFrame(self.metrics_save).to_csv(foldername + "/metrics_save.csv")
         pd.DataFrame(self.validation_loss).to_csv(foldername + "/validation_loss.csv")
 
