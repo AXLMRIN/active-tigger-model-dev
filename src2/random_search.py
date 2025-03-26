@@ -11,7 +11,7 @@ from tqdm import tqdm
 from random import choice
 
 config = Config()
-config.model_train_n_epoch = 1 # huge number of epoch for exploration purposes
+config.model_train_n_epoch = 10 # huge number of epoch for exploration purposes
 
 dataset = CustomDataset(config)
 dataset.open_dataset()
@@ -35,7 +35,7 @@ test_loader = DataLoader(
     shuffle = True
 )
 
-num_attempts = 2
+num_attempts = 50
 
 for n_attempt in tqdm(range(num_attempts), 
                       desc = "Attempt", position = 0, leave = True):
@@ -61,7 +61,7 @@ for n_attempt in tqdm(range(num_attempts),
     # evaluate on test data
     metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
     for batch in tqdm(test_loader, 
-                      desc = "Testing loop", leave = False, position = 2):
+                      desc = "Testing loop", leave = False, position = 1):
         prediction_logits = model.predict(batch["text"], eval_grad = False)
         loss = model.loss_function_validation(
             prediction_logits.to(device = "cpu"), 
