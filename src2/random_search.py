@@ -11,7 +11,7 @@ from tqdm import tqdm
 from random import choice
 
 config = Config()
-config.model_train_n_epoch = 10 # huge number of epoch for exploration purposes
+config.model_train_n_epoch = 1 # huge number of epoch for exploration purposes
 
 dataset = CustomDataset(config)
 dataset.open_dataset()
@@ -35,10 +35,10 @@ test_loader = DataLoader(
     shuffle = True
 )
 
-num_attempts = 0
+num_attempts = 2
 
 for n_attempt in tqdm(range(num_attempts), 
-                      desc = "Attempt", position = 0, leave = True):
+                      desc = "Attempt", position = 2, leave = True):
     # pick random parameters
     config.model_train_classifier_learning_rate = choice(
         [1e-2 * (.5**i) for i in range(10)]
@@ -50,7 +50,7 @@ for n_attempt in tqdm(range(num_attempts),
         [0.001 + 0.099 * i / 19 for i in range(20)]
     )
     config.classifier_hiddenlayer_dim = choice([10, 50, 300])
-    config.history_foldersave = "./save_random_search/{n_attempt}"
+    config.history_foldersave = f"./save_random_search/{n_attempt}"
 
     # train evaluate, save
     embedder = CustomEmbedder(config)
