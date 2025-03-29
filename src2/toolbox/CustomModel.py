@@ -63,6 +63,7 @@ class CustomModel:
         self.best_classifier = None
     
     def load_best(self) : 
+        self.best_embedder = CustomEmbedder()
         self.best_embedder.load_from_disk(self.config.embeddingmodel_save_filename)
         self.best_classifier = CustomClassifier(self.config)
         self.best_classifier.load_state_dict(
