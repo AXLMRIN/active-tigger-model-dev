@@ -1,7 +1,8 @@
 # IMPORTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Third parties
 from datasets import Dataset
-from torch import Tensor, no_grad
+from numpy import inf
+from torch import Tensor, no_grad, load, save
 from torch.cuda import synchronize, ipc_collect, empty_cache
 from torch.optim import Adam, SGD
 from torch.utils.data import DataLoader
@@ -58,15 +59,31 @@ class CustomModel:
 
         self.loss_function_train = CrossEntropyLoss(reduction = "mean")
         self.loss_function_validation = CrossEntropyLoss(reduction = "sum")
+        self.best_embedder = None
+        self.best_classifier = None
     
-    def predict(self, entries : list[str], eval_grad : bool = False):
+    def load_best(self) : 
+        self.best_embedder.load_from_disk(self.config.embeddingmodel_save_filename)
+        self.best_classifier = CustomClassifier(self.config)
+        self.best_classifier.load_state_dict(
+            load(self.config.classifier_save_filename, weights_only=True)
+        )
+
+    def predict(self, entries : list[str], eval_grad : bool = False,
+                use_best : bool = False):
+        can_use_best_embedder = not(self.best_embedder is None)
+        can_use_best_classifier = not(self.best_embedder is None)
+
+        embedder = self.best_embedder if use_best&can_use_best_embedder else self.embedder
+        classifier = self.best_classifier if use_best&can_use_best_embedder else self.classifier
+        
         if eval_grad:
-            embeddings : Tensor = self.embedder(entries) # shape(batch x config.embeddingmodel_dim)
-            logits = self.classifier(embeddings)
+            embeddings : Tensor = embedder(entries) # shape(batch x config.embeddingmodel_dim)
+            logits = classifier(embeddings)
         else :
             with no_grad():
-                embeddings : Tensor = self.embedder(entries) # shape(batch x config.embeddingmodel_dim)
-                logits = self.classifier(embeddings)
+                embeddings : Tensor = embedder(entries) # shape(batch x config.embeddingmodel_dim)
+                logits = classifier(embeddings)
         return logits
 
     def train_loop(self, loader : DataLoader, epoch : int) -> None: 
@@ -136,10 +153,20 @@ class CustomModel:
             shuffle = True, 
             batch_size = self.config.model_train_batchsize
         )
+        lowest_validation_loss = inf
         for epoch in tqdm(range(self.config.model_train_n_epoch),
                           desc = "Train Epoch", leave = False, position = 1):
+            self.embedder.train()
+            self.classifier.train()
             self.train_loop(train_loader, epoch)
+            self.embedder.eval()
+            self.classifier.eval()
             self.validation_loop(validation_loader, epoch)
+            
+            if self.history.validation_loss[-1] <= lowest_validation_loss : 
+                lowest_validation_loss = self.history.validation_loss[-1]
+                self.embedder.save_to_disk(self.config.embeddingmodel_save_filename)
+                save(self.classifier.state_dict(), self.config.classifier_save_filename)
 
     def __str__(self) -> str:
         return (
