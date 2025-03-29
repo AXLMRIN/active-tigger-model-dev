@@ -11,7 +11,7 @@ from tqdm import tqdm
 from random import choice
 
 config = Config()
-config.model_train_n_epoch = 10 # huge number of epoch for exploration purposes
+config.model_train_n_epoch = 5 # After first result analysis
 
 dataset = CustomDataset(config)
 dataset.open_dataset()
