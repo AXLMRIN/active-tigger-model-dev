@@ -8,4 +8,5 @@ data/*
 .vscode/
 *.log
 save_random_search/
+save_random_search_2/
 save_random_search_embedder/
