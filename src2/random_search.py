@@ -70,7 +70,10 @@ for n_attempt in tqdm(range(num_attempts),
     )
 
     config.history_foldersave = f"./save_random_search/{n_attempt}"
-
+    config.embeddingmodel_save_filename = (f"{config.history_foldersave}/"
+                                         f"{config.embeddingmodel_save_filename}")
+    config.classifier_save_filename = (f"{config.history_foldersave}/"
+                                    f"{config.classifier_save_filename}")
     # train evaluate, save
     embedder = CustomEmbedder(config)
     classifier = CustomClassifier(config)
@@ -82,7 +85,7 @@ for n_attempt in tqdm(range(num_attempts),
     model.embedder.eval()
     model.classifier.eval()
     metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
-    
+
     for batch in tqdm(test_loader, 
                       desc = "Testing loop", leave = False, position = 1):
         prediction_logits = model.predict(
