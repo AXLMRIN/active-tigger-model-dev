@@ -33,7 +33,19 @@ class CustomEmbedder:
             return output.pooler_output
         else:
             return output.last_hidden_state[:,0,:]
-        
+    
+    def save_to_disk(self, filename):
+        self.model.save_pretrained(filename)
+
+    def load_from_disk(self, filename):
+        self.model = AutoModel.from_pretrained(filename)
+
+    def train(self):
+        for param in self.model.parameters(): param.requires_grad = True
+    
+    def eval(self):
+        for param in self.model.parameters(): param.requires_grad = False
+
     def clean(self):
         del self.model, self.tokenizer
         gc.collect()
