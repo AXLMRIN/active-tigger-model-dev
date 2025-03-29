@@ -27,6 +27,8 @@ class Config(object):
         # TODO Implement dynamic
         self.classifier_hiddenlayer_dim = 50 # After first result analysis
         self.classifier_threshold = 0.3
+        self.classifier_save_filename = "custom_classifier_save"
+        
         # Tokenizer 
         self.tokennizer_settings : dict = {
             "padding" : "max_length",
@@ -34,17 +36,19 @@ class Config(object):
             "max_length" : 20,
             "return_tensors" : "pt"
         }
+
         # Embedding model
         self.embeddingmodel_name = "google-bert/bert-base-uncased"
         self.embeddingmodel_dim = None
         self.embeddingmodel_output = "last_hidden_state"
+        self.embeddingmodel_save_filename = f"{self.embeddingmodel_name}_custom_save"
         
         # Model
         self.model_train_batchsize = 32
         self.model_train_n_epoch = 5
         self.model_train_embedding_optimizer = "Adam"
         self.model_train_embedding_learning_rate = 300e-6 # After first result analysis
-        self.model_train_embedding_momentum = 0.9 # NOTE not used with Adam
+        self.model_train_embedding_momentum = None # NOTE not used with Adam
         self.model_train_embedding_weight_decay = 0.001 # After first result analysis
         self.model_train_classifier_optimizer = "SGD"
         self.model_train_classifier_learning_rate = 1e-2 # After first result analysis
