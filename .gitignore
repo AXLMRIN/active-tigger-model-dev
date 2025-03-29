@@ -7,3 +7,7 @@ models/2025-03-04-bert-base-uncased
 data/*
 .vscode/
 *.log
+save_random_search/
+save_random_search_embedder/
+save_random_searchU/
+save_random_search_embedderU/
