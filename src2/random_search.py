@@ -71,9 +71,10 @@ for n_attempt in tqdm(range(num_attempts),
 
     config.history_foldersave = f"./save_random_search/{n_attempt}"
     config.embeddingmodel_save_filename = (f"{config.history_foldersave}/"
-                                         f"{config.embeddingmodel_save_filename}")
+                                         f"custom_classifier_save.pt")
     config.classifier_save_filename = (f"{config.history_foldersave}/"
-                                    f"{config.classifier_save_filename}")
+                                    f"bert-base-uncased_custom_save")
+    #NOTE Will be erased because of the saving process in history that overwrite everything
     # train evaluate, save
     embedder = CustomEmbedder(config)
     classifier = CustomClassifier(config)
