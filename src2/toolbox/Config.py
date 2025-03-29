@@ -27,8 +27,8 @@ class Config(object):
         # TODO Implement dynamic
         self.classifier_hiddenlayer_dim = 50 # After first result analysis
         self.classifier_threshold = 0.3
-        self.classifier_save_filename = "custom_classifier_save"
-        
+        self.classifier_save_filename = "custom_classifier_save.pt"
+
         # Tokenizer 
         self.tokennizer_settings : dict = {
             "padding" : "max_length",
@@ -41,7 +41,7 @@ class Config(object):
         self.embeddingmodel_name = "google-bert/bert-base-uncased"
         self.embeddingmodel_dim = None
         self.embeddingmodel_output = "last_hidden_state"
-        self.embeddingmodel_save_filename = f"{self.embeddingmodel_name}_custom_save"
+        self.embeddingmodel_save_filename = f"bert-base-uncased_custom_save"
         
         # Model
         self.model_train_batchsize = 32
