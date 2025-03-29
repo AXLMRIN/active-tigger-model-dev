@@ -25,7 +25,7 @@ class Config(object):
         self.dataset_n_labels = None
         #Custom classifier settings
         # TODO Implement dynamic
-        self.classifier_hiddenlayer_dim = 10
+        self.classifier_hiddenlayer_dim = 50 # After first result analysis
         self.classifier_threshold = 0.3
         # Tokenizer 
         self.tokennizer_settings : dict = {
@@ -43,13 +43,13 @@ class Config(object):
         self.model_train_batchsize = 32
         self.model_train_n_epoch = 5
         self.model_train_embedding_optimizer = "Adam"
-        self.model_train_embedding_learning_rate = 1e-5
+        self.model_train_embedding_learning_rate = 300e-6 # After first result analysis
         self.model_train_embedding_momentum = 0.9 # NOTE not used with Adam
-        self.model_train_embedding_weight_decay = 0.01
+        self.model_train_embedding_weight_decay = 0.001 # After first result analysis
         self.model_train_classifier_optimizer = "SGD"
-        self.model_train_classifier_learning_rate = 1e-3
-        self.model_train_classifier_momentum = 0.9 # NOTE not used with Adam
-        self.model_train_classifier_weight_decay = 0.01
+        self.model_train_classifier_learning_rate = 1e-2 # After first result analysis
+        self.model_train_classifier_momentum = 0.6 # NOTE not used with Adam # After first result analysis
+        self.model_train_classifier_weight_decay = 0.03 # After first result analysis
 
         #History
         self.history_foldersave : str = "./HISTORY_SAVE"
