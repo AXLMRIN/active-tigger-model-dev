@@ -65,7 +65,7 @@ class CustomModel:
     def load_best(self) : 
         self.best_embedder = CustomEmbedder(self.config)
         self.best_embedder.load_from_disk(self.config.embeddingmodel_save_filename)
-        self.best_classifier = CustomClassifier(self.config)
+        self.best_classifier = CustomClassifier(self.config).to(device = self.config.device)
         self.best_classifier.load_state_dict(
             load(self.config.classifier_save_filename, weights_only=True)
         )
