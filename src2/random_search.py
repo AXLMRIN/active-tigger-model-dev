@@ -78,10 +78,18 @@ for n_attempt in tqdm(range(num_attempts),
     model.train(dataset.ds["train"],dataset.ds["validation"])
 
     # evaluate on test data
+    model.load_best()
+    model.embedder.eval()
+    model.classifier.eval()
     metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
+    
     for batch in tqdm(test_loader, 
                       desc = "Testing loop", leave = False, position = 1):
-        prediction_logits = model.predict(batch["text"], eval_grad = False)
+        prediction_logits = model.predict(
+            batch["text"], 
+            eval_grad = False,
+            use_best = True
+        )
         loss = model.loss_function_validation(
             prediction_logits.to(device = "cpu"), 
             batch["label"]
