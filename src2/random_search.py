@@ -35,21 +35,40 @@ test_loader = DataLoader(
     shuffle = True
 )
 
-num_attempts = 50
+num_attempts = 100
 
 for n_attempt in tqdm(range(num_attempts), 
                       desc = "Attempt", position = 0, leave = True):
     # pick random parameters
+    # Classifier
     config.model_train_classifier_learning_rate = choice(
-        [1e-2 * (.5**i) for i in range(10)]
+        [0.01, 0.005, 1e-6]
     )
+
     config.model_train_classifier_momentum = choice(
-        [0.5 + 0.4 * i / 9 for i in range(10)]
+        [0.45, 0.50, 0.55, 0.60, 0.65]
     )
+
     config.model_train_classifier_weight_decay = choice(
-        [0.001 + 0.099 * i / 19 for i in range(20)]
+        [1e-3, 2e-3, 3e-3, 4e-3, 5e-3]
     )
-    config.classifier_hiddenlayer_dim = choice([10, 50, 300])
+
+    config.classifier_hiddenlayer_dim = choice(
+        [50, 100, 150, 200, 250]
+    )
+    # Embedding
+    config.model_train_embedding_learning_rate = choice(
+        [200e-6, 300e-6, 400e-6, 50e-6]
+    )
+
+    config.model_train_embedding_weight_decay = choice(
+        [0.001, 0.075, 0.05, 0.1]
+    )
+
+    config.embeddingmodel_output = choice(
+        ["pooler_output", "last_hidden_state"]
+    )
+    
     config.history_foldersave = f"./save_random_search/{n_attempt}"
 
     # train evaluate, save
