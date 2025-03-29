@@ -35,7 +35,7 @@ test_loader = DataLoader(
     shuffle = True
 )
 
-num_attempts = 100
+num_attempts = 1
 
 for n_attempt in tqdm(range(num_attempts), 
                       desc = "Attempt", position = 0, leave = True):
@@ -68,7 +68,7 @@ for n_attempt in tqdm(range(num_attempts),
     config.embeddingmodel_output = choice(
         ["pooler_output", "last_hidden_state"]
     )
-    
+
     config.history_foldersave = f"./save_random_search/{n_attempt}"
 
     # train evaluate, save
