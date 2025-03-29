@@ -45,7 +45,7 @@ class Config(object):
         
         # Model
         self.model_train_batchsize = 32
-        self.model_train_n_epoch = 2 #DEBUG
+        self.model_train_n_epoch = 5
         self.model_train_embedding_optimizer = "Adam"
         self.model_train_embedding_learning_rate = 300e-6 # After first result analysis
         self.model_train_embedding_momentum = None # NOTE not used with Adam
