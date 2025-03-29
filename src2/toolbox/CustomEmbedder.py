@@ -38,7 +38,7 @@ class CustomEmbedder:
         self.model.save_pretrained(filename)
 
     def load_from_disk(self, filename):
-        self.model = AutoModel.from_pretrained(filename)
+        self.model = AutoModel.from_pretrained(filename).to(device = self.config.device)
 
     def train(self):
         for param in self.model.parameters(): param.requires_grad = True
