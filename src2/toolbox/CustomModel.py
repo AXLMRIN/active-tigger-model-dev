@@ -76,7 +76,7 @@ class CustomModel:
         can_use_best_classifier = not(self.best_embedder is None)
 
         embedder = self.best_embedder if use_best&can_use_best_embedder else self.embedder
-        classifier = self.best_classifier if use_best&can_use_best_embedder else self.classifier
+        classifier = self.best_classifier if use_best&can_use_best_classifier else self.classifier
         
         if eval_grad:
             embeddings : Tensor = embedder(entries) # shape(batch x config.embeddingmodel_dim)

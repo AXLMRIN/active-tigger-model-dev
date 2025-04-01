@@ -38,6 +38,7 @@ class CustomDataset:
                         **self.config.dataset_split_parameters
             )
             self.open_status = True
+            
     def find_labels(self) -> None: 
         for split in ["train", "test", "validation"] : 
             self.ds[split] = self.ds[split].rename_column(
