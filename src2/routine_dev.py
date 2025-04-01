@@ -1,6 +1,6 @@
+# CUSTOM IMPORTS
 from toolbox.Config import Config
 from toolbox.CustomModel import CustomModel
-from toolbox.History import History
 from toolbox.CustomDataset import CustomDataset
 from toolbox.CustomClassifier import CustomClassifier
 from toolbox.CustomEmbedder import CustomEmbedder
