@@ -24,7 +24,6 @@ class Config(object):
         }
         self.dataset_n_labels = None
         #Custom classifier settings
-        # TODO Implement dynamic
         self.classifier_hiddenlayer_dim = 50 # After first result analysis
         self.classifier_threshold = 0.3
         self.classifier_save_filename = "custom_classifier_save.pt"
@@ -66,6 +65,7 @@ class Config(object):
     def save(self) : 
         with open(self.history_foldersave + "/config.json", "w") as file:
             json.dump(self.__dict__, file, sort_keys = True, indent = 4)
+            
     def __str__(self):
         return (
             "Config object"
