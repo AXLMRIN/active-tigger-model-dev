@@ -4,7 +4,7 @@ from datasets import Dataset
 from numpy import inf
 from torch import Tensor, no_grad, load, save
 from torch.cuda import synchronize, ipc_collect, empty_cache
-from torch.optim import Adam, SGD
+from torch.optim import Adam, SGD, AdamW, Adamax
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
 # Native
@@ -32,29 +32,38 @@ class CustomModel:
         if self.config.model_train_embedding_optimizer == "Adam":
             self.optimizer_embedding = Adam(
                 self.embedder.model.parameters(),
-                lr = self.config.model_train_embedding_learning_rate,
-                weight_decay = self.config.model_train_embedding_weight_decay 
+                **self.config.model_train_embedding_adam_parameters
             )
-        elif self.config.model_train_embedding_optimizer == "SGD":
-            self.optimizer_embedding = SGD(
+        elif self.config.model_train_embedding_optimizer == "AdamW":
+            self.optimizer_embedding = AdamW(
                 self.embedder.model.parameters(),
-                lr = self.config.model_train_embedding_learning_rate,
-                momentum = self.config.model_train_embedding_momentum,
-                weight_decay = self.config.model_train_embedding_weight_decay
+                **self.config.model_train_embedding_adamw_parameters
+            )
+        elif self.config.model_train_embedding_optimizer == "Adamax":
+            self.optimizer_embedding = Adamax(
+                self.embedder.model.parameters(),
+                **self.config.model_train_embedding_adamw_parameters
             )
 
-        if self.config.model_train_classifier_optimizer == "Adam":
-            self.optimizer_classifier = Adam(
-                self.classifier.parameters(),
-                lr = self.config.model_train_classifier_learning_rate,
-                weight_decay = self.config.model_train_classifier_weight_decay 
-            )
         elif self.config.model_train_classifier_optimizer == "SGD":
             self.optimizer_classifier = SGD(
                 self.classifier.parameters(),
-                lr = self.config.model_train_classifier_learning_rate,
-                momentum = self.config.model_train_classifier_momentum,
-                weight_decay = self.config.model_train_classifier_weight_decay
+                **self.config.model_train_classifier_sgd_parameters
+            )
+        if self.config.model_train_classifier_optimizer == "Adam":
+            self.optimizer_classifier = Adam(
+                self.classifier.parameters(),
+                **self.config.model_train_classifier_adam_parameters
+            )
+        if self.config.model_train_classifier_optimizer == "AdamW":
+            self.optimizer_classifier = AdamW(
+                self.classifier.parameters(),
+                **self.config.model_train_classifier_adamw_parameters
+            )
+        if self.config.model_train_classifier_optimizer == "Adamax":
+            self.optimizer_classifier = Adamax(
+                self.classifier.parameters(),
+                **self.config.model_train_classifier_adamax_parameters
             )
 
         self.loss_function_train = CrossEntropyLoss(reduction = "mean")

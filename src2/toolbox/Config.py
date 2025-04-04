@@ -46,13 +46,50 @@ class Config(object):
         self.model_train_batchsize = 32
         self.model_train_n_epoch = 5
         self.model_train_embedding_optimizer = "Adam"
-        self.model_train_embedding_learning_rate = 300e-6 # After first result analysis
-        self.model_train_embedding_momentum = None # NOTE not used with Adam
-        self.model_train_embedding_weight_decay = 0.001 # After first result analysis
+        self.model_train_embedding_adam_parameters = {
+            "lr" : 1e-3,                                # Default
+            "betas" : (0.9,0.999),                      # Default
+            "eps" : 1e-8,                               # Default
+            "weight_decay" : 0                          # Default
+        }
+        self.model_train_embedding_adamw_parameters = {
+            "lr" : 1e-3,                                # Default
+            "betas" : (0.9,0.999),                      # Default
+            "eps" : 1e-8,                               # Default
+            "weight_decay" : 1e-2                       # Default
+        }
+        self.model_train_embedding_adamax_parameters = {
+            "lr" : 2e-3,                                # Default
+            "betas" : (0.9,0.999),                      # Default
+            "eps" : 1e-8,                               # Default
+            "weight_decay" : 0                          # Default
+        }
+
         self.model_train_classifier_optimizer = "SGD"
-        self.model_train_classifier_learning_rate = 1e-2 # After first result analysis
-        self.model_train_classifier_momentum = 0.6 # NOTE not used with Adam # After first result analysis
-        self.model_train_classifier_weight_decay = 0.03 # After first result analysis
+        self.model_train_classifier_sgd_parameters = {
+            "lr" : 1e-3,                                # Default
+            "momentum" : 0,                             # Default
+            "dampening" : 0,                            # Default
+            "weight_decay" : 0                          # Default
+        }
+        self.model_train_classifier_adam_parameters = {
+            "lr" : 1e-3,                                # Default
+            "betas" : (0.9,0.999),                      # Default
+            "eps" : 1e-8,                               # Default
+            "weight_decay" : 0                          # Default
+        }
+        self.model_train_classifier_adamw_parameters = {
+            "lr" : 1e-3,                                # Default
+            "betas" : (0.9,0.999),                      # Default
+            "eps" : 1e-8,                               # Default
+            "weight_decay" : 1e-2                       # Default
+        }
+        self.model_train_classifier_adamax_parameters = {
+            "lr" : 2e-3,                                # Default
+            "betas" : (0.9,0.999),                      # Default
+            "eps" : 1e-8,                               # Default
+            "weight_decay" : 0                          # Default
+        }
 
         #History
         self.history_foldersave : str = "./HISTORY_SAVE"
