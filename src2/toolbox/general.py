@@ -50,7 +50,7 @@ def split_test_train_valid(dataset : Dataset, proportion_train : float = 0.7,
 
 class Evaluator:
     def __init__(self, n_label : int, threshold : float = 0.5):
-        self.log_threshold = np.log(threshold)
+        self.log_threshold = np.log(threshold) # UNUSED FIXME
         self.n_label = n_label
         self.device = "cpu"
 
@@ -67,7 +67,7 @@ class Evaluator:
         labels are only the id of the labels
         The results are coming out of the log_softmax activation function
         """
-        # next, use threshold to turn them into integer predictions
+        # next, use the max logit to make the prediction
         y_pred = np.array([
             [element == max(row) for element in row]
             for row in log_probs
@@ -87,3 +87,27 @@ class Evaluator:
         return {'f1': f1_micro_average,
                 'roc_auc': roc_auc,
                 'accuracy': accuracy}
+    
+    def confusion_matrix(self, log_probs : Tensor, labels_true : list[int]) -> dict:
+        """EVERYTHING HAPPENS ON CPU
+        labels are only the id of the labels
+        The results are coming out of the log_softmax activation function
+
+            PREDICTED
+        T   x | x | x | x
+        R   x | x | x | x
+        U   x | x | x | x
+        E   x | x | x | x
+        """
+
+        labels_pred = np.array([
+            np.argmax(row) for row in log_probs
+        ])
+        
+        confusion_matrix = {
+            i : {j for j in range(self.n_label)} 
+            for i in range(self.n_label)
+        }
+        for pred, true in (labels_pred, labels_true) : 
+            confusion_matrix[true][pred] += 1
+        return confusion_matrix

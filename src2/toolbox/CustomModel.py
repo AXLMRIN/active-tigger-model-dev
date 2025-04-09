@@ -119,8 +119,11 @@ class CustomModel:
             self.optimizer_embedding.step()
         
         metrics = self.evaluator(log_probs,labels)
+        confusion_matrix = self.evaluator.confusion_matrix(log_probs,labels)
         self.history.append_loss_train(epoch, loss_value / len(loader.dataset))
         self.history.append_metrics(epoch, "train", metrics)
+        self.history.append_confusion_matrix(epoch, confusion_matrix,
+            tag = "train", id2label = self.config.dataset_id2label)
 
     def validation_loop(self, loader : DataLoader, epoch : int) -> None:
         loss_value : float = 0
@@ -139,9 +142,12 @@ class CustomModel:
             labels.extend(batch["label"])
 
         metrics = self.evaluator(log_probs,labels)
+        confusion_matrix = self.evaluator.confusion_matrix(log_probs,labels)
         self.history.append_loss_validation(epoch,loss_value / len(loader.dataset))
         self.history.append_metrics(epoch, "validation", metrics)
-
+        self.history.append_confusion_matrix(epoch, confusion_matrix,
+                tag = "validation", id2label = self.config.dataset_id2label)
+        
     def test_loop(self, loader : DataLoader) -> None:
         loss_value : float = 0
         log_probs : list[list[float]] = []
@@ -159,8 +165,10 @@ class CustomModel:
             labels.extend(batch["label"])
 
         metrics = self.evaluator(log_probs,labels)
+        confusion_matrix = self.evaluator.confusion_matrix(log_probs,labels)
         self.history.append_metrics(-1, "test", metrics)
-
+        self.history.append_confusion_matrix(-1, confusion_matrix,
+                tag = "test", id2label = self.config.dataset_id2label)
     
     def train(self, train_dataset : Dataset, validation_dataset : Dataset) -> None:
         train_loader = DataLoader(

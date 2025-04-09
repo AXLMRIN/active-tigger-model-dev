@@ -19,6 +19,7 @@ class History:
             "roc_auc" : [],
             "accuracy" : []
         }
+        self.confusion_matrix : list[dict[str:int]] = []
 
     def append_loss_train(self,epoch : int, loss_value : float) -> None:
         self.train_loss.append({
@@ -31,6 +32,26 @@ class History:
             "epoch" : epoch,
             "loss_value" : loss_value
         })
+    
+    def append_confusion_matrix(self, epoch : int, confusion_matrix : dict, tag : str,
+                         id2label : dict[int:str]) -> None:
+        """
+              PREDICTED
+        T   x | x | x | x
+        R   x | x | x | x
+        U   x | x | x | x
+        E   x | x | x | x
+        """
+        for idtrue in confusion_matrix :
+            self.confusion_matrix.append({
+                "epoch" : epoch,
+                "tag" : tag,
+                "true" : id2label[idtrue]
+                **{
+                    f"pred_{id2label[idpred]}" : confusion_matrix[idtrue][idpred]
+                    for idpred in confusion_matrix[idtrue]
+                }
+            }) 
 
     def append_metrics(self,epoch : int, loop : str, 
                        metrics : dict[str:float]) -> None:
@@ -53,6 +74,7 @@ class History:
         pd.DataFrame(self.train_loss).to_csv(foldername + "/train_loss.csv") 
         pd.DataFrame(self.metrics_save).to_csv(foldername + "/metrics_save.csv")
         pd.DataFrame(self.validation_loss).to_csv(foldername + "/validation_loss.csv")
+        pd.DataFrame(self.validation_loss).to_csv(foldername + "/confusion_matrix.csv")
 
     def __str__(self) -> str:
         return (
