@@ -52,7 +52,7 @@ class History:
 
         pd.DataFrame(self.train_loss).to_csv(foldername + "/train_loss.csv") 
         pd.DataFrame(self.metrics_save).to_csv(foldername + "/metrics_save.csv")
-        pd.Series(self.validation_loss).to_csv(foldername + "/validation_loss.csv")
+        pd.DataFrame(self.validation_loss).to_csv(foldername + "/validation_loss.csv")
 
     def __str__(self) -> str:
         return (
