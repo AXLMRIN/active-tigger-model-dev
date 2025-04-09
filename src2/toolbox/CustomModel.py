@@ -123,7 +123,6 @@ class CustomModel:
         self.history.append_metrics(epoch, "train", metrics)
 
     def validation_loop(self, loader : DataLoader, epoch : int) -> None:
-        # UPGRADE the metrics are averages of averages, which is very bad
         loss_value : float = 0
         log_probs : list[list[float]] = []
         labels : list[int] = []
@@ -142,6 +141,25 @@ class CustomModel:
         metrics = self.evaluator(log_probs,labels)
         self.history.append_loss_validation(epoch,loss_value / len(loader.dataset))
         self.history.append_metrics(epoch, "validation", metrics)
+
+    def test_loop(self, loader : DataLoader) -> None:
+        loss_value : float = 0
+        log_probs : list[list[float]] = []
+        labels : list[int] = []
+        for batch in tqdm(loader, 
+                          desc = "Validation loop", leave = False, position = 2):
+            prediction_logits = self.predict(batch["text"], eval_grad = False)
+            loss = self.loss_function(
+                prediction_logits.to(device = "cpu"), 
+                batch["label"]
+            )
+
+            loss_value += loss.item()
+            log_probs.extend(prediction_logits.to(device = "cpu").tolist())
+            labels.extend(batch["label"])
+
+        metrics = self.evaluator(log_probs,labels)
+        self.history.append_metrics(-1, "test", metrics)
 
     
     def train(self, train_dataset : Dataset, validation_dataset : Dataset) -> None:
