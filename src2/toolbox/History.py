@@ -10,8 +10,8 @@ import shutil
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class History:
     def __init__(self):
-        self.train_loss : list[dict[str : int|float]] = {}
-        self.validation_loss : list[dict[str : int|float]] = {}
+        self.train_loss : list[dict[str : int|float]] = []
+        self.validation_loss : list[dict[str : int|float]] = []
         self.metrics_save : dict = {
             "epoch" : [],
             "loop" : [],
