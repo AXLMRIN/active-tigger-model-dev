@@ -10,8 +10,8 @@ import shutil
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class History:
     def __init__(self):
-        self.train_loss : dict[int:float] = {}
-        self.validation_loss : dict[int:float] = {}
+        self.train_loss : list[dict[str : int|float]] = {}
+        self.validation_loss : list[dict[str : int|float]] = {}
         self.metrics_save : dict = {
             "epoch" : [],
             "loop" : [],
@@ -21,10 +21,16 @@ class History:
         }
 
     def append_loss_train(self,epoch : int, loss_value : float) -> None:
-        self.train_loss[epoch] = loss_value
+        self.train_loss.append({
+            "epoch" : epoch,
+            "loss_value" : loss_value
+        })
     
     def append_loss_validation(self, epoch : int, loss_value : float) -> None :
-        self.validation_loss[epoch] = loss_value
+        self.validation_loss.append({
+            "epoch" : epoch,
+            "loss_value" : loss_value
+        })
 
     def append_metrics(self,epoch : int, loop : str, 
                        metrics : dict[str:float]) -> None:
@@ -44,7 +50,7 @@ class History:
             shutil.rmtree(foldername)
         os.makedirs(foldername)
 
-        pd.DataFrame(self.train_loss).to_csv(foldername + "/loss_train.csv") 
+        pd.DataFrame(self.train_loss).to_csv(foldername + "/train_loss.csv") 
         pd.DataFrame(self.metrics_save).to_csv(foldername + "/metrics_save.csv")
         pd.Series(self.validation_loss).to_csv(foldername + "/validation_loss.csv")
 
