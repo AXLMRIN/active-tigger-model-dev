@@ -11,7 +11,7 @@ from tqdm import tqdm
 from random import choice
 
 config = Config()
-config.model_train_n_epoch = 5 # After first result analysis
+config.model_train_n_epoch = 2 # After first result analysis
 
 dataset = CustomDataset(config)
 dataset.open_dataset()
@@ -28,6 +28,12 @@ dataset.preprocess_data(
     lambda batch : preprocess_function_label(batch, LABEL2ID)
 )
 del LABEL2ID
+
+# debug
+config.model_train_batchsize = 8
+dataset.ds["train"] = dataset.ds["train"].select(range(80))
+dataset.ds["validation"] = dataset.ds["validation"].select(range(80))
+dataset.ds["test"] = dataset.ds["test"].select(range(80))
 
 
 embedder = CustomEmbedder(config)
