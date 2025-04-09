@@ -16,7 +16,7 @@ for iLRC in tqdm(range(len(lr_classifier_to_test)),desc = "lr_classifier_to_test
         config = Config()
         config.model_train_n_epoch = 5 # After first result analysis
 
-        config.history_foldersave = f"./LRE_{iLRE}_LRC_{iLRC}"
+        config.history_foldersave = f"./2025-04-09-grid-search/LRE_{iLRE}_LRC_{iLRC}"
         config.embeddingmodel_save_filename = f"{config.history_foldersave}/{config.embeddingmodel_save_filename}"
         config.classifier_save_filename = f"{config.history_foldersave}/{config.classifier_save_filename}"
 
