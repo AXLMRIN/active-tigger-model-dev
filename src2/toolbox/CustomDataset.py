@@ -20,8 +20,6 @@ class CustomDataset:
         self.ds : None | DatasetDict = None
         self.open_status : bool = False
         self.preprocess_status : bool = False
-        self.label2id : None | dict[str:int] = None
-        self.id2label : None | dict[int:str] = None
         self.labels : None | list[str] = None
         self.n_labels : None | int = None
 
@@ -49,8 +47,8 @@ class CustomDataset:
             )
         self.labels = list(set(self.ds["train"]["label"]))
         self.n_labels = len(self.labels)
-        self.label2id = {label : i for i,label in enumerate(self.labels)}
-        self.id2label = {i : label for i,label in enumerate(self.labels)}
+        self.config.dataset_label2id = {label : i for i,label in enumerate(self.labels)}
+        self.config.dataset_id2label = {i : label for i,label in enumerate(self.labels)}
         # Save to config to be used elsewhere
         self.config.dataset_n_labels = self.n_labels
     

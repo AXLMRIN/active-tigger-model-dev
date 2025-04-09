@@ -4,7 +4,7 @@ from toolbox.History import History
 from toolbox.CustomDataset import CustomDataset
 from toolbox.CustomClassifier import CustomClassifier
 from toolbox.CustomEmbedder import CustomEmbedder
-from copy import deepcopy
+
 
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -22,12 +22,11 @@ def preprocess_function_label(batch, label2id):
 def preprocess_function_text(batch): 
     return [sentence.lower() for sentence in batch["text"]]
 
-LABEL2ID = deepcopy(dataset.label2id)
+
 dataset.preprocess_data(
     preprocess_function_text, 
-    lambda batch : preprocess_function_label(batch, LABEL2ID)
+    lambda batch : preprocess_function_label(batch, config.dataset_label2id)
 )
-del LABEL2ID
 
 test_loader = DataLoader(
     dataset.ds["test"], 

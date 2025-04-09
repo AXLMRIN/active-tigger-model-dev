@@ -23,6 +23,8 @@ class Config(object):
             "seed" : self.seed
         }
         self.dataset_n_labels = None
+        self.dataset_label2id = None
+        self.dataset_id2label = None
         #Custom classifier settings
         self.classifier_hiddenlayer_dim = 50 # After first result analysis
         self.classifier_threshold = 0.3
