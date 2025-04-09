@@ -147,7 +147,7 @@ class CustomModel:
         log_probs : list[list[float]] = []
         labels : list[int] = []
         for batch in tqdm(loader, 
-                          desc = "Validation loop", leave = False, position = 2):
+                          desc = "Test loop", leave = False, position = 2):
             prediction_logits = self.predict(batch["text"], eval_grad = False)
             loss = self.loss_function(
                 prediction_logits.to(device = "cpu"), 
