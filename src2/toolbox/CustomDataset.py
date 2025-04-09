@@ -28,7 +28,7 @@ class CustomDataset:
     def open_dataset(self) -> None:
         #UPGRADE make possible to load from the internet
         #UPGRADE for now, only open csv but need to make it possible for different format
-        print(self.config.dataset_filename)
+        #print(self.config.dataset_filename)
         if self.config.dataset_filename.endswith(".csv") : 
             ds_config = load_dataset("csv",data_files={
                 "whole" : self.config.dataset_filename
