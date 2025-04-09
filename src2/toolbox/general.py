@@ -103,11 +103,11 @@ class Evaluator:
         labels_pred = np.array([
             np.argmax(row) for row in log_probs
         ])
-        
+        labels_true = [int(label) for label in labels_true]
         confusion_matrix = {
-            i : {j for j in range(self.n_label)} 
+            i : {j : 0 for j in range(self.n_label)} 
             for i in range(self.n_label)
         }
-        for pred, true in (labels_pred, labels_true) : 
+        for pred, true in zip(labels_pred, labels_true) :
             confusion_matrix[true][pred] += 1
         return confusion_matrix

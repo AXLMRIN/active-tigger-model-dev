@@ -46,7 +46,7 @@ class History:
             self.confusion_matrix.append({
                 "epoch" : epoch,
                 "tag" : tag,
-                "true" : id2label[idtrue]
+                "true" : id2label[idtrue],
                 **{
                     f"pred_{id2label[idpred]}" : confusion_matrix[idtrue][idpred]
                     for idpred in confusion_matrix[idtrue]
@@ -74,7 +74,7 @@ class History:
         pd.DataFrame(self.train_loss).to_csv(foldername + "/train_loss.csv") 
         pd.DataFrame(self.metrics_save).to_csv(foldername + "/metrics_save.csv")
         pd.DataFrame(self.validation_loss).to_csv(foldername + "/validation_loss.csv")
-        pd.DataFrame(self.validation_loss).to_csv(foldername + "/confusion_matrix.csv")
+        pd.DataFrame(self.confusion_matrix).to_csv(foldername + "/confusion_matrix.csv")
 
     def __str__(self) -> str:
         return (
