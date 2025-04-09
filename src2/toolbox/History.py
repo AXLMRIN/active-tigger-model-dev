@@ -34,17 +34,8 @@ class History:
         self.metrics_save["roc_auc"].append(metrics["roc_auc"])
         self.metrics_save["accuracy"].append(metrics["accuracy"])
 
-    def plot_loss_train(self):
-        # UPGRADE MAKE IT BETTER
-        go.Figure(
-            data = [
-                go.Scatter(
-                    x = [i for i in range(len(self.train_loss_global))],
-                    y = self.train_loss_global,
-                    name = "Train Loss"
-                )
-            ],
-        ).write_image("train_loss.png")
+    def OUTDATED_plot_loss_train(self):
+        print("OUTDATED NOTHING RUNS")
 
     def plot_all(self):
         self.plot_loss_train()
