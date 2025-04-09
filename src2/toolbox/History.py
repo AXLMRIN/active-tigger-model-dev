@@ -10,8 +10,7 @@ import shutil
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 class History:
     def __init__(self):
-        self.train_loss_per_epoch : dict[int:list[float]] = {}
-        self.train_loss_global : list[float] = []
+        self.train_loss : dict[int:float] = {}
         self.validation_loss : dict[int:float] = {}
         self.metrics_save : dict = {
             "epoch" : [],
@@ -21,12 +20,8 @@ class History:
             "accuracy" : []
         }
 
-    def append_loss_train(self, epoch : int, loss_value : float) -> None:
-        self.train_loss_global.append(loss_value)
-        
-        if epoch not in self.train_loss_per_epoch:
-            self.train_loss_per_epoch[epoch] = []
-        self.train_loss_per_epoch[epoch].append(loss_value)
+    def append_loss_train(self,epoch : int, loss_value : float) -> None:
+        self.train_loss[epoch] = loss_value
     
     def append_loss_validation(self, epoch : int, loss_value : float) -> None :
         self.validation_loss[epoch] = loss_value

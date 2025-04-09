@@ -66,8 +66,7 @@ class CustomModel:
                 **self.config.model_train_classifier_adamax_parameters
             )
 
-        self.loss_function_train = CrossEntropyLoss(reduction = "mean")
-        self.loss_function_validation = CrossEntropyLoss(reduction = "sum")
+        self.loss_function = CrossEntropyLoss(reduction = "sum")
         self.best_embedder = None
         self.best_classifier = None
     
@@ -80,7 +79,7 @@ class CustomModel:
         )
 
     def predict(self, entries : list[str], eval_grad : bool = False,
-                use_best : bool = False):
+                use_best : bool = False) -> Tensor:
         can_use_best_embedder = not(self.best_embedder is None)
         can_use_best_classifier = not(self.best_embedder is None)
 
@@ -97,59 +96,51 @@ class CustomModel:
         return logits
 
     def train_loop(self, loader : DataLoader, epoch : int) -> None: 
-        # UPGRADE the metrics are averages of averages, which is very bad
-        # TODO change, only save once every epoch
-        metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
+        log_probs : list[list[float]] = []
+        labels : list[int] = []
+        loss_value = 0
         for batch in tqdm(loader, 
                           desc = "Training loop", leave = False, position = 2):
             self.optimizer_classifier.zero_grad()
             self.optimizer_embedding.zero_grad()
 
             prediction_logits = self.predict(batch["text"], eval_grad = True)
-            loss = self.loss_function_train(
+            
+            loss = self.loss_function(
                 prediction_logits.to(device = "cpu"), 
                 batch["label"])
-            self.history.append_loss_train(epoch, loss.item())
             loss.backward()
 
-            batch_metrics = self.evaluator(
-                prediction_logits.to(device = "cpu"), 
-                batch["label"]
-            )
-            metrics = {
-                key : metrics[key] + batch_metrics[key] for key in metrics
-            }
+            loss_value += loss.item()
+            log_probs.extend(prediction_logits.to(device = "cpu").tolist())
+            labels.extend(batch["label"])
+
             self.optimizer_classifier.step()
             self.optimizer_embedding.step()
-        metrics = {
-            key : metrics[key] / len(loader) for key in metrics
-        }
+        
+        metrics = self.evaluator(log_probs,labels)
+        self.history.append_loss_train(epoch, loss_value / len(loader.dataset))
         self.history.append_metrics(epoch, "train", metrics)
 
     def validation_loop(self, loader : DataLoader, epoch : int) -> None:
         # UPGRADE the metrics are averages of averages, which is very bad
         loss_value : float = 0
-        metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
+        log_probs : list[list[float]] = []
+        labels : list[int] = []
         for batch in tqdm(loader, 
                           desc = "Validation loop", leave = False, position = 2):
             prediction_logits = self.predict(batch["text"], eval_grad = False)
-            loss = self.loss_function_validation(
+            loss = self.loss_function(
                 prediction_logits.to(device = "cpu"), 
                 batch["label"]
             )
+
             loss_value += loss.item()
-            batch_metrics = self.evaluator(
-                prediction_logits.to(device = "cpu"), 
-                batch["label"]
-            )
-            metrics = {
-                key : metrics[key] + batch_metrics[key] for key in metrics
-            }
-        loss_value = loss_value / len(loader.dataset)
-        self.history.append_loss_validation(epoch, loss_value = loss_value)
-        metrics = {
-            key : metrics[key] / len(loader) for key in metrics
-        }
+            log_probs.extend(prediction_logits.to(device = "cpu").tolist())
+            labels.extend(batch["label"])
+
+        metrics = self.evaluator(log_probs,labels)
+        self.history.append_loss_validation(epoch,loss_value / len(loader.dataset))
         self.history.append_metrics(epoch, "validation", metrics)
 
     
