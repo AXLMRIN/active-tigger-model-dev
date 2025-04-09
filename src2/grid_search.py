@@ -13,8 +13,8 @@ from random import choice
 
 lr_classifier_to_test = [1e-2,1e-3,1e-4,1e-5]
 lr_embedder_to_test = [1e-2,1e-3,1e-4,1e-5]
-for iLRC in tqdm(range(len(lr_classifier_to_test)),desc = "lr_classifier_to_test", position= 2):
-    for iLRE in tqdm(range(len(lr_embedder_to_test)), desc = "lr_embedder_to_test", position = 3):
+for iLRC in tqdm(range(len(lr_classifier_to_test)),desc = "lr_classifier_to_test", position= 4):
+    for iLRE in tqdm(range(len(lr_embedder_to_test)), desc = "lr_embedder_to_test", position = 5):
         config = Config()
         config.model_train_n_epoch = 5 # After first result analysis
 
