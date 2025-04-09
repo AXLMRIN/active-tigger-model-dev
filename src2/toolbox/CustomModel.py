@@ -183,7 +183,7 @@ class CustomModel:
             self.classifier.eval()
             self.validation_loop(validation_loader, epoch)
 
-            if self.history.validation_loss[epoch] <= lowest_validation_loss : 
+            if self.history.validation_loss[-1]["loss_value"] <= lowest_validation_loss : 
                 lowest_validation_loss = self.history.validation_loss[epoch]
                 self.embedder.save_to_disk(self.config.embeddingmodel_save_filename)
                 save(self.classifier.state_dict(), self.config.classifier_save_filename)
