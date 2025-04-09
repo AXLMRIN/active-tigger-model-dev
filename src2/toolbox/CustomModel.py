@@ -98,6 +98,7 @@ class CustomModel:
 
     def train_loop(self, loader : DataLoader, epoch : int) -> None: 
         # UPGRADE the metrics are averages of averages, which is very bad
+        # TODO change, only save once every epoch
         metrics : dict[str:float] = {"f1" : 0, "roc_auc" : 0, "accuracy" : 0}
         for batch in tqdm(loader, 
                           desc = "Training loop", leave = False, position = 2):
