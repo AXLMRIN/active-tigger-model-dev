@@ -45,22 +45,22 @@ class CustomModel:
                 **self.config.model_train_embedding_adamw_parameters
             )
 
-        elif self.config.model_train_classifier_optimizer == "SGD":
+        if self.config.model_train_classifier_optimizer == "SGD":
             self.optimizer_classifier = SGD(
                 self.classifier.parameters(),
                 **self.config.model_train_classifier_sgd_parameters
             )
-        if self.config.model_train_classifier_optimizer == "Adam":
+        elif self.config.model_train_classifier_optimizer == "Adam":
             self.optimizer_classifier = Adam(
                 self.classifier.parameters(),
                 **self.config.model_train_classifier_adam_parameters
             )
-        if self.config.model_train_classifier_optimizer == "AdamW":
+        elif self.config.model_train_classifier_optimizer == "AdamW":
             self.optimizer_classifier = AdamW(
                 self.classifier.parameters(),
                 **self.config.model_train_classifier_adamw_parameters
             )
-        if self.config.model_train_classifier_optimizer == "Adamax":
+        elif self.config.model_train_classifier_optimizer == "Adamax":
             self.optimizer_classifier = Adamax(
                 self.classifier.parameters(),
                 **self.config.model_train_classifier_adamax_parameters
