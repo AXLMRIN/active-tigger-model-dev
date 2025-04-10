@@ -113,7 +113,7 @@ class Evaluator:
             confusion_matrix[true][pred] += 1
         
         self.CM : np.ndarray= np.array([
-            list[confusion_matrix[true].values()]
+            list(confusion_matrix[true].values())
             for true in confusion_matrix
         ])
 
