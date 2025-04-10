@@ -12,13 +12,7 @@ class History:
     def __init__(self):
         self.train_loss : list[dict[str : int|float]] = []
         self.validation_loss : list[dict[str : int|float]] = []
-        self.metrics_save : dict = {
-            "epoch" : [],
-            "loop" : [],
-            "f1" : [],
-            "roc_auc" : [],
-            "accuracy" : []
-        }
+        self.metrics_save : list[dict] = []
         self.confusion_matrix : list[dict[str:int]] = []
 
     def append_loss_train(self,epoch : int, loss_value : float) -> None:
@@ -55,11 +49,11 @@ class History:
 
     def append_metrics(self,epoch : int, loop : str, 
                        metrics : dict[str:float]) -> None:
-        self.metrics_save["epoch"].append(epoch)
-        self.metrics_save["loop"].append(loop)
-        self.metrics_save["f1"].append(metrics["f1"])
-        self.metrics_save["roc_auc"].append(metrics["roc_auc"])
-        self.metrics_save["accuracy"].append(metrics["accuracy"])
+        self.metrics_save.append({
+            "epoch" : epoch,
+            "loop" : loop,
+            **metrics
+        })
 
     def OUTDATED_plot_loss_train(self):
         print("OUTDATED NOTHING RUNS")

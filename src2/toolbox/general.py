@@ -53,6 +53,7 @@ class Evaluator:
         self.log_threshold = np.log(threshold) # UNUSED FIXME
         self.n_label = n_label
         self.device = "cpu"
+        self.confusion_matrix = None
 
     def create_target(self,labels : list[int]) -> Tensor:
         return Tensor(
@@ -110,4 +111,20 @@ class Evaluator:
         }
         for pred, true in zip(labels_pred, labels_true) :
             confusion_matrix[true][pred] += 1
+        
+        self.confusion_matrix : np.ndarray= np.array([
+            list[confusion_matrix[true].values()]
+            for true in confusion_matrix
+        ])
+
         return confusion_matrix
+    
+    def f1(self, idlabel) -> float: 
+        if self.confusion_matrix is None :return -1
+
+        acc = self.confusion_matrix[idlabel,idlabel].item() /\
+              self.confusion_matrix[idlabel,:].sum().item()
+        prec = self.confusion_matrix[idlabel,idlabel].item() /\
+               self.confusion_matrix[:,idlabel].sum().item()
+        return 2 * acc * prec / (prec + acc)
+        

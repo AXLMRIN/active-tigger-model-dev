@@ -120,6 +120,9 @@ class CustomModel:
         
         metrics = self.evaluator(log_probs,labels)
         confusion_matrix = self.evaluator.confusion_matrix(log_probs,labels)
+        for idlabel in confusion_matrix.keys() : 
+            metrics[f"f1_{self.config.dataset_id2label[idlabel]}"] = self.evaluator.f1(idlabel)
+
         self.history.append_loss_train(epoch, loss_value / len(loader.dataset))
         self.history.append_metrics(epoch, "train", metrics)
         self.history.append_confusion_matrix(epoch, confusion_matrix,
@@ -143,6 +146,9 @@ class CustomModel:
 
         metrics = self.evaluator(log_probs,labels)
         confusion_matrix = self.evaluator.confusion_matrix(log_probs,labels)
+        for idlabel in confusion_matrix.keys() : 
+            metrics[f"f1_{self.config.dataset_id2label[idlabel]}"] = self.evaluator.f1(idlabel)
+
         self.history.append_loss_validation(epoch,loss_value / len(loader.dataset))
         self.history.append_metrics(epoch, "validation", metrics)
         self.history.append_confusion_matrix(epoch, confusion_matrix,
@@ -166,6 +172,9 @@ class CustomModel:
 
         metrics = self.evaluator(log_probs,labels)
         confusion_matrix = self.evaluator.confusion_matrix(log_probs,labels)
+        for idlabel in confusion_matrix.keys() : 
+            metrics[f"f1_{self.config.dataset_id2label[idlabel]}"] = self.evaluator.f1(idlabel)
+            
         self.history.append_metrics(-1, "test", metrics)
         self.history.append_confusion_matrix(-1, confusion_matrix,
                 tag = "test", id2label = self.config.dataset_id2label)

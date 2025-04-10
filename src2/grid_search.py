@@ -11,7 +11,7 @@ from tqdm import tqdm
 logger = CustomLogger()
 
 lr_classifier_to_test = [1e-2,1e-3,1e-4,1e-5]
-lr_embedder_to_test = [1e-2,1e-3,1e-4,1e-5]
+lr_embedder_to_test = [1e-5, 3e-5, 5e-5, 7e-5, 5e-6, 1e-6]
 for iLRC in tqdm(range(len(lr_classifier_to_test)),desc = "lr_classifier_to_test", position= 4):
     for iLRE in tqdm(range(len(lr_embedder_to_test)), desc = "lr_embedder_to_test", position = 5):
         break
