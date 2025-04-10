@@ -19,14 +19,14 @@ for iLRC in tqdm(range(len(lr_classifier_to_test)),desc = "lr_classifier_to_test
             config = Config()
             config.model_train_n_epoch = 5 # After first result analysis
 
-            config.history_foldersave = f"./2025-04-09-grid-search/LRE_{iLRE}_LRC_{iLRC}_DIM_{iDIM}"
+            config.history_foldersave = f"./2025-04-09-grid-search-2/LRE_{iLRE}_LRC_{iLRC}_DIM_{iDIM}"
             config.embeddingmodel_save_filename = f"{config.history_foldersave}/{config.embeddingmodel_save_filename}"
             config.classifier_save_filename = f"{config.history_foldersave}/{config.classifier_save_filename}"
 
             config.model_train_embedding_adam_parameters["lr"] = lr_embedder_to_test[iLRE]
             config.model_train_classifier_sgd_parameters["lr"] = lr_classifier_to_test[iLRC]
             config.classifier_hiddenlayer_dim = dim[iDIM]
-            
+
             dataset = CustomDataset(config)
             dataset.open_dataset()
             dataset.find_labels()
