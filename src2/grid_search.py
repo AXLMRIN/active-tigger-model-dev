@@ -1,6 +1,6 @@
 from toolbox.Config import Config
 from toolbox.CustomModel import CustomModel
-from toolbox.History import History
+from toolbox.CustomLogger import CustomLogger
 from toolbox.CustomDataset import CustomDataset
 from toolbox.CustomClassifier import CustomClassifier
 from toolbox.CustomEmbedder import CustomEmbedder
@@ -8,11 +8,13 @@ from toolbox.CustomEmbedder import CustomEmbedder
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+logger = CustomLogger()
 
 lr_classifier_to_test = [1e-2,1e-3,1e-4,1e-5]
 lr_embedder_to_test = [1e-2,1e-3,1e-4,1e-5]
 for iLRC in tqdm(range(len(lr_classifier_to_test)),desc = "lr_classifier_to_test", position= 4):
     for iLRE in tqdm(range(len(lr_embedder_to_test)), desc = "lr_embedder_to_test", position = 5):
+        break
         config = Config()
         config.model_train_n_epoch = 5 # After first result analysis
 
@@ -52,3 +54,5 @@ for iLRC in tqdm(range(len(lr_classifier_to_test)),desc = "lr_classifier_to_test
         model.history.save_all(config.history_foldersave)
         config.save()
         model.clean()
+
+logger.notify_when_done()
