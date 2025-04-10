@@ -1,0 +1,12 @@
+epoch,loop,f1,roc_auc,accuracy
+0,train,0.4754160363086233,0.4995046235138705,0.08388375165125496
+0,validation,0.5,0.5,0.0
+1,train,0.5,0.5,0.0
+1,validation,0.5,0.5,0.0
+2,train,0.5,0.5,0.0
+2,validation,0.5,0.5,0.0
+3,train,0.5,0.5,0.0
+3,validation,0.5,0.5,0.0
+4,train,0.5,0.5,0.0
+4,validation,0.5,0.5,0.0
+-1,test,0.5,0.5,0.0
