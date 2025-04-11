@@ -129,6 +129,7 @@ class Evaluator:
         if self.CM is None :return -1
         elif self.CM[idlabel,:].sum().item() == 0 : return -2
         elif self.CM[:,idlabel].sum().item() == 0 : return -3
+        elif self.CM[idlabel,idlabel].item() == 0 : return -4
 
         acc = self.CM[idlabel,idlabel].item() /\
               self.CM[idlabel,:].sum().item()
