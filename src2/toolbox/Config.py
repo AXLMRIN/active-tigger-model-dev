@@ -45,6 +45,10 @@ class Config(object):
         self.embeddingmodel_save_filename = f"bert-base-uncased_custom_save"
         
         # Model
+        self.model_loss_parameters = {
+            "reduction" : "sum",
+            "weight" : None
+        }
         self.model_train_batchsize = 32
         self.model_train_n_epoch = 5
         self.model_train_embedding_optimizer = "Adam"

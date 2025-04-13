@@ -26,7 +26,6 @@ class CustomDataset:
     def open_dataset(self) -> None:
         #UPGRADE make possible to load from the internet
         #UPGRADE for now, only open csv but need to make it possible for different format
-        #print(self.config.dataset_filename)
         if self.config.dataset_filename.endswith(".csv") : 
             ds_config = load_dataset("csv",data_files={
                 "whole" : self.config.dataset_filename
@@ -38,19 +37,28 @@ class CustomDataset:
             self.open_status = True
             
     def find_labels(self) -> None: 
+        " Rename columns"
         for split in ["train", "test", "validation"] : 
             self.ds[split] = self.ds[split].rename_column(
-                self.config.dataset_text_col, "text"
-            )
+                self.config.dataset_text_col, "text")
             self.ds[split] = self.ds[split].rename_column(
-                self.config.dataset_label_col, "label"
-            )
+                self.config.dataset_label_col, "label")
+        # Look for the labels
         self.labels = list(set(self.ds["train"]["label"]))
         self.n_labels = len(self.labels)
         self.config.dataset_label2id = {label : i for i,label in enumerate(self.labels)}
         self.config.dataset_id2label = {i : label for i,label in enumerate(self.labels)}
         # Save to config to be used elsewhere
         self.config.dataset_n_labels = self.n_labels
+
+        # evaluate the number of elements per class in the training set
+        instances = self.ds["train"].to_pandas().groupby("label").size()
+        # Change the weights for the loss function
+        self.config.model_loss_parameters["weight"] = [1 for i in range(self.n_labels)]
+        for label in self.config.dataset_label2id : 
+            self.config.model_loss_parameters["weight"]\
+                [self.config.dataset_label2id[label]] = 1 / float(instances[label])
+            
     
     def preprocess_data(self,preprocess_function_text, 
         preprocess_function_label)->None:

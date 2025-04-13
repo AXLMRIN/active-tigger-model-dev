@@ -66,7 +66,7 @@ class CustomModel:
                 **self.config.model_train_classifier_adamax_parameters
             )
 
-        self.loss_function = CrossEntropyLoss(reduction = "sum")
+        self.loss_function = CrossEntropyLoss(**self.config.model_loss_parameters)
         self.best_embedder = None
         self.best_classifier = None
     
