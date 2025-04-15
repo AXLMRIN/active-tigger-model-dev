@@ -75,9 +75,9 @@ for model_name in [
     "FacebookAI/roberta-large",
     "FacebookAI/xlm-roberta-large"
                   ]:
-    
-    if model_name not in os.listdir("./sklearn_save") : 
-         os.mkdir(f"./sklearn_save/{model_name}")
+    model_name_path = model_name.replace("/","_")
+    if model_name_path not in os.listdir("./sklearn_save") : 
+         os.mkdir(f"./sklearn_save/{model_name_path}")
 
     config.embeddingmodel_name = model_name
     embedder = CustomEmbedder(config)
@@ -93,7 +93,7 @@ for model_name in [
             batch_size = config.model_train_batchsize
         ),
         embedder,
-        f"./sklearn_save/{model_name}/epoch"
+        f"./sklearn_save/{model_name_path}/epoch"
     )
     model.train(dataset.ds["train"],dataset.ds["validation"],
         callback_function=callback_function_save_tensors,
@@ -101,5 +101,5 @@ for model_name in [
             "dataloader" : DataLoader(dataset.ds["train"], shuffle = True, 
                                     batch_size = config.model_train_batchsize),
             "model" : embedder,
-            "filename" : f"./sklearn_save/{model_name}/epoch"
+            "filename" : f"./sklearn_save/{model_name_path}/epoch"
         })
