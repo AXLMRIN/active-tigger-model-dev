@@ -55,9 +55,10 @@ def callback_function_save_tensors(epoch : int, dataloader : DataLoader,
                 output_list.append({
                     "id" : f"{id}#{i}",
                     "text" : batch["text"][i],
-                    "label" : batch["label"][i],
+                    "label" : batch["label"][i].to(device="cpu"),
                     **{
-                        f"dim_{j}" : outputs[i,j] for j in range(shape[1])
+                        f"dim_{j}" : outputs[i,j].to(device="cpu").item() 
+                        for j in range(shape[1])
                     }
                 })
     pd.DataFrame(output_list).to_csv(f"{filename}_{epoch}.csv", index=False)
