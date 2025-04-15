@@ -1,6 +1,7 @@
 # IMPORTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Third parties
 from datasets import load_dataset, Dataset, DatasetDict
+from torch import Tensor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 # Native
@@ -54,7 +55,7 @@ class CustomDataset:
         # evaluate the number of elements per class in the training set
         instances = self.ds["train"].to_pandas().groupby("label").size()
         # Change the weights for the loss function
-        self.config.model_loss_parameters["weight"] = [1 for i in range(self.n_labels)]
+        self.config.model_loss_parameters["weight"] = Tensor([1 for i in range(self.n_labels)])
         for label in self.config.dataset_label2id : 
             self.config.model_loss_parameters["weight"]\
                 [self.config.dataset_label2id[label]] = max(instances) / float(instances[label])
