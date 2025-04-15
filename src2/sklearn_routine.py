@@ -103,3 +103,4 @@ for model_name in [
             "model" : embedder,
             "filename" : f"./sklearn_save/{model_name_path}/epoch"
         })
+    model.clean()
