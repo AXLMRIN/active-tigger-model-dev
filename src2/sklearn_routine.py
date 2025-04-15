@@ -5,7 +5,7 @@ from toolbox.CustomClassifier import CustomClassifier
 from toolbox.CustomEmbedder import CustomEmbedder
 
 import pandas as pd
-from torch import zero_grad, Tensor
+from torch import no_grad, Tensor
 from torch.utils.data import DataLoader
 
 config = Config()
@@ -47,7 +47,7 @@ model = CustomModel(config, embedder, classifier)
 def callback_function_save_tensors(epoch : int, dataloader : DataLoader, 
         model : CustomModel, filename : str) -> None: 
     output_list : list[dict] = [] 
-    with zero_grad():
+    with no_grad():
         for id, batch in enumerate(dataloader) : 
             outputs : Tensor = model(batch["text"]) # shape(batch x config.embeddingmodel_dim)
             shape = outputs.shape
