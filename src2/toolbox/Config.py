@@ -45,6 +45,7 @@ class Config(object):
         self.embeddingmodel_save_filename = f"bert-base-uncased_custom_save"
         
         # Model
+        self.model_save_best_model = True
         self.model_loss_parameters = {
             "reduction" : "sum",
             "weight" : None

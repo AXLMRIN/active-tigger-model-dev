@@ -43,6 +43,7 @@ config.classifier_save_filename = f"{config.history_foldersave}/{config.classifi
 config.model_train_embedding_adam_parameters["lr"] = 5e-5
 config.model_train_classifier_sgd_parameters["lr"] = 0.0003
 config.classifier_hiddenlayer_dim = 10
+config.model_save_best_model = False
 
 dataset = CustomDataset(config)
 dataset.open_dataset()
