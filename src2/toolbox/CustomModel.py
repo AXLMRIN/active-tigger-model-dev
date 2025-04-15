@@ -181,7 +181,7 @@ class CustomModel:
     
     def train(
             self, train_dataset : Dataset, validation_dataset : Dataset, 
-            callback_function = lambda x : None, callback_parameters : dict = {}
+            callback_function = lambda epoch : None, callback_parameters : dict = {}
             ) -> None:
         train_loader = DataLoader(
             train_dataset, 
@@ -208,7 +208,7 @@ class CustomModel:
                 self.embedder.save_to_disk(self.config.embeddingmodel_save_filename)
                 save(self.classifier.state_dict(), self.config.classifier_save_filename)
             
-            callback_function(**callback_parameters)
+            callback_function(epoch = epoch, **callback_parameters)
 
     def __str__(self) -> str:
         return (
