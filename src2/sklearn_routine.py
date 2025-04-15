@@ -5,7 +5,8 @@ from toolbox.CustomClassifier import CustomClassifier
 from toolbox.CustomEmbedder import CustomEmbedder
 
 import pandas as pd
-from torch import DataLoader, zero_grad, Tensor
+from torch import zero_grad, Tensor
+from torch.utils.data import DataLoader
 
 config = Config()
 config.model_train_n_epoch = 5 # After first result analysis
