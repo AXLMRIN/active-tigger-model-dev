@@ -179,7 +179,10 @@ class CustomModel:
         self.history.append_confusion_matrix(-1, confusion_matrix,
                 tag = "test", id2label = self.config.dataset_id2label)
     
-    def train(self, train_dataset : Dataset, validation_dataset : Dataset) -> None:
+    def train(
+            self, train_dataset : Dataset, validation_dataset : Dataset, 
+            callback_function = lambda x : None, callback_parameters : dict = {}
+            ) -> None:
         train_loader = DataLoader(
             train_dataset, 
             shuffle = True, 
@@ -204,6 +207,8 @@ class CustomModel:
                 lowest_validation_loss = self.history.validation_loss[-1]["loss_value"]
                 self.embedder.save_to_disk(self.config.embeddingmodel_save_filename)
                 save(self.classifier.state_dict(), self.config.classifier_save_filename)
+            
+            callback_function(**callback_parameters)
 
     def __str__(self) -> str:
         return (
