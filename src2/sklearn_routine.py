@@ -55,7 +55,7 @@ def callback_function_save_tensors(epoch : int, dataloader : DataLoader,
                 output_list.append({
                     "id" : f"{id}#{i}",
                     "text" : batch["text"][i],
-                    "label" : batch["label"][i].to(device="cpu"),
+                    "label" : batch["label"][i].to(device="cpu").item(),
                     **{
                         f"dim_{j}" : outputs[i,j].to(device="cpu").item() 
                         for j in range(shape[1])
@@ -70,5 +70,5 @@ model.train(dataset.ds["train"],dataset.ds["validation"],
         "dataloader" : DataLoader(dataset.ds["train"], shuffle = True, 
                                   batch_size = config.model_train_batchsize),
         "model" : embedder,
-        "filename" : "sklearn_save"
+        "filename" : "./sklearn_save/epoch"
     })
