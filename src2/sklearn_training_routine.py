@@ -5,6 +5,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.gaussian_process import GaussianProcessClassifier
 import plotly.express as px
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 import os
 from torch import load
@@ -44,6 +45,22 @@ for model in os.listdir("./sklearn_save"):
         print(X_test.shape)
         print(y_test.shape)
         
+
+        shuffle_index_train = np.random.shuffle(np.arange(np.shape(X_train)[0]))
+        X_train = X_train[shuffle_index_train,:]
+        y_train = y_train[shuffle_index_train]
+        
+        shuffle_index_test = np.random.shuffle(np.arange(np.shape(X_test)[0]))
+        X_test = X_test[shuffle_index_test,:]
+        y_test = y_test[shuffle_index_test]
+
+        # debug
+        X_train = X_train[:100,:100]
+        y_train = y_train[:100]
+
+        X_test = X_test[:50,:100]
+        y_test = y_test[:50]
+
         # Adaboost-----------------------------------------------------------------------------------
         print("Adaboost")
         for n in [400,450,500,800] : 
@@ -53,7 +70,7 @@ for model in os.listdir("./sklearn_save"):
             ababoost.append({
                 "n_estimators" : n,
                 "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch_file)
+                "epoch" : str(epoch)
             })
         # RandomForestClassifier-----------------------------------------------------------------------------------
         print("RandomForestClassifier")
@@ -64,7 +81,7 @@ for model in os.listdir("./sklearn_save"):
             random_forest.append({
                 "max_depth" : n,
                 "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch_file)
+                "epoch" : str(epoch)
             })
         
         # NeuralNet-----------------------------------------------------------------------------------
@@ -76,7 +93,7 @@ for model in os.listdir("./sklearn_save"):
             neural_net.append({
                 "hidden_layers" : str(n),
                 "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch_file)
+                "epoch" : str(epoch)
             })
         # GaussianProcessClassifier-----------------------------------------------------------------------------------
         print("GaussianProcessClassifier")
@@ -87,7 +104,7 @@ for model in os.listdir("./sklearn_save"):
             gaussian.append({
                 "unnamed" : n,
                 "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch_file)
+                "epoch" : str(epoch)
             })
         
         
@@ -100,7 +117,7 @@ for model in os.listdir("./sklearn_save"):
             knn.append({
                 "n_neighbors" : n,
                 "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch_file)
+                "epoch" : str(epoch)
             })
     
     
