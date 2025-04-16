@@ -62,7 +62,7 @@ def callback_function_save_tensors(epoch : int,
             # Test dataset =====================================================
             full_output : Tensor|None = None
             idx = 0 
-            for batch in dataloader_valid: 
+            for batch in dataloader_test: 
                 embeddings : Tensor = model(batch["text"]) # shape(batch x config.embeddingmodel_dim)
                 indexes = Tensor([i for i in range(idx, idx + len(batch["text"]))]).\
                             to(device='cpu')
@@ -110,6 +110,13 @@ dataset.preprocess_data(
     lambda batch : preprocess_function_label(batch, config.dataset_label2id)
 )
 
+train_loader = DataLoader(dataset=dataset.ds["train"], shuffle = True, 
+                          batch_size = config.model_train_batchsize)
+validation_loader = DataLoader(dataset=dataset.ds["validation"], shuffle = True, 
+                          batch_size = config.model_train_batchsize)
+test_loader = DataLoader(dataset=dataset.ds["test"], shuffle = True, 
+                          batch_size = config.model_train_batchsize)
+
 if "sklearn_save" not in os.listdir("./") : 
      os.mkdir("./sklearn_save")
 
@@ -133,26 +140,19 @@ for model_name in [
     model = CustomModel(config, embedder, classifier)
 
     
-
-    callback_function_save_tensors(-1,
-        DataLoader(
-            dataset=dataset.ds["train"], 
-            shuffle = True, 
-            batch_size = config.model_train_batchsize
-        ),
-        embedder,
-        f"./sklearn_save/{model_name_path}/epoch"
-    )
+    callback_parameters = {
+        "dataloader_train" : train_loader,
+        "dataloader_valid" : validation_loader,
+        "dataloader_test" : test_loader, 
+        "model" : embedder,
+        "filename" :  f"./sklearn_save/{model_name_path}/epoch"
+    }
+    callback_function_save_tensors(epoch = -1,**callback_parameters)
 
     if not(model_name.endswith("large")):
         model.train(dataset.ds["train"],dataset.ds["validation"],
-            callback_function=callback_function_save_tensors,
-            callback_parameters={
-                "dataloader" : DataLoader(dataset.ds["train"], shuffle = True, 
-                                        batch_size = config.model_train_batchsize),
-                "model" : embedder,
-                "filename" : f"./sklearn_save/{model_name_path}/epoch"
-            })
+            callback_function = callback_function_save_tensors,
+            callback_parameters = callback_parameters)
     model.clean()
 
 CustomLogger().notify_when_done()
