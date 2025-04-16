@@ -26,7 +26,7 @@ for model in os.listdir("./sklearn_save"):
                 epochs.append(epoch_id)
     epochs = sorted(epochs)
     print(epochs)
-    break
+    continue
     for epoch_file in os.listdir(f"./sklearn_save/{model}"):
         print(epoch_file)
         X_train = load(f"./sklearn_save/{model}/{epoch_file}", weights_only=True).numpy()[:,:-2]
