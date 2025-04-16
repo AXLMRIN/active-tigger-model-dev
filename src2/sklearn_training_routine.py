@@ -56,93 +56,89 @@ for model in os.listdir("./sklearn_save"):
 
         # Adaboost-----------------------------------------------------------------------------------
         print("Adaboost")
-        for n in [400,450,500,800] : 
-            clf = AdaBoostClassifier(n_estimators=n, random_state=0)
-            clf.fit(X_train, y_train)
-        
-            ababoost.append({
-                "n_estimators" : n,
-                "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch)
-            })
+        clf = AdaBoostClassifier(n_estimators=400, random_state=0)
+        clf.fit(X_train, y_train)
+    
+        ababoost.append({
+            "n_estimators" : 400,
+            "score" : clf.score(X_test,y_test),
+            "epoch" : str(epoch)
+        })
         # RandomForestClassifier-----------------------------------------------------------------------------------
         print("RandomForestClassifier")
-        for n in [20,40,60] : 
-            clf = RandomForestClassifier(max_depth=n, random_state=0)
-            clf.fit(X_train, y_train)
-        
-            random_forest.append({
-                "max_depth" : n,
-                "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch)
-            })
+        clf = RandomForestClassifier(max_depth=60, random_state=0)
+        clf.fit(X_train, y_train)
+    
+        random_forest.append({
+            "max_depth" : 60,
+            "score" : clf.score(X_test,y_test),
+            "epoch" : str(epoch)
+        })
         
         # NeuralNet-----------------------------------------------------------------------------------
         print("NeuralNet")
-        for n in [(5,),(10,),(15,),(200,5)] : 
-            clf = MLPClassifier(hidden_layer_sizes=n, max_iter = 300)
-            clf.fit(X_train, y_train)
-            
-            neural_net.append({
-                "hidden_layers" : str(n),
-                "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch)
-            })
+        clf = MLPClassifier(hidden_layer_sizes=(5,), max_iter = 300)
+        clf.fit(X_train, y_train)
+        
+        neural_net.append({
+            "hidden_layers" : str((5,)),
+            "score" : clf.score(X_test,y_test),
+            "epoch" : str(epoch)
+        })
+
         # GaussianProcessClassifier-----------------------------------------------------------------------------------
-        print("GaussianProcessClassifier")
-        for n in [0] : 
-            clf = GaussianProcessClassifier()
-            clf.fit(X_train, y_train)
-        
-            gaussian.append({
-                "unnamed" : n,
-                "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch)
-            })
-        
+        print("GaussianProcessClassifier") 
+        clf = GaussianProcessClassifier()
+        clf.fit(X_train, y_train)
+    
+        gaussian.append({
+            "unnamed" : "default",
+            "score" : clf.score(X_test,y_test),
+            "epoch" : str(epoch)
+        })
+    
         
         # KNN-----------------------------------------------------------------------------------
         print("KNN")
-        for n in [3,5,10,20] : 
-            clf = KNeighborsClassifier(n_neighbors = n)
-            clf.fit(X_train, y_train)
-        
-            knn.append({
-                "n_neighbors" : n,
-                "score" : clf.score(X_test,y_test),
-                "epoch" : str(epoch)
-            })
+        clf = KNeighborsClassifier(n_neighbors = 10)
+        clf.fit(X_train, y_train)
+    
+        knn.append({
+            "n_neighbors" : 10,
+            "score" : clf.score(X_test,y_test),
+            "epoch" : str(epoch)
+        })
     
     
-    px.line(
+    px.scatter(
             pd.DataFrame(ababoost), 
-            x = 'n_estimators', 
+            x = 'epoch', 
             y = "score", 
-            color = "epoch"
+            color = "n_estimators"
         ).write_html(f"./sklearn_save/{model}/adaboost.html")
-    px.line(
+    px.scatter(
             pd.DataFrame(random_forest), 
-            x = 'max_depth', 
+            x = 'epoch', 
             y = "score", 
-            color = "epoch"
+            color = "max_depth"
         ).write_html(f"./sklearn_save/{model}/random_forest.html")
-    px.line(
+    px.scatter(
             pd.DataFrame(neural_net), 
-            x = 'hidden_layers', 
+            x = 'epoch', 
             y = "score", 
-            color = "epoch"
+            color = "hidden_layers"
         ).write_html(f"./sklearn_save/{model}/neural_net.html")
-    px.line(
+    px.scatter(
             pd.DataFrame(gaussian), 
-            x = 'unnamed', 
+            x = 'epoch', 
             y = "score", 
-            color = "epoch"
+            color = "unnamed"
         ).write_html(f"./sklearn_save/{model}/gaussian.html")
-    px.line(
+    px.scatter(
             pd.DataFrame(knn), 
-            x = 'n_neighbors', 
+            x = 'epoch', 
             y = "score", 
-            color = "epoch"
+            color = "n_neighbors"
         ).write_html(f"./sklearn_save/{model}/knn.html")
     break
 
