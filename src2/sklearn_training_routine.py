@@ -43,9 +43,6 @@ for model in os.listdir("./sklearn_save"):
                     .numpy()[:,-1]
         print(X_test.shape)
         print(y_test.shape)
-
-
-        continue
         
         # Adaboost-----------------------------------------------------------------------------------
         print("Adaboost")
@@ -137,6 +134,6 @@ for model in os.listdir("./sklearn_save"):
             y = "score", 
             color = "epoch"
         ).write_html(f"./sklearn_save/{model}/knn.html")
-    
-    
+    break
+
 # CustomLogger().notify_when_done()
