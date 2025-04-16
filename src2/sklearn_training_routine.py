@@ -21,7 +21,10 @@ for model in os.listdir("./sklearn_save"):
     for epoch_file in os.listdir(f"./sklearn_save/{model}"):
         # epoch files are written like epoch_xx_{train|test}.pt
         if epoch_file.startswith("epoch_")&epoch_file.endswith(".pt"): 
-            epochs.append(epoch_file.split("_")[1])
+            epoch_id = epoch_file.split("_")[1]
+            if epoch_id not in epochs : 
+                epochs.append(epoch_id)
+    epochs = sorted(epochs)
     print(epochs)
     break
     for epoch_file in os.listdir(f"./sklearn_save/{model}"):
