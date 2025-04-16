@@ -25,19 +25,27 @@ for model in os.listdir("./sklearn_save"):
             if epoch_id not in epochs : 
                 epochs.append(epoch_id)
     epochs = sorted(epochs)
-    print(epochs)
-    continue
-    for epoch_file in os.listdir(f"./sklearn_save/{model}"):
-        print(epoch_file)
-        X_train = load(f"./sklearn_save/{model}/{epoch_file}", weights_only=True).numpy()[:,:-2]
-        y_train = load(f"./sklearn_save/{model}/{epoch_file}",weights_only=True).numpy()[:,-2]
-        
-        X_test = load(f"./sklearn_save/{model}/{epoch_file}", weights_only=True).numpy()[:,:-2]
-        y_test = load(f"./sklearn_save/{model}/{epoch_file}",weights_only=True).numpy()[:,-2]
+    
+    del epoch_file, epoch_id
 
-        print(X.shape)
-        print(y.shape)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    for epoch in epochs:
+        print(epoch)
+        X_train = load(f"./sklearn_save/{model}/epoch_{epoch_file}_train.pt", weights_only=True).\
+                    numpy()[:,1:-1]
+        y_train = load(f"./sklearn_save/{model}/epoch_{epoch_file}_train.pt",weights_only=True).\
+                    numpy()[:,-1]
+        print(X_train.shape)
+        print(y_train.shape)
+        
+        X_test = load(f"./sklearn_save/{model}/epoch_{epoch_file}_test.pt", weights_only=True)\
+                    .numpy()[:,1:-1]
+        y_test = load(f"./sklearn_save/{model}/epoch_{epoch_file}_test.pt",weights_only=True)\
+                    .numpy()[:,-1]
+        print(X_test.shape)
+        print(y_test.shape)
+
+
+        continue
         
         # Adaboost-----------------------------------------------------------------------------------
         print("Adaboost")
