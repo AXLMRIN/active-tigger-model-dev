@@ -3,20 +3,25 @@ from toolbox.CustomModel import CustomModel
 from toolbox.CustomDataset import CustomDataset
 from toolbox.CustomClassifier import CustomClassifier
 from toolbox.CustomEmbedder import CustomEmbedder
+from toolbox.CustomLogger import CustomLogger
 
 import os
 from torch import no_grad, Tensor, concat, save
 from torch.utils.data import DataLoader
 
-def callback_function_save_tensors(epoch : int, dataloader : DataLoader, 
+def callback_function_save_tensors(epoch : int, 
+            dataloader_train : DataLoader, 
+            dataloader_valid : DataLoader, 
+            dataloader_test : DataLoader,
             model : CustomModel, filename : str) -> None: 
-        full_output : Tensor|None = None
-        idx = 0 
-
         with no_grad():
-            for batch in dataloader: 
+            # Train dataset ====================================================
+            full_output : Tensor|None = None
+            idx = 0 
+            for batch in dataloader_train: 
                 embeddings : Tensor = model(batch["text"]) # shape(batch x config.embeddingmodel_dim)
-                indexes = Tensor([i for i in range(idx, idx + len(batch["text"]))]).to(device='cpu')
+                indexes = Tensor([i for i in range(idx, idx + len(batch["text"]))]).\
+                            to(device='cpu')
                 output_batch = concat(
                     (
                         indexes.to(device='cpu').unsqueeze(dim = 1),
@@ -31,8 +36,52 @@ def callback_function_save_tensors(epoch : int, dataloader : DataLoader,
                     full_output = output_batch
                 else: 
                     full_output = concat((full_output, output_batch))
-        print(full_output.shape)
-        save(full_output, f"{filename}_{epoch}.pt")
+            print(full_output.shape) # TODELETE
+            # Validation dataset ===============================================
+            # concatenate the train and validation
+            for batch in dataloader_valid: 
+                embeddings : Tensor = model(batch["text"]) # shape(batch x config.embeddingmodel_dim)
+                indexes = Tensor([i for i in range(idx, idx + len(batch["text"]))]).\
+                            to(device='cpu')
+                output_batch = concat(
+                    (
+                        indexes.to(device='cpu').unsqueeze(dim = 1),
+                        embeddings.to(device='cpu'), 
+                        batch["label"].to(device='cpu').unsqueeze(dim = 1)
+                    ), 
+                    axis = 1
+                )
+                idx += len(batch["text"])
+
+                if full_output is None: 
+                    full_output = output_batch
+                else: 
+                    full_output = concat((full_output, output_batch))
+            print(full_output.shape) # TODELETE
+            save(full_output, f"{filename}_{epoch}_train.pt")
+            # Test dataset =====================================================
+            full_output : Tensor|None = None
+            idx = 0 
+            for batch in dataloader_valid: 
+                embeddings : Tensor = model(batch["text"]) # shape(batch x config.embeddingmodel_dim)
+                indexes = Tensor([i for i in range(idx, idx + len(batch["text"]))]).\
+                            to(device='cpu')
+                output_batch = concat(
+                    (
+                        indexes.to(device='cpu').unsqueeze(dim = 1),
+                        embeddings.to(device='cpu'), 
+                        batch["label"].to(device='cpu').unsqueeze(dim = 1)
+                    ), 
+                    axis = 1
+                )
+                idx += len(batch["text"])
+
+                if full_output is None: 
+                    full_output = output_batch
+                else: 
+                    full_output = concat((full_output, output_batch))
+            print(full_output.shape) # TODELETE
+            save(full_output, f"{filename}_{epoch}_test.pt")
 
 
 config = Config()
@@ -105,3 +154,5 @@ for model_name in [
                 "filename" : f"./sklearn_save/{model_name_path}/epoch"
             })
     model.clean()
+
+CustomLogger().notify_when_done()
