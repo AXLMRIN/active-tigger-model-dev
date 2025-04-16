@@ -49,10 +49,14 @@ for model in os.listdir("./sklearn_save"):
         shuffle_index_train = np.random.shuffle(np.arange(np.shape(X_train)[0]))
         X_train = X_train[shuffle_index_train,:]
         y_train = y_train[shuffle_index_train]
+        print(X_train.shape)
+        print(y_train.shape)
         
         shuffle_index_test = np.random.shuffle(np.arange(np.shape(X_test)[0]))
         X_test = X_test[shuffle_index_test,:]
         y_test = y_test[shuffle_index_test]
+        print(X_test.shape)
+        print(y_test.shape)
 
         # debug
         X_train = X_train[:100,:100]
