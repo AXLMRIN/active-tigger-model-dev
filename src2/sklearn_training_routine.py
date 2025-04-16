@@ -30,16 +30,16 @@ for model in os.listdir("./sklearn_save"):
 
     for epoch in epochs:
         print(epoch)
-        X_train = load(f"./sklearn_save/{model}/epoch_{epoch_file}_train.pt", weights_only=True).\
+        X_train = load(f"./sklearn_save/{model}/epoch_{epoch}_train.pt", weights_only=True).\
                     numpy()[:,1:-1]
-        y_train = load(f"./sklearn_save/{model}/epoch_{epoch_file}_train.pt",weights_only=True).\
+        y_train = load(f"./sklearn_save/{model}/epoch_{epoch}_train.pt",weights_only=True).\
                     numpy()[:,-1]
         print(X_train.shape)
         print(y_train.shape)
         
-        X_test = load(f"./sklearn_save/{model}/epoch_{epoch_file}_test.pt", weights_only=True)\
+        X_test = load(f"./sklearn_save/{model}/epoch_{epoch}_test.pt", weights_only=True)\
                     .numpy()[:,1:-1]
-        y_test = load(f"./sklearn_save/{model}/epoch_{epoch_file}_test.pt",weights_only=True)\
+        y_test = load(f"./sklearn_save/{model}/epoch_{epoch}_test.pt",weights_only=True)\
                     .numpy()[:,-1]
         print(X_test.shape)
         print(y_test.shape)
