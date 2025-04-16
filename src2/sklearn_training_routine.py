@@ -136,4 +136,4 @@ for model in os.listdir("./sklearn_save"):
         ).write_html(f"./sklearn_save/{model}/knn.html")
     break
 
-# CustomLogger().notify_when_done()
+CustomLogger().notify_when_done()
