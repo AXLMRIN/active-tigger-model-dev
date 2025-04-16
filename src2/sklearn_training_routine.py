@@ -18,7 +18,7 @@ for model in os.listdir("./sklearn_save"):
     gaussian = []
     knn = []
     epochs = []
-    for epoch_file in os.listdir():
+    for epoch_file in os.listdir(f"./sklearn_save/{model}"):
         # epoch files are written like epoch_xx_{train|test}.pt
         if epoch_file.startswith("epoch_")&epoch_file.endswith(".pt"): 
             epochs.append(epoch_file.split("_")[1])
