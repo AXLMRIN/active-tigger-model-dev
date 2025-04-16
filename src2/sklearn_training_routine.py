@@ -1,4 +1,4 @@
-from src2.toolbox.CustomLogger import CustomLogger
+from toolbox.CustomLogger import CustomLogger
 from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
