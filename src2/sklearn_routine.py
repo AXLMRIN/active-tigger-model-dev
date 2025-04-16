@@ -56,11 +56,6 @@ def preprocess_function_label(batch, label2id):
 def preprocess_function_text(batch): 
     return [sentence.lower() for sentence in batch["text"]]
 
-# debug ---
-dataset.ds["train"] = dataset.ds["train"].select(range(150))
-dataset.ds["test"] = dataset.ds["test"].select(range(40))
-dataset.ds["validation"] = dataset.ds["validation"].select(range(40))
-
 dataset.preprocess_data(
     preprocess_function_text, 
     lambda batch : preprocess_function_label(batch, config.dataset_label2id)
@@ -99,7 +94,7 @@ for model_name in [
         embedder,
         f"./sklearn_save/{model_name_path}/epoch"
     )
-    break
+
     if not(model_name.endswith("large")):
         model.train(dataset.ds["train"],dataset.ds["validation"],
             callback_function=callback_function_save_tensors,
