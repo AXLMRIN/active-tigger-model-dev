@@ -107,40 +107,35 @@ for model in os.listdir("./sklearn_save"):
             })
     
     
-    px.scatter(
+    px.line(
             pd.DataFrame(ababoost), 
             x = 'n_estimators', 
             y = "score", 
-            color = "epoch", 
-            mode = "lines+markers"
+            color = "epoch"
         ).write_html(f"./sklearn_save/{model}/adaboost.html")
-    px.scatter(
+    px.line(
             pd.DataFrame(random_forest), 
             x = 'max_depth', 
             y = "score", 
-            color = "epoch", 
-            mode = "lines+markers"
+            color = "epoch"
         ).write_html(f"./sklearn_save/{model}/random_forest.html")
-    px.scatter(
+    px.line(
             pd.DataFrame(neural_net), 
             x = 'hidden_layers', 
             y = "score", 
-            color = "epoch", 
-            mode = "lines+markers"
+            color = "epoch"
         ).write_html(f"./sklearn_save/{model}/neural_net.html")
-    px.scatter(
+    px.line(
             pd.DataFrame(gaussian), 
             x = 'unnamed', 
             y = "score", 
-            color = "epoch", 
-            mode = "lines+markers"
+            color = "epoch"
         ).write_html(f"./sklearn_save/{model}/gaussian.html")
-    px.scatter(
+    px.line(
             pd.DataFrame(knn), 
             x = 'n_neighbors', 
             y = "score", 
-            color = "epoch", 
-            mode = "lines+markers"
+            color = "epoch"
         ).write_html(f"./sklearn_save/{model}/knn.html")
     
     
