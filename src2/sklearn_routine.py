@@ -10,27 +10,29 @@ from torch.utils.data import DataLoader
 
 def callback_function_save_tensors(epoch : int, dataloader : DataLoader, 
             model : CustomModel, filename : str) -> None: 
-        output_list : Tensor|None = None
+        full_output : Tensor|None = None
         idx = 0 
 
         with no_grad():
             for batch in dataloader: 
-                outputs : Tensor = model(batch["text"]) # shape(batch x config.embeddingmodel_dim)
+                embeddings : Tensor = model(batch["text"]) # shape(batch x config.embeddingmodel_dim)
                 indexes = Tensor([i for i in range(idx, idx + len(batch["text"]))]).to(device='cpu')
-                outputs_cat = concat(
+                output_batch = concat(
                     (
-                        outputs.to(device='cpu'), 
-                        batch["label"].to(device='cpu').unsqueeze(dim = 1),
-                        indexes.to(device='cpu').unsqueeze(dim = 1)
+                        indexes.to(device='cpu').unsqueeze(dim = 1),
+                        embeddings.to(device='cpu'), 
+                        batch["label"].to(device='cpu').unsqueeze(dim = 1)
                     ), 
                     axis = 1
                 )
                 idx += len(batch["text"])
 
-                if output_list is None: output_list =outputs_cat
-                else: output_list = concat((output_list, outputs_cat))
-            
-        save(outputs_cat, f"{filename}_{epoch}")
+                if full_output is None: 
+                    full_output = output_batch
+                else: 
+                    full_output = concat((full_output, output_batch))
+        print(full_output.shape)
+        save(full_output, f"{filename}_{epoch}.pt")
 
 
 config = Config()
@@ -55,7 +57,7 @@ def preprocess_function_text(batch):
     return [sentence.lower() for sentence in batch["text"]]
 
 # debug ---
-dataset.ds["train"] = dataset.ds["train"].select(range(40))
+dataset.ds["train"] = dataset.ds["train"].select(range(150))
 dataset.ds["test"] = dataset.ds["test"].select(range(40))
 dataset.ds["validation"] = dataset.ds["validation"].select(range(40))
 
@@ -70,12 +72,13 @@ if "sklearn_save" not in os.listdir("./") :
 for model_name in [
     "google-bert/bert-base-uncased",
     "answerdotai/ModernBERT-base",
-    "answerdotai/ModernBERT-large",
     "nlptown/bert-base-multilingual-uncased-sentiment",
     "FacebookAI/roberta-base",
     "FacebookAI/roberta-large",
-    "FacebookAI/xlm-roberta-large"
+    "FacebookAI/xlm-roberta-large",
+    "answerdotai/ModernBERT-large",
                   ]:
+    print(model_name)
     model_name_path = model_name.replace("/","_")
     if model_name_path not in os.listdir("./sklearn_save") : 
          os.mkdir(f"./sklearn_save/{model_name_path}")
@@ -96,12 +99,14 @@ for model_name in [
         embedder,
         f"./sklearn_save/{model_name_path}/epoch"
     )
-    model.train(dataset.ds["train"],dataset.ds["validation"],
-        callback_function=callback_function_save_tensors,
-        callback_parameters={
-            "dataloader" : DataLoader(dataset.ds["train"], shuffle = True, 
-                                    batch_size = config.model_train_batchsize),
-            "model" : embedder,
-            "filename" : f"./sklearn_save/{model_name_path}/epoch"
-        })
+    break
+    if not(model_name.endswith("large")):
+        model.train(dataset.ds["train"],dataset.ds["validation"],
+            callback_function=callback_function_save_tensors,
+            callback_parameters={
+                "dataloader" : DataLoader(dataset.ds["train"], shuffle = True, 
+                                        batch_size = config.model_train_batchsize),
+                "model" : embedder,
+                "filename" : f"./sklearn_save/{model_name_path}/epoch"
+            })
     model.clean()
