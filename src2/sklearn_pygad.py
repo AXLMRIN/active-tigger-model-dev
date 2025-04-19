@@ -3,7 +3,7 @@ from torch import load
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.utils import resample, shuffle
-
+from toolbox.CustomLogger import CustomLogger
 # lexic
 # 0 : epoch
 # 1 : Max depth
@@ -102,3 +102,4 @@ GA_parameters = {
 ga_instance = pygad.GA(**GA_parameters)
 ga_instance.run()
 print(ga_instance.best_solution())
+CustomLogger.notify_when_done()
