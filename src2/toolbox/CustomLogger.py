@@ -7,10 +7,11 @@ class CustomLogger:
     def __init__(self):
         self.name = ""
 
-    def notify_when_done(self) : 
+    def notify_when_done(self, message : str = '') : 
         """send an email when finished"""
         subj = "Onyxia run — done"
-        body = "https://projet-datalab-axel-morin-135428-0.lab.groupe-genes.fr/lab?"
+        body = ("https://projet-datalab-axel-morin-135428-0.lab.groupe-genes.fr/lab?"
+                f"\n{message}")
         em = EmailMessage()
         em["From"] = os.environ["EMAIL_FROM"]
         em["To"] = os.environ["EMAIL_TO"]

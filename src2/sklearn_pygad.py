@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.utils import resample, shuffle
 from toolbox.CustomLogger import CustomLogger
+from time import time
+
 # lexic
 # 0 : epoch
 # 1 : Max depth
@@ -100,6 +102,11 @@ GA_parameters = {
     'save_solutions' : False,
 }
 ga_instance = pygad.GA(**GA_parameters)
+t1 = time()
 ga_instance.run()
-print(ga_instance.best_solution())
-CustomLogger.notify_when_done()
+t2 = time()
+CustomLogger.notify_when_done(message = (
+    f'It took {int((t2 - t1) / 60)} min to run\n'
+    f'The results are :\n'
+    f'{ga_instance.best_solution()}'
+))
