@@ -72,7 +72,7 @@ def fitness_func(ga_instance, solution : np.ndarray, solution_idx : int):
     clf.fit(X_train_resampled, y_train_resampled)
     score_model = clf.score(X_test, y_test) # [0,1]
     score_sample = solution[2] / 1000 # [1, inf[
-    return score_model #- 0.25 * score_sample
+    return score_model - 0.025 * score_sample
 
 GA_parameters = {
     #Must Specify
