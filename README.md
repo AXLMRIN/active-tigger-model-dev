@@ -12,6 +12,7 @@ conda install scikit-learn
 pip install mergedeep
 conda install plotly
 pip install -U kaleido
+conda install pygad
 ```
 Si sur GPU : 
 ```
