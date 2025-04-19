@@ -17,3 +17,4 @@ save_random_search_embedder/
 *.zip
 2025-04-13-grid-search/
 sklearn-save/
+*.crt
