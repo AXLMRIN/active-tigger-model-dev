@@ -26,15 +26,16 @@ class Config(object):
         self.dataset_label2id = None
         self.dataset_id2label = None
         #Custom classifier settings
-        self.classifier_hiddenlayer_dim = 50 # After first result analysis
-        self.classifier_threshold = 0.3
+        self.classifier_mode = "single_layer" # "single_layer" or "multi_layer"
+        self.classifier_hiddenlayer_dim = 50 # Not used if classifier_mode = "single_layer"
+        self.classifier_threshold = 0.3 # NOTE Never used
         self.classifier_save_filename = "custom_classifier_save.pt"
 
         # Tokenizer 
         self.tokennizer_settings : dict = {
             "padding" : "max_length",
             "truncation" : True,
-            "max_length" : 20,
+            "max_length" : None, # NOTE this was modified to urge the user to choose the max_length wisely
             "return_tensors" : "pt"
         }
 
