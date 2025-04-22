@@ -13,7 +13,7 @@ pip install mergedeep
 conda install plotly
 pip install -U kaleido
 conda install pygad
-pip install -U "ray[data,train,tune,serve]"
+~~pip install -U "ray[data,train,tune,serve]"~~
 ```
 Si sur GPU : 
 ```
