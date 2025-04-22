@@ -95,10 +95,6 @@ for N_dims in range(5,25,5) :
                             'seed' : seed,
                             'passing' : passing
                         })
-                break
-            break
-        break
-    break
 
 DataFrame(record).to_csv("GA_exploration.csv", index=False)
 CustomLogger().notify_when_done()
