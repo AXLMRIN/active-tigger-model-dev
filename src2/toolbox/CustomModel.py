@@ -17,6 +17,7 @@ from .CustomClassifier import CustomClassifier
 from .History import History
 from .general import Evaluator
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# TODO add a scheduler
 class CustomModel:
     def __init__(self, config : Config, embedder : CustomEmbedder, 
                  classifier : CustomClassifier) -> None:
