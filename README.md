@@ -2,7 +2,7 @@
 This repository is used to develop models to be used in [active tigger](https://github.com/emilienschultz/activetigger)
 
 # Env
-```
+```bash
 conda create -n VENV python=3.11
 pip install -q transformers datasets
 conda install pytorch
@@ -20,3 +20,11 @@ pip install -U flash_attn
 ```
 
 CAREFUL, this is not running properly on some GPUs — only god knows why.
+
+# Optimization with SMAC3
+seems to be linux only
+```bash
+conda create -n AT-HPO python=3.10
+conda install gxx_linux-64 gcc_linux-64 swig
+pip install smac
+```
