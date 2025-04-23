@@ -5,7 +5,7 @@ from random import shuffle
 
 model_name = "google-bert/bert-base-uncased"
 # Load and shuffle
-df = pd.read_csv("../../dataUNSAFE/ibc.csv").sample(frac = 1)
+df = pd.read_csv("../dataUNSAFE/ibc.csv").sample(frac = 1)
 
 # Group per label
 grouped = df.groupby("leaning")
