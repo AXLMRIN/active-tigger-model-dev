@@ -1,4 +1,4 @@
-# %%
+ 
 from datasets import Dataset, DatasetDict
 import pandas as pd
 from random import shuffle
@@ -53,7 +53,7 @@ dataset["train"] = dataset["train"].map(preprocess, batched = True, batch_size =
 dataset["eval"] = dataset["eval"].map(preprocess, batched = True, batch_size = 64)
 dataset["test"] = dataset["test"].map(preprocess, batched = True, batch_size = 64)
 
-# %%
+ 
 from transformers.tokenization_utils_base import BatchEncoding
 from transformers.models.bert.tokenization_bert_fast import BertTokenizerFast
 from datasets.formatting.formatting import LazyBatch
@@ -88,7 +88,7 @@ encoded_dataset = dataset.map(
     batched = True, remove_columns=dataset["train"].column_names
 )
 
-# %%
+ 
 from transformers import AutoModelForSequenceClassification, AutoConfig
 
 model = AutoModelForSequenceClassification.from_pretrained(
@@ -99,7 +99,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
     )
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-# %%
+ 
 from transformers import TrainingArguments, Trainer
 
 
@@ -135,7 +135,7 @@ training_args = TrainingArguments(
 )
     
 
-# %%
+ 
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 from torch import Tensor
 from torch.nn import Sigmoid
@@ -174,12 +174,7 @@ def compute_metrics(model_output: EvalPrediction):
         labels=model_output.label_ids)
     return metrics
 
-# %%
-# Debug
-encoded_dataset["train"] = encoded_dataset["train"].select(range(20))
-encoded_dataset["eval"] = encoded_dataset["eval"].select(range(20))
-
-# %%
+ 
 trainer = Trainer(
     model = model,
     args = training_args,
@@ -189,10 +184,10 @@ trainer = Trainer(
     # optimizers = 
 )
 
-# %%
+ 
 trainer.train()
 
-# %%
+ 
 
 
 
