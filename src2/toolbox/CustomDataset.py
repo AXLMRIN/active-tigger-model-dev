@@ -64,8 +64,7 @@ class CustomDataset:
         self.config.model_loss_parameters["weight"] = Tensor([1 for i in range(self.n_labels)])
         for label in self.config.dataset_label2id : 
             self.config.model_loss_parameters["weight"]\
-                [self.config.dataset_label2id[label]] = max(instances) / float(instances[label])
-            
+                [self.config.dataset_label2id[label]] = max(instances) / float(instances[label])    
     
     def preprocess_data(self,preprocess_function_text, 
         preprocess_function_label)->None:

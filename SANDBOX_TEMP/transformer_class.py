@@ -90,7 +90,7 @@ class transformer:
         total_per_batch = 64
         batch_size_device = 8
         self.training_args = TrainingArguments(
-            num_train_epochs=10,
+            num_train_epochs=5,
             # bf16=True,
             # Hyperparameters
             learning_rate=2e-5,
