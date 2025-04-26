@@ -14,6 +14,12 @@ config.history_foldersave = "./debug"
 config.embeddingmodel_save_filename = f"{config.history_foldersave}/{config.embeddingmodel_save_filename}"
 config.classifier_save_filename = f"{config.history_foldersave}/{config.classifier_save_filename}"
 
+# config.model_train_embedding_optimizer = "AdamW"
+config.model_train_embedding_adam_parameters["lr"] = 2e-5
+
+# config.model_train_classifier_optimizer = "AdamW"
+config.model_train_classifier_sgd_parameters["lr"] = 2e-5
+
 dataset = CustomDataset(config)
 dataset.open_dataset()
 dataset.find_labels()
@@ -24,11 +30,12 @@ def preprocess_function_text(batch):
     return [sentence.lower() for sentence in batch["text"]]
 
 
-dataset.preprocess_data(
-    preprocess_function_text, 
-    lambda batch : preprocess_function_label(batch, config.dataset_label2id)
-)
+dataset.preprocess_data(preprocess_function_text, 
+    lambda batch : preprocess_function_label(batch, config.dataset_label2id))
 
+print(dataset)
+dataset.debug()
+print(dataset)
 
 embedder = CustomEmbedder(config)
 classifier = CustomClassifier(config)
