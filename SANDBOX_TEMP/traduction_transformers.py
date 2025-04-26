@@ -6,7 +6,7 @@ from transformer_functions import multi_label_metrics
 disable_progress_bar()
 
 def fitness(ga_instance, solution, solution_idx):
-    ds = dataset("data/316_ideological_book_corpus/ibc.csv",
+    ds = dataset("dataUNSAFE/ibc.csv",
                 col_text = "sentence", 
                 col_label = "leaning")
 
