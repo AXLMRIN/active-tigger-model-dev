@@ -4,12 +4,14 @@ from datasets import load_dataset, Dataset, DatasetDict
 from torch import Tensor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import pandas as pd
 # Native
 
 # Custom
 from .Config import Config
 from .general import (
-    split_test_train_valid
+    split_test_train_valid,
+    split
 )
 
 # CLASS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -28,22 +30,26 @@ class CustomDataset:
         #UPGRADE make possible to load from the internet
         #UPGRADE for now, only open csv but need to make it possible for different format
         if self.config.dataset_filename.endswith(".csv") : 
-            ds_config = load_dataset("csv",data_files={
-                "whole" : self.config.dataset_filename
-            })
+            ds_config : pd.DataFrame = pd.\
+                read_csv(self.config.dataset_filename).\
+                rename(
+                    {
+                        self.config.dataset_label_col : "label",
+                        self.config.dataset_text_col : "text"
+                    }, 
+                    axis = 1)
+
+            # NOTE This method is deprecated
             # Split dataset into 3 Datasets (train, test, validation)
-            self.ds = split_test_train_valid(ds_config["whole"],
-                        **self.config.dataset_split_parameters
-            )
+            # self.ds = split_test_train_valid(ds_config["whole"],
+            #             **self.config.dataset_split_parameters_DEPRECATED
+            # )
+            
+            # Split dataset into 3 Datasets (train, test, validation)
+            self.ds = split(ds_config, **self.config.dataset_split_parameters)
             self.open_status = True
             
     def find_labels(self) -> None: 
-        " Rename columns"
-        for split in ["train", "test", "validation"] : 
-            self.ds[split] = self.ds[split].rename_column(
-                self.config.dataset_text_col, "text")
-            self.ds[split] = self.ds[split].rename_column(
-                self.config.dataset_label_col, "label")
         # Look for the labels
         self.labels = list(set(self.ds["train"]["label"]))
         self.n_labels = len(self.labels)
@@ -78,11 +84,19 @@ class CustomDataset:
             self.ds[split] = Dataset.from_dict(new_ds)
         self.preprocess_status = True
 
+    def debug(self):
+        for split in ["train", "test", "validation"] : 
+            self.ds[split] = self.ds[split].select(range(0,20))
+
     def __str__(self):
         return (
             "Custom Dataset object\n"
             "Status :\n"
             f"\t- File open : {'Done' if self.open_status else ''}\n"
             f"\t- labels : {self.labels}\n"
-            f"\t- Preprocess : {'Done' if self.preprocess_status else ''}"
+            f"\t- Preprocess : {'Done' if self.preprocess_status else ''}\n"
+            f"\t- sizes : \n"
+            f"\t\t- train : {len(self.ds['train'])}\n"
+            f"\t\t- validation : {len(self.ds['validation'])}\n"
+            f"\t\t- test : {len(self.ds['test'])}\n"
         )

@@ -15,11 +15,17 @@ class Config(object):
         self.dataset_filename : str = "dataUNSAFE/ibc.csv" # UPGRADE make it editable 
         self.dataset_label_col : str = "leaning"
         self.dataset_text_col : str = "sentence"
-        self.dataset_split_parameters : dict = {
+        self.dataset_split_parameters_DEPRECATED : dict = {
             "proportion_train" : 0.7,
             "proportion_test" : 0.15, 
             "proportion_valid" : 0.15,
             "shuffle" : True, 
+            "seed" : self.seed
+        }
+        self.dataset_split_parameters : dict = {
+            "N_trainP" : 0.7,
+            "N_testP" : 0.15, 
+            "N_evalP" : 0.15,
             "seed" : self.seed
         }
         self.dataset_n_labels = None

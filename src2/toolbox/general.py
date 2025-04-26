@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 from torch import Tensor
 from torch.nn import Sigmoid
+import pandas as pd
+from pandas.core.groupby.generic import DataFrameGroupBy
 # Native
 
 # Custom
@@ -48,6 +50,40 @@ def split_test_train_valid(dataset : Dataset, proportion_train : float = 0.7,
 
     return ds
 
+def concat_shuffle(df_grouped : DataFrameGroupBy, start : int, 
+                   finish : int) -> pd.DataFrame :
+        
+        return pd.\
+            concat([sub_df[start:finish] for _, sub_df in df_grouped]).\
+            sample(frac = 1) # shuffle
+
+def split(df : pd.DataFrame, 
+          N_trainP : None|float|int = None, N_testP : None|float|int = None, 
+          N_evalP : None|float|int = None, seed : int = 42) -> DatasetDict :
+     
+    grouped = df.groupby("label")
+    min_size : int = min(grouped.size())
+
+    # TODO refine
+    N0 = 0
+    if (0 < N_trainP)&(N_trainP<= 1): N1 = int(min_size * N_trainP)
+    else : N1 = int(min_size * N_trainP); print("Not IMPLEMENTED yet")
+
+    if (0 < N_evalP)&(N_evalP<= 1): N2 = int(min_size * N_evalP) + N1
+    else : N2 = int(min_size * N_evalP) + N1; print("Not IMPLEMENTED yet")
+
+    # UPGRADE might not be necessary
+    if (0 < N_testP)&(N_testP<= 1): N3 = int(min_size * N_testP) + N2
+    else : N3 = int(min_size * N_testP) + N2; print("Not IMPLEMENTED yet")
+    
+    try : assert(N3 <= min_size)
+    except : N3 = min_size
+
+    return DatasetDict({
+        "train" : Dataset.from_pandas(concat_shuffle(grouped, N0, N1)),
+        "validation" : Dataset.from_pandas(concat_shuffle(grouped, N1, N2)),
+        "test" : Dataset.from_pandas(concat_shuffle(grouped, N2, N3))
+    })
 class Evaluator:
     def __init__(self, n_label : int, threshold : float = 0.5):
         self.log_threshold = np.log(threshold) # UNUSED FIXME
