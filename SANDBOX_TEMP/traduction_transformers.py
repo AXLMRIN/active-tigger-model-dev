@@ -23,8 +23,10 @@ def fitness(ga_instance, solution, solution_idx):
     tr.train()
 
     output = tr.model(**{
-        "input_ids" : Tensor(tr.encoded_dataset["eval"]["input_ids"]).squeeze().int(),
-        "attention_mask" : Tensor(tr.encoded_dataset["eval"]["attention_mask"]).squeeze()
+        "input_ids" : Tensor(tr.encoded_dataset["eval"]["input_ids"]).\
+            squeeze().int().to(device=tr.model.device),
+        "attention_mask" : Tensor(tr.encoded_dataset["eval"]["attention_mask"]).\
+            squeeze().to(device=tr.model.device)
     })
 
     return multi_label_metrics(
