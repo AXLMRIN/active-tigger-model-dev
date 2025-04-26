@@ -27,6 +27,9 @@ def fitness(ga_instance, solution, solution_idx):
         "attention_mask" : Tensor(tr.encoded_dataset["eval"]["attention_mask"]).squeeze()
     })
 
-    return multi_label_metrics(output.logits,tr.encoded_dataset["eval"]["labels"])['f1']
+    return multi_label_metrics(
+        output.logits.to(device="cpu"),
+        tr.encoded_dataset["eval"]["labels"]
+        )['f1']
 
 fitness(None,None, None)
