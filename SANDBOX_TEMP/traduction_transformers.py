@@ -33,5 +33,3 @@ def fitness(ga_instance, solution, solution_idx):
         output.logits.to(device="cpu"),
         tr.encoded_dataset["eval"]["labels"]
         )['f1']
-
-fitness(None,None, None)
