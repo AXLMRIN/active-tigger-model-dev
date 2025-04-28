@@ -5,7 +5,7 @@ from numpy.random import rand
 from torch import tensor, Tensor
 from torch.distributions import MultivariateNormal
 from pandas import DataFrame
-import tqdm
+from tqdm import tqdm
 # from src2.toolbox.CustomLogger import CustomLogger
 
 SEEDS = [42, 18, 2306406, 98, 12471, 41274, 5328, 1247, 125732,31253]
