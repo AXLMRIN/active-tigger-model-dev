@@ -1,8 +1,11 @@
 from transformer_class import dataset, transformer, CustomLogger
 from datasets.utils.logging import disable_progress_bar
 from torch import Tensor
+from torch.cuda import synchronize, ipc_collect, empty_cache
 from transformer_functions import multi_label_metrics
 import pygad 
+
+import gc
 
 disable_progress_bar()
 
@@ -38,10 +41,19 @@ def fitness_func(ga_instance, solution, solution_idx):
             squeeze().to(device=tr.model.device)
     })
 
-    return multi_label_metrics(
-        output.logits.to(device="cpu"),
-        tr.encoded_dataset["eval"]["labels"]
-        )['f1']
+    result = multi_label_metrics(
+            output.logits.to(device="cpu"),
+            tr.encoded_dataset["eval"]["labels"]
+            )['f1']
+    print(result)
+    
+    del tr, ds
+    gc.collect()
+    if tr.device() == "cuda":
+        synchronize()
+        empty_cache()
+        ipc_collect()
+    return result
 
 GA_parameters = {
     #Must Specify

@@ -9,6 +9,7 @@ from transformers import (
 from transformers.tokenization_utils_base import BatchEncoding
 from transformers.trainer_utils import TrainOutput
 from transformer_functions import compute_metrics
+from torch.cuda import is_available as cuda_available
 
 class dataset:
     def __init__(self, csv_filename : str, col_text : str, col_label : str) -> None:
@@ -68,8 +69,11 @@ class transformer:
 
         self.model_name : str = model_name
 
+        self.device : str = "cuda" if cuda_available() else "cpu"
         # Load tokenizer and model
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.tokenizer = AutoTokenizer.\
+                            from_pretrained(self.model_name).\
+                            to(device = self.device)
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.model_name, problem_type = "multi_label_classification",
             num_labels = self.ds.n_labels, id2label = self.ds.id2label,
