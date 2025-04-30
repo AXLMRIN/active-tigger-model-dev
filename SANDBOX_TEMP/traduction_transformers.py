@@ -54,7 +54,7 @@ GA_parameters = {
     
     'num_genes' : 2,
     "gene_space" : [
-        {'low' : 1e-6, 'high' : 1e-4},
+        {'low' : 1e-6, 'high' : 1e-3},
         [0.1,0.2,0.3,0.4]
     ],
     "stop_criteria" : "saturate_5",
