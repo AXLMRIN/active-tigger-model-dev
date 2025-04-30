@@ -72,13 +72,16 @@ class transformer:
         self.device : str = "cuda" if cuda_available() else "cpu"
         # Load tokenizer and model
         self.tokenizer = AutoTokenizer.\
-                            from_pretrained(self.model_name).\
-                            to(device = self.device)
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            self.model_name, problem_type = "multi_label_classification",
-            num_labels = self.ds.n_labels, id2label = self.ds.id2label,
-            label2id = self.ds.label2id
-        )
+                            from_pretrained(self.model_name)
+        model_parameters = {
+            "problem_type" : "multi_label_classification",
+            "num_labels" : self.ds.n_labels, 
+            "id2label" : self.ds.id2label,
+            "label2id" : self.ds.label2id
+        }
+        self.model = AutoModelForSequenceClassification.\
+                        from_pretrained(self.model_name, **model_parameters).\
+                        to(device = self.device)
 
         # Parameters 
         tokenizer_max_length = 128 if 'tokenizer_max_length' not in kwargs else kwargs['tokenizer_max_length']
