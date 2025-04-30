@@ -62,7 +62,7 @@ GA_parameters = {
     'mutation_type' : "random",
     'parent_selection_type' : "sss",
     'crossover_type' : "single_point",
-    'Ò' : 50,
+    'mutation_percent_genes' : 50,
     # Other
     'save_solutions' : False,
     'random_seed' : 2306406
