@@ -164,6 +164,10 @@ class transformer:
         return trainer.train()
 
 
+import os
+from email.message import EmailMessage
+import ssl
+import smtplib
 class CustomLogger:
     def __init__(self):
         self.name = ""
