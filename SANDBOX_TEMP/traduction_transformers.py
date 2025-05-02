@@ -35,7 +35,6 @@ def fitness_func(ga_instance, solution, solution_idx):
     tr.training_args.weight_decay = solution[1]
     
     tr.train()
-    print(np.array(tr.encoded_dataset["test"]["input_ids"]).shape)
     test_loader = DataLoader(tr.encoded_dataset["test"], 
                     batch_size = tr.training_args.per_device_train_batch_size,
                     shuffle = True)
@@ -52,8 +51,6 @@ def fitness_func(ga_instance, solution, solution_idx):
         logits.extend(output.logits.tolist())
         labels.extend(Tensor([t.tolist() for t in batch["labels"]]).T.tolist())
 
-    print(Tensor(logits).shape)
-    print(Tensor(labels).shape)
     result = multi_label_metrics(
             Tensor(logits).to(device="cpu"),
             Tensor(labels).to(device="cpu")
