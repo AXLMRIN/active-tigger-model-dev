@@ -1,9 +1,11 @@
 from transformer_class import dataset, transformer, CustomLogger
 from datasets.utils.logging import disable_progress_bar
 from torch import Tensor
+from torch.utils.data import DataLoader
 from torch.cuda import synchronize, ipc_collect, empty_cache
 from transformer_functions import multi_label_metrics
 import pygad 
+import numpy as np
 
 import gc
 
@@ -33,26 +35,37 @@ def fitness_func(ga_instance, solution, solution_idx):
     tr.training_args.weight_decay = solution[1]
     
     tr.train()
+    print(np.array(tr.encoded_dataset["test"]["input_ids"]).shape)
+    test_loader = DataLoader(tr.encoded_dataset["test"], 
+                    batch_size = tr.training_args.per_device_train_batch_size,
+                    shuffle = True)
+    logits = []
+    labels = []
+    for batch in test_loader: 
+        output = tr.model(**{
+            "input_ids" : Tensor([t.tolist() for t in batch["input_ids"]]).T.\
+                squeeze().int().to(device=tr.model.device),
+            "attention_mask" : Tensor([t.tolist() for t in batch["attention_mask"]]).T.\
+                squeeze().to(device=tr.model.device)
+        })
 
-    output = tr.model(**{
-        "input_ids" : Tensor(tr.encoded_dataset["eval"]["input_ids"]).\
-            squeeze().int().to(device=tr.model.device),
-        "attention_mask" : Tensor(tr.encoded_dataset["eval"]["attention_mask"]).\
-            squeeze().to(device=tr.model.device)
-    })
+        logits.extend(output.logits.tolist())
+        labels.extend(Tensor([t.tolist() for t in batch["labels"]]).T.tolist())
 
+    print(Tensor(logits).shape)
+    print(Tensor(labels).shape)
     result = multi_label_metrics(
-            output.logits.to(device="cpu"),
-            tr.encoded_dataset["eval"]["labels"]
+            Tensor(logits).to(device="cpu"),
+            Tensor(labels).to(device="cpu")
             )['f1']
     print(result)
     
-    del tr, ds
-    gc.collect()
-    if tr.device() == "cuda":
+    if tr.device == "cuda":
         synchronize()
         empty_cache()
         ipc_collect()
+    del tr, ds
+    gc.collect()
     return result
 
 GA_parameters = {
