@@ -20,11 +20,3 @@ pip install -U flash_attn
 ```
 
 CAREFUL, this is not running properly on some GPUs — only god knows why.
-
-# Optimization with SMAC3
-seems to be linux only
-```bash
-conda create -n AT-HPO python=3.10
-conda install gxx_linux-64 gcc_linux-64 swig
-pip install smac
-```
