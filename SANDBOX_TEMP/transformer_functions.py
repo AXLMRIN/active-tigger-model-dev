@@ -20,10 +20,12 @@ def multi_label_metrics(results_matrix, labels : Tensor, threshold : float = 0.5
     # finally, compute metrics
     y_true = labels
     f1_micro_average = f1_score(y_true=y_true, y_pred=y_pred, average='micro')
+    f1_macro_average = f1_score(y_true=y_true, y_pred=y_pred, average='macro')
     roc_auc = roc_auc_score(y_true, y_pred, average = 'micro')
     accuracy = accuracy_score(y_true, y_pred)
     # return as dictionary
-    return {'f1': f1_micro_average,
+    return {'f1_micro': f1_micro_average,
+            'f1_macro': f1_macro_average,
              'roc_auc': roc_auc,
              'accuracy': accuracy}
 

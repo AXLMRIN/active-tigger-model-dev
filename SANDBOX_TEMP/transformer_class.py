@@ -110,17 +110,17 @@ class transformer:
             gradient_accumulation_steps = int(total_per_batch/ batch_size_device),
             optim = "adamw_torch",
             # Metrics
-            metric_for_best_model="f1",
+            metric_for_best_model="f1_macro",
             # Pipe
-            output_dir = "2025-04-23-bert-GA",
+            output_dir = "debug",
             overwrite_output_dir=True,
             eval_strategy = "epoch",
             logging_strategy = "epoch",
             save_strategy = "epoch",
             torch_empty_cache_steps = int(
                 self.ds.n_labels * self.ds.N_train / batch_size_device),
-            load_best_model_at_end=True,
-            save_total_limit = 1,
+            load_best_model_at_end=False,
+            save_total_limit = 6,
 
             disable_tqdm = True
         )
@@ -132,7 +132,7 @@ class transformer:
     
     def encode(self):
         self.encoded_dataset = DatasetDict()
-
+        self.encoded_dataset.save_to_disk
         for ds_name in ["train","eval", "test"] : 
             list_of_rows : list[dict] = []
             for row in self.ds_data[ds_name] :
