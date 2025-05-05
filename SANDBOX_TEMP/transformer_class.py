@@ -132,7 +132,7 @@ class transformer:
     
     def encode(self):
         self.encoded_dataset = DatasetDict()
-        self.encoded_dataset.save_to_disk
+
         for ds_name in ["train","eval", "test"] : 
             list_of_rows : list[dict] = []
             for row in self.ds_data[ds_name] :
