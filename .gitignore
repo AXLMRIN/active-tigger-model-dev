@@ -9,3 +9,4 @@ data/*
 *.zip
 *.crt
 box/
+SANDBOX_TEMP/2025-05-05-*
