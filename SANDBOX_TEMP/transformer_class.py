@@ -82,7 +82,7 @@ class transformer:
         self.model = AutoModelForSequenceClassification.\
                         from_pretrained(self.model_name, **model_parameters).\
                         to(device = self.device)
-
+        print(f"I am stupid : {self.model.device}")
         # Parameters 
         tokenizer_max_length = 128 if 'tokenizer_max_length' not in kwargs else kwargs['tokenizer_max_length']
         self.tokenizer_p = {
@@ -142,7 +142,7 @@ class transformer:
                 
                 list_of_rows.append({
                     "input_ids" : tokens.input_ids,
-                    "token_type_ids" : tokens.token_type_ids,
+                    # "token_type_ids" : tokens.token_type_ids,
                     "attention_mask" : tokens.attention_mask,
                     "labels" : [float(id == self.ds.label2id[row["label"]])
                                 for id in range(self.ds.n_labels)]
@@ -165,8 +165,7 @@ class transformer:
             args = self.training_args,
             train_dataset = self.encoded_dataset["train"],
             eval_dataset = self.encoded_dataset["eval"],
-            compute_metrics = compute_metrics,
-            # optimizers = 
+            compute_metrics = compute_metrics
         )
         return trainer.train()
 
