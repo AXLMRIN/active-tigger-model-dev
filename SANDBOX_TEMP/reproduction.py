@@ -92,7 +92,7 @@ def routineRandomForest(folder_name : str) -> None:
             for epoch in range(2,5):
                 d, GA_param, t1, t2, optimum, value, optimizer = None,None,None,None,None,None,None 
                 try : 
-                    d = DATA(folder_name,epoch, 10) # !!!
+                    d = DATA(folder_name,epoch, n_samples)
                     GA_param = {
                         'num_genes' : 3,
                         "gene_space" : [
@@ -161,9 +161,19 @@ def routineRandomForest(folder_name : str) -> None:
         fail = True
 
     finally : 
-        df = pd.readcsv("RandomForest.csv")
+        df = pd.read_csv("RandomForest.csv")
         df = pd.concat((df,pd.DataFrame(save)))
         df.to_csv("RandomForest.csv", index = False)
         CustomLogger().notify_when_done(f"fail : {fail}")
 
 routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-5e-06-data")
+
+routineRandomForest("2025-05-05-FacebookAI/roberta-base-1e-05-data")
+routineRandomForest("2025-05-05-FacebookAI/roberta-base-2e-05-data")
+routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-05-data")
+routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-06-data")
+
+routineRandomForest("2025-05-05-google-bert/bert-base-uncased-1e-05-data")
+routineRandomForest("2025-05-05-google-bert/bert-base-uncased-2e-05-data")
+routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-05-data")
+routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-06-data")
