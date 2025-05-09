@@ -6,6 +6,7 @@ from time import time
 from torch import load
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
+from sklearn.neural_network import MLPClassifier
 from sklearn.utils import resample
 import pandas as pd
 from transformer_class import CustomLogger
@@ -133,7 +134,7 @@ def routineRandomForest(folder_name : str) -> None:
 
                 except Exception as e: 
                     save.append({
-                        "filename" : "2025-05-05-answerdotai/ModernBERT-base-1e-05-data",
+                        "filename" : folder_name,
                         "n_samples" : n_samples,
                         "epoch" : epoch,
                         "time" : None,
@@ -166,14 +167,80 @@ def routineRandomForest(folder_name : str) -> None:
         df.to_csv("RandomForest.csv", index = False)
         CustomLogger().notify_when_done(f"fail : {fail}")
 
-routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-5e-06-data")
+# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-1e-05-data")
+# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-2e-05-data")
+# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-5e-05-data")
+# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-5e-06-data")
 
-routineRandomForest("2025-05-05-FacebookAI/roberta-base-1e-05-data")
-routineRandomForest("2025-05-05-FacebookAI/roberta-base-2e-05-data")
-routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-05-data")
-routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-06-data")
+# routineRandomForest("2025-05-05-FacebookAI/roberta-base-1e-05-data")
+# routineRandomForest("2025-05-05-FacebookAI/roberta-base-2e-05-data")
+# routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-05-data")
+# routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-06-data")
 
-routineRandomForest("2025-05-05-google-bert/bert-base-uncased-1e-05-data")
-routineRandomForest("2025-05-05-google-bert/bert-base-uncased-2e-05-data")
-routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-05-data")
-routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-06-data")
+# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-1e-05-data")
+# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-2e-05-data")
+# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-05-data")
+# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-06-data")
+
+
+def basicML(d: DATA):
+    clf = MLPClassifier(hidden_layer_sizes=(),max_iter = 1000, early_stopping=True)
+    clf.fit(d.X_train, d.y_train)
+    return f1_score(y_true=d.y_test, y_pred=clf.predict(d.X_test), average='macro')
+
+save = []
+for folder_name in [
+        "2025-05-05-answerdotai/ModernBERT-base-1e-05-data",
+        "2025-05-05-answerdotai/ModernBERT-base-2e-05-data",
+        "2025-05-05-answerdotai/ModernBERT-base-5e-05-data",
+        "2025-05-05-answerdotai/ModernBERT-base-5e-06-data",
+        "2025-05-05-FacebookAI/roberta-base-1e-05-data",
+        "2025-05-05-FacebookAI/roberta-base-2e-05-data",
+        "2025-05-05-FacebookAI/roberta-base-5e-05-data",
+        "2025-05-05-FacebookAI/roberta-base-5e-06-data",
+        "2025-05-05-google-bert/bert-base-uncased-1e-05-data",
+        "2025-05-05-google-bert/bert-base-uncased-2e-05-data",
+        "2025-05-05-google-bert/bert-base-uncased-5e-05-data",
+        "2025-05-05-google-bert/bert-base-uncased-5e-06-data"
+    ]:
+    for epoch in [1,2,3,4,5]:
+        print(f"\n{folder_name}\n")
+        try:
+            d = DATA(folder_name, epoch=epoch, n_samples=1500)
+            
+            t1 = time()
+            f1_macro = basicML(d)
+            t2 = time()
+
+            save.append({
+                "filename" : folder_name,
+                "n_samples" : 1500,
+                "epoch" : epoch,
+                "time" : t2-t1,
+                "f1_macro" : float(f1_macro)
+            })
+            print((
+                f"{'{}'.format(folder_name):<50}|"
+                f"{'%.0f'%(1500):<10}|"
+                f"{'%.0f'%(epoch):<10}|"
+                f"{'%.2f'%(t2-t1):<10}|"
+                f"{'%.3f'%(float(f1_macro)):<10}|"
+            ))
+        except Exception as e: 
+            save.append({
+                "filename" : folder_name,
+                "n_samples" : 1500,
+                "epoch" : epoch,
+                "time" : None,
+                "f1_macro" : None
+            })
+            print((
+                f"{'{}'.format(folder_name):<50}|"
+                f"{'%.0f'%(1500):<10}|"
+                f"{'%.0f'%(epoch):<10}|"
+                f"{'FAILED':<10}|"
+                f"{'FAILED':<10}|"
+                f"\tError : {e}"
+            ))
+pd.DataFrame(save).to_csv("basicML.csv")
+CustomLogger().notify_when_done()
