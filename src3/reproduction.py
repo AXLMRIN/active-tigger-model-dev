@@ -15,7 +15,7 @@ from transformer_class import CustomLogger
 
 from toolbox import routine, cMapper
 
-routine(
+R = routine(
     folder_name = "2025-05-05-answerdotai/ModernBERT-base-1e-05-data",
     classifier = RandomForestClassifier, 
     n_sample_range = [500, 750],
@@ -37,6 +37,9 @@ routine(
         ] 
     )
 )
+
+R.run_all()
+R.save_to_csv("test.csv")
 
 # routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-1e-05-data")
 # routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-2e-05-data")
