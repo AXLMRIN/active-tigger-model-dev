@@ -1,20 +1,24 @@
-# SKLEARN
-import gc
-import numpy as np
-import pygad
-from time import time
-from torch import load
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import f1_score
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.utils import resample
-import pandas as pd
-from transformer_class import CustomLogger
 
+from toolbox import routine, cMapper, CustomLogger
 
-from toolbox import routine, cMapper
+all_models = [
+    "src3/2025-05-05-answerdotai/ModernBERT-base",
+    "src3/2025-05-05-FacebookAI/roberta-base",
+    "src3/2025-05-05-google-bert/bert-base-uncased"
+]
 
+all_lrs = [
+    "1e-05",
+    "2e-05", 
+    "5e-05", 
+    "5e-06"
+]
+
+# Routine Random Forest, each model x lr x epoch x  is opitmised 3 times
+
+# Build cMapper
 def n_estimators_mapper_function(value):
     return int(value)
 def criterion_mapper_function(idx):
@@ -23,42 +27,90 @@ def criterion_mapper_function(idx):
 def max_depth_mapper_function(value):
     return int(value)
 
-R = routine(
-    folder_name = "src3/2025-05-05-answerdotai/ModernBERT-base-1e-05-data",
-    classifier = RandomForestClassifier, 
-    n_sample_range = [500],
-    epoch_range = [3],
-    GA_parameters = {
-        'num_genes' : 3,
-        "gene_space" : [
-            {'low' : 10, 'high' : 1000, 'step' : 50},
-            [0,1,2],
-            [30, 60, 90]
-        ]
-    },
-    custom_mapping = cMapper(
-        keys = ["n_estimators", "criterion","max_depth"],
-        functions = [n_estimators_mapper_function,criterion_mapper_function,max_depth_mapper_function] 
-    )
+mapper = cMapper(keys = ["n_estimators", "criterion","max_depth"],
+    functions = [n_estimators_mapper_function,criterion_mapper_function,max_depth_mapper_function] 
 )
 
-R.run_all()
-R.save_to_csv("src3/results/test.csv")
+# GA parameters 
+GA_p = {
+    'num_genes' : 3,
+    "gene_space" : [
+        {'low' : 10, 'high' : 1000, 'step' : 50},
+        [0,1,2],
+        [30, 60, 90]
+    ]
+}
 
-# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-1e-05-data")
-# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-2e-05-data")
-# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-5e-05-data")
-# routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-5e-06-data")
+# logger 
+logger = CustomLogger("src3/pers_logs/RoutineRandomForest.txt")
 
-# routineRandomForest("2025-05-05-FacebookAI/roberta-base-1e-05-data")
-# routineRandomForest("2025-05-05-FacebookAI/roberta-base-2e-05-data")
-# routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-05-data")
-# routineRandomForest("2025-05-05-FacebookAI/roberta-base-5e-06-data")
+#Loop
+for model in all_models:
+    for lr in all_lrs:
+            for attempt in range(3):
 
-# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-1e-05-data")
-# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-2e-05-data")
-# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-05-data")
-# routineRandomForest("2025-05-05-google-bert/bert-base-uncased-5e-06-data")
+                routineRandomForest = routine(
+                    folder_name = f"{model}-{lr}-data",
+                    classifier = RandomForestClassifier, 
+                    n_sample_range = [250,500,750,1000,1500],
+                    epoch_range = [0,1,2,3,4,5],
+                    GA_parameters = GA_p,
+                    custom_mapping = mapper,
+                    logger = logger,
+                    print_logs = False
+                )
+
+                routineRandomForest.run_all()
+                routineRandomForest.save_to_csv("src3/results/2025-05-18-RandomForest-2.csv")
+
+CustomLogger().notify_when_done("The RandomForest routine is finished")
+del routineRandomForest, model, lr, GA_p, mapper, logger
+
+# Routine KNN, each model x lr x epoch x  is opitmised 3 times
+
+# Build cMapper
+def n_neighbors_mapper_function(value):
+    return int(value)
+def metric_mapper_function(idx):
+    crits = ["cosine","l1","l2"]
+    return crits[int(idx)]
+
+mapper = cMapper(keys = ["n_neighbors", "metric"],
+    functions = [n_neighbors_mapper_function,metric_mapper_function] 
+)
+
+# GA parameters 
+GA_p = {
+    'num_genes' : 2,
+    "gene_space" : [
+        {'low' : 1, 'high' : 20},
+        [0,1,2]
+    ]
+}
+
+# Logger
+logger = CustomLogger("src3/pers_logs/RoutineKNN.txt")
+
+#Loop
+for model in all_models:
+    for lr in ["1e-05", "2e-05", "5e-05", "5e-06"]:
+            for attempt in range(3):
+
+                routineKNN = routine(
+                    folder_name = f"{model}-{lr}-data",
+                    classifier = KNeighborsClassifier, 
+                    n_sample_range = [250,500,750,1000,1500],
+                    epoch_range = [0,1,2,3,4,5],
+                    GA_parameters = GA_p,
+                    custom_mapping = mapper,
+                    logger = logger,
+                    print_logs = False 
+                )
+
+                routineKNN.run_all()
+                routineKNN.save_to_csv("src3/results/2025-05-18-KNN-2.csv")
+
+CustomLogger().notify_when_done("The RandomForest routine is finished")
 
 
 # def basicML(d: DATA):
@@ -122,108 +174,3 @@ R.save_to_csv("src3/results/test.csv")
 #             ))
 # pd.DataFrame(save).to_csv("basicML.csv")
 # CustomLogger().notify_when_done()
-
-# def routineKNN(folder_name : str) -> None:
-    
-#     def custom_mapping(idx, value, printFunction : bool = False):
-#         if idx == 0:
-#             if printFunction : return int(value)
-#             else : return {"n_neighbors" : int(value)}
-#         if idx == 1:
-#             metric = ["cosine","l1","l2"]
-#             if printFunction : return metric[value]
-#             else : return {"metric" : metric[value]}
-#         else:
-#             raise(KeyError, "custom mapping idx not right")
-
-#     save = []
-#     fail = False
-#     try : 
-#         for n_samples in [250, 500, 750, 1000]: 
-#             print(f"\nn_samples : {n_samples}\n")
-#             for epoch in range(1,6):
-#                 d, GA_param, t1, t2, optimum, value, optimizer = None,None,None,None,None,None,None 
-#                 try : 
-#                     d = DATA(folder_name,epoch, n_samples)
-#                     GA_param = {
-#                         'num_genes' : 2,
-#                         "gene_space" : [
-#                             {'low' : 1, 'high' : 20},
-#                             [0,1,2]
-#                         ],
-#                         "gene_type": [int,int],
-#                     }
-#                     classifier = KNeighborsClassifier
-#                     param_mapping = custom_mapping
-
-#                     optimizer = optimize_classifier(d, classifier, GA_param, param_mapping)
-
-#                     t1 = time()
-#                     optimum, value  = optimizer.run()
-#                     t2 = time()
-
-#                     save.append({
-#                         "filename" : folder_name,
-#                         "n_samples" : n_samples,
-#                         "epoch" : epoch,
-#                         "time" : t2-t1,
-#                         "f1_macro" : float(value),
-#                         "n_neighbors" : custom_mapping(0, optimum[0],True),
-#                         "metric" : custom_mapping(1, optimum[1],True)
-#                     })
-#                     print((
-#                         f"{'%.0f'%(n_samples):<10}|"
-#                         f"{'%.0f'%(epoch):<10}|"
-#                         f"{'%.2f'%(t2-t1):<10}|"
-#                         f"{'%.3f'%(float(value)):<10}|"
-#                         f"{'{}'.format(custom_mapping(0, optimum[0],True)):<10}|"
-#                         f"{'{}'.format(custom_mapping(1, optimum[1],True)):<10}|"
-#                     ))
-
-#                 except Exception as e: 
-#                     save.append({
-#                         "filename" : folder_name,
-#                         "n_samples" : n_samples,
-#                         "epoch" : epoch,
-#                         "time" : None,
-#                         "f1_macro" : None,
-#                         "n_neighbors" : None,
-#                         "metric" : None
-#                     })
-#                     print((
-#                         f"{'%.0f'%(n_samples):<10}|"
-#                         f"{'%.0f'%(epoch):<10}|"
-#                         f"{'FAILED':<10}|"
-#                         f"{'FAILED':<10}|"
-#                         f"{'FAILED':<10}|"
-#                         f"{'FAILED':<10}|"
-#                         f"\tError : {e}"
-#                     ))
-
-#                 finally : 
-#                     del d, GA_param, t1, t2, optimum, value, optimizer
-#                     gc.collect()
-        
-#     except : 
-#         fail = True
-
-#     finally : 
-#         df = pd.read_csv("KNN.csv")
-#         df = pd.concat((df,pd.DataFrame(save)))
-#         df.to_csv("KNN.csv", index = False)
-#         CustomLogger().notify_when_done(f"KNN {folder_name}")
-
-# routineKNN("2025-05-05-answerdotai/ModernBERT-base-1e-05-data")
-# routineKNN("2025-05-05-answerdotai/ModernBERT-base-2e-05-data")
-# routineKNN("2025-05-05-answerdotai/ModernBERT-base-5e-05-data")
-# routineKNN("2025-05-05-answerdotai/ModernBERT-base-5e-06-data")
-
-# routineKNN("2025-05-05-FacebookAI/roberta-base-1e-05-data")
-# routineKNN("2025-05-05-FacebookAI/roberta-base-2e-05-data")
-# routineKNN("2025-05-05-FacebookAI/roberta-base-5e-05-data")
-# routineKNN("2025-05-05-FacebookAI/roberta-base-5e-06-data")
-
-# routineKNN("2025-05-05-google-bert/bert-base-uncased-1e-05-data")
-# routineKNN("2025-05-05-google-bert/bert-base-uncased-2e-05-data")
-# routineKNN("2025-05-05-google-bert/bert-base-uncased-5e-05-data")
-# routineKNN("2025-05-05-google-bert/bert-base-uncased-5e-06-data")
