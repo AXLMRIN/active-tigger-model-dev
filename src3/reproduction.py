@@ -61,7 +61,7 @@ for model in all_models:
                     GA_parameters = GA_p,
                     custom_mapping = mapper,
                     logger = logger,
-                    print_logs = False
+                    print_logs = True
                 )
 
                 routineRandomForest.run_all()
@@ -123,7 +123,7 @@ for model in all_models:
                     GA_parameters = GA_p,
                     custom_mapping = mapper,
                     logger = logger,
-                    print_logs = False 
+                    print_logs = True 
                 )
 
                 routineKNN.run_all()
