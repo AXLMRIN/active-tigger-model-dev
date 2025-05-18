@@ -3,12 +3,20 @@ import gc
 import pandas as pd 
     
 class routine:
-    def __init__(self, folder_name : str, custom_mapping : cMapper,
-                n_sample_range : list|range, epoch_range : list|range, 
-                GA_parameters : dict, classifier):
+    def __init__(self, 
+        folder_name : str, 
+        custom_mapping : cMapper,
+        n_sample_range : list|range, 
+        epoch_range : list|range, 
+        GA_parameters : dict, 
+        classifier, 
+        logger : CustomLogger, 
+        print_logs : bool = False):
+
         # Files parameters
         self.folder_name : str = folder_name
-        
+        self.logger : CustomLogger = logger
+        self.print_logs : bool = print_logs
         # Loop parameters
         self.mapper : cMapper = custom_mapping
         self.n_sample_range : list|range = n_sample_range;   
@@ -51,7 +59,7 @@ class routine:
             for idx, value in enumerate(optimum):
                 string_log += f"{'{}'.format(self.mapper.functions[idx](value)):<10}|"
             
-            print(string_log)
+            self.logger.log(string_log+"\n", self.print_logs)
 
         except Exception as e: 
             # Save
@@ -67,12 +75,13 @@ class routine:
             string_log = (f"{'%.0f'%(self.current_n_sample):<10}|"
                 f"{'%.0f'%(self.current_epoch):<10}|"
                 f"{'FAILED':<10}|"
+                f"{'FAILED':<10}|"
                 f"{'FAILED':<10}|")
             for _ in range(self.GAp['num_genes']):
                 string_log += f"{'FAILED':<10}|"
             string_log += f"\tError : {e}"
             
-            print(string_log)
+            self.logger.log(string_log+"\n", self.print_logs)
         finally : 
             # Clean
             del d, evaluation_time, optimum, value, optimizer, string_log
@@ -82,17 +91,19 @@ class routine:
         width = 11 * (5 + self.GAp['num_genes'])
         print("===  " * (1 + width // 5 ))
         print(self.folder_name,'\n')
+        self.logger.log("===  " * (1 + width // 5 )+"\n", False)
+        self.logger.log(f'{self.folder_name}\n', False)
+
         # Update the current values
         for n_sample in self.n_sample_range:
             self.current_n_sample = n_sample
-            print('-' * width)
+            self.logger.log('-' * width+"\n", self.print_logs)
             for epoch in self.epoch_range:
                 self.current_epoch = epoch
                 ###
                 self.optimisation_loop()
                 ###
-            print('-' * 11 * (5 + self.GAp['num_genes']))
-            print()
+            self.logger.log('-' * width+"\n", self.print_logs)
 
     def save_to_csv(self, filename : str):
         try : 
@@ -103,8 +114,3 @@ class routine:
             # The file does not exist
             df = pd.DataFrame(self.save)
         df.to_csv(filename, index = False)
-        CustomLogger().\
-            notify_when_done((
-                f"Processed data : {self.folder_name}\n"
-                f"Result saved : {filename}"
-            ))
