@@ -5,13 +5,74 @@ from sklearn.neural_network import MLPClassifier
 from toolbox import routine, cMapper, CustomLogger, routineNotOptmisied
 
 ################################################################################
+# One layer ML, each model x lr x epoch x  is opitmised 3 times (No optimisation here)
+################################################################################
+
+all_models = [
+    "src3/2025-05-05-answerdotai/ModernBERT-base",
+    "src3/2025-05-05-FacebookAI/roberta-base", 
+    "src3/2025-05-05-google-bert/bert-base-uncased"
+]
+
+all_lrs = [
+    "1e-05",
+    "2e-05", 
+    "5e-05", 
+    "5e-06"
+]
+# Build cMapper
+def layers_mapper_function(value):
+    return ()
+
+mapper = cMapper(keys = ["n_neighbors", "metric"],
+    functions = [n_neighbors_mapper_function,metric_mapper_function] 
+)
+
+# GA parameters 
+GA_p = {
+    'num_genes' : 1,
+    "gene_space" : [
+        [0]
+    ]
+}
+
+# Logger
+logger = CustomLogger("src3/pers_logs/MLPOneLayer.txt")
+
+#Loop
+routineOneLayer, model, lr = (None,) * 3
+for model in all_models:
+    for lr in ["1e-05", "2e-05", "5e-05", "5e-06"]:
+            for attempt in range(3):
+
+                routineOneLayer = routineNotOptmisied(
+                     folder_name = f"{model}-{lr}-data",
+                     classifier = MLPClassifier,
+                     n_sample_range = [500,1000,1500],
+                     epoch_range = [0,1,2,3,4,5],
+                     classifier_parameters = {
+                          "hidden_layer_sizes" : (),
+                          "max_iter" : 1000, 
+                          "early_stopping" : True
+                        },
+                    logger = logger,
+                    print_logs = True
+                )
+
+                routineOneLayer.run_all()
+                routineOneLayer.save_to_csv("src3/results/2025-05-18-MLPOneLayer-2.csv")
+
+CustomLogger().notify_when_done("The MLPOneLayer routine is finished")
+del routineOneLayer, model, all_models, lr, all_lrs, GA_p, mapper, logger
+
+################################################################################
 # Routine Random Forest, each model x lr x epoch x  is opitmised 3 times
 ################################################################################
 
 all_models = [
-    # "src3/2025-05-05-answerdotai/ModernBERT-base", #DONE
-    # "src3/2025-05-05-FacebookAI/roberta-base", # DONE
-    # "src3/2025-05-05-google-bert/bert-base-uncased" #DONE
+    "src3/2025-05-05-answerdotai/ModernBERT-base",
+    "src3/2025-05-05-FacebookAI/roberta-base",
+    "src3/2025-05-05-google-bert/bert-base-uncased"
 ]
 
 all_lrs = [
@@ -75,9 +136,9 @@ del routineRandomForest, model, all_models, lr, all_lrs, GA_p, mapper, logger
 ################################################################################
 
 all_models = [
-    # "src3/2025-05-05-answerdotai/ModernBERT-base", #DONE
-    # "src3/2025-05-05-FacebookAI/roberta-base", # DONE
-    # "src3/2025-05-05-google-bert/bert-base-uncased" #DONE
+    "src3/2025-05-05-answerdotai/ModernBERT-base",
+    "src3/2025-05-05-FacebookAI/roberta-base", 
+    "src3/2025-05-05-google-bert/bert-base-uncased"
 ]
 
 all_lrs = [
@@ -131,64 +192,3 @@ for model in all_models:
 
 CustomLogger().notify_when_done("The KNN routine is finished")
 del routineKNN, model, all_models, lr, all_lrs, GA_p, mapper, logger
-
-################################################################################
-# One layer ML, each model x lr x epoch x  is opitmised 3 times (No optimisation here)
-################################################################################
-
-all_models = [
-    "src3/2025-05-05-answerdotai/ModernBERT-base",
-    "src3/2025-05-05-FacebookAI/roberta-base", 
-    "src3/2025-05-05-google-bert/bert-base-uncased"
-]
-
-all_lrs = [
-    "1e-05",
-    "2e-05", 
-    "5e-05", 
-    "5e-06"
-]
-# Build cMapper
-def layers_mapper_function(value):
-    return ()
-
-mapper = cMapper(keys = ["n_neighbors", "metric"],
-    functions = [n_neighbors_mapper_function,metric_mapper_function] 
-)
-
-# GA parameters 
-GA_p = {
-    'num_genes' : 1,
-    "gene_space" : [
-        [0]
-    ]
-}
-
-# Logger
-logger = CustomLogger("src3/pers_logs/MLPOneLayer.txt")
-
-#Loop
-routineOneLayer, model, lr = (None,) * 3
-for model in all_models:
-    for lr in ["1e-05", "2e-05", "5e-05", "5e-06"]:
-            for attempt in range(3):
-
-                routineOneLayer = routineNotOptmisied(
-                     folder_name = f"{model}-{lr}-data",
-                     classifier = MLPClassifier,
-                     n_sample_range = [500,1000,1500],
-                     epoch_range = [0,1,2,3,4,5],
-                     classifier_parameters = {
-                          "hidden_layer_sizes" : (),
-                          "max_iter" : 1000, 
-                          "early_stopping" : True
-                        },
-                    logger = logger,
-                    print_logs = True
-                )
-
-                routineOneLayer.run_all()
-                routineOneLayer.save_to_csv("src3/results/2025-05-18-MLPOneLayer-2.csv")
-
-CustomLogger().notify_when_done("The MLPOneLayer routine is finished")
-del routineOneLayer, model, all_models, lr, all_lrs, GA_p, mapper, logger
