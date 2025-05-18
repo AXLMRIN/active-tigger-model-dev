@@ -20,6 +20,7 @@ class optimize_classifier:
             **GA_param,
             
             "stop_criteria" : "saturate_5",
+            "parallel_processing" : 5, 
             
             # Default
             'mutation_type' : "random",
