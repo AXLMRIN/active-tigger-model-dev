@@ -25,7 +25,7 @@ class optimize_classifier:
             'mutation_type' : "random",
             'parent_selection_type' : "sss",
             'crossover_type' : "single_point",
-            'mutation_percent_genes' : 100,
+            'mutation_percent_genes' : 50,
             # Other
             'save_solutions' : False,
         }
@@ -45,4 +45,4 @@ class optimize_classifier:
         instance.run()
         t2 = time()
         optimum, value, _ = instance.best_solution()
-        return optimum, value, t2-t1
+        return optimum, value, t2-t1, instance.generations_completed
