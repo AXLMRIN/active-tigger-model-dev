@@ -34,7 +34,7 @@ class routineNotOptmisied:
         self.save : list[dict] = []
 
     def optimisation_loop(self):
-        d, evaluation_time, value, optimizer, string_log = (None,) * 6 
+        d, evaluation_time, value, optimizer, string_log = (None,) * 5
         try : 
             # Create the instances 
             d = DATA(self.folder_name,self.current_epoch, self.current_n_sample)
@@ -96,7 +96,7 @@ class routineNotOptmisied:
             gc.collect()
     
     def run_all(self):
-        width = 11 * (5 + self.GAp['num_genes'])
+        width = 11 * (5 + len(self.classifier_parameters))
         print("===  " * (1 + width // 5 ))
         print(self.folder_name,'\n')
         self.logger.log("===  " * (1 + width // 5 )+"\n", False)
