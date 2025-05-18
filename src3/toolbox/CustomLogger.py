@@ -10,7 +10,7 @@ class CustomLogger:
     def notify_when_done(self, message : str = '') : 
         """send an email when finished"""
         subj = "Onyxia run — done"
-        body = ("https://projet-datalab-axel-morin-135428-0.lab.groupe-genes.fr/lab?"
+        body = ("https://projet-datalab-axel-morin-437675-0.lab.groupe-genes.fr/?folder=/home/onyxia/work"
                 f"\n{message}")
         em = EmailMessage()
         em["From"] = os.environ["EMAIL_FROM"]
