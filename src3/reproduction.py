@@ -20,21 +20,6 @@ all_lrs = [
     "5e-05", 
     "5e-06"
 ]
-# Build cMapper
-def layers_mapper_function(value):
-    return ()
-
-mapper = cMapper(keys = ["n_neighbors", "metric"],
-    functions = [n_neighbors_mapper_function,metric_mapper_function] 
-)
-
-# GA parameters 
-GA_p = {
-    'num_genes' : 1,
-    "gene_space" : [
-        [0]
-    ]
-}
 
 # Logger
 logger = CustomLogger("src3/pers_logs/MLPOneLayer.txt")
@@ -63,7 +48,7 @@ for model in all_models:
                 routineOneLayer.save_to_csv("src3/results/2025-05-18-MLPOneLayer-2.csv")
 
 CustomLogger().notify_when_done("The MLPOneLayer routine is finished")
-del routineOneLayer, model, all_models, lr, all_lrs, GA_p, mapper, logger
+del routineOneLayer, model, all_models, lr, all_lrs, logger
 
 ################################################################################
 # Routine Random Forest, each model x lr x epoch x  is opitmised 3 times
