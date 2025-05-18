@@ -48,6 +48,7 @@ GA_p = {
 logger = CustomLogger("src3/pers_logs/RoutineRandomForest.txt")
 
 #Loop
+routineRandomForest, model, lr = (None,) * 3
 for model in all_models:
     for lr in all_lrs:
             for attempt in range(3):
@@ -67,7 +68,7 @@ for model in all_models:
                 routineRandomForest.save_to_csv("src3/results/2025-05-18-RandomForest-2.csv")
 
 CustomLogger().notify_when_done("The RandomForest routine is finished")
-del routineRandomForest, model, lr, GA_p, mapper, logger
+del routineRandomForest, model, all_models, lr, all_lrs, GA_p, mapper, logger
 
 ################################################################################
 # Routine KNN, each model x lr x epoch x  is opitmised 3 times
@@ -109,6 +110,7 @@ GA_p = {
 logger = CustomLogger("src3/pers_logs/RoutineKNN.txt")
 
 #Loop
+routineKNN, model, lr = (None,) * 3
 for model in all_models:
     for lr in ["1e-05", "2e-05", "5e-05", "5e-06"]:
             for attempt in range(3):
@@ -128,6 +130,7 @@ for model in all_models:
                 routineKNN.save_to_csv("src3/results/2025-05-18-KNN-2.csv")
 
 CustomLogger().notify_when_done("The KNN routine is finished")
+del routineKNN, model, all_models, lr, all_lrs, GA_p, mapper, logger
 
 ################################################################################
 # One layer ML, each model x lr x epoch x  is opitmised 3 times (No optimisation here)
@@ -165,6 +168,7 @@ GA_p = {
 logger = CustomLogger("src3/pers_logs/MLPOneLayer.txt")
 
 #Loop
+routineOneLayer, model, lr = (None,) * 3
 for model in all_models:
     for lr in ["1e-05", "2e-05", "5e-05", "5e-06"]:
             for attempt in range(3):
@@ -183,70 +187,8 @@ for model in all_models:
                     print_logs = True
                 )
 
-                routineKNN.run_all()
-                routineKNN.save_to_csv("src3/results/2025-05-18-MLPOneLayer-2.csv")
+                routineOneLayer.run_all()
+                routineOneLayer.save_to_csv("src3/results/2025-05-18-MLPOneLayer-2.csv")
 
 CustomLogger().notify_when_done("The MLPOneLayer routine is finished")
-
-
-# def basicML(d: DATA):
-#     clf = MLPClassifier(hidden_layer_sizes=(),max_iter = 1000, early_stopping=True)
-#     clf.fit(d.X_train, d.y_train)
-#     return f1_score(y_true=d.y_test, y_pred=clf.predict(d.X_test), average='macro')
-
-# save = []
-# for folder_name in [
-#         "2025-05-05-answerdotai/ModernBERT-base-1e-05-data",
-#         "2025-05-05-answerdotai/ModernBERT-base-2e-05-data",
-#         "2025-05-05-answerdotai/ModernBERT-base-5e-05-data",
-#         "2025-05-05-answerdotai/ModernBERT-base-5e-06-data",
-#         "2025-05-05-FacebookAI/roberta-base-1e-05-data",
-#         "2025-05-05-FacebookAI/roberta-base-2e-05-data",
-#         "2025-05-05-FacebookAI/roberta-base-5e-05-data",
-#         "2025-05-05-FacebookAI/roberta-base-5e-06-data",
-#         "2025-05-05-google-bert/bert-base-uncased-1e-05-data",
-#         "2025-05-05-google-bert/bert-base-uncased-2e-05-data",
-#         "2025-05-05-google-bert/bert-base-uncased-5e-05-data",
-#         "2025-05-05-google-bert/bert-base-uncased-5e-06-data"
-#     ]:
-#     for epoch in [1,2,3,4,5]:
-#         print(f"\n{folder_name}\n")
-#         try:
-#             d = DATA(folder_name, epoch=epoch, n_samples=1500)
-            
-#             t1 = time()
-#             f1_macro = basicML(d)
-#             t2 = time()
-
-#             save.append({
-#                 "filename" : folder_name,
-#                 "n_samples" : 1500,
-#                 "epoch" : epoch,
-#                 "time" : t2-t1,
-#                 "f1_macro" : float(f1_macro)
-#             })
-#             print((
-#                 f"{'{}'.format(folder_name):<50}|"
-#                 f"{'%.0f'%(1500):<10}|"
-#                 f"{'%.0f'%(epoch):<10}|"
-#                 f"{'%.2f'%(t2-t1):<10}|"
-#                 f"{'%.3f'%(float(f1_macro)):<10}|"
-#             ))
-#         except Exception as e: 
-#             save.append({
-#                 "filename" : folder_name,
-#                 "n_samples" : 1500,
-#                 "epoch" : epoch,
-#                 "time" : None,
-#                 "f1_macro" : None
-#             })
-#             print((
-#                 f"{'{}'.format(folder_name):<50}|"
-#                 f"{'%.0f'%(1500):<10}|"
-#                 f"{'%.0f'%(epoch):<10}|"
-#                 f"{'FAILED':<10}|"
-#                 f"{'FAILED':<10}|"
-#                 f"\tError : {e}"
-#             ))
-# pd.DataFrame(save).to_csv("basicML.csv")
-# CustomLogger().notify_when_done()
+del routineOneLayer, model, all_models, lr, all_lrs, GA_p, mapper, logger
