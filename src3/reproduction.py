@@ -15,11 +15,19 @@ from transformer_class import CustomLogger
 
 from toolbox import routine, cMapper
 
+def n_estimators_mapper_function(value):
+    return int(value)
+def criterion_mapper_function(idx):
+    crits = ["gini", "entropy", "log_loss"]
+    return crits[int(idx)]
+def max_depth_mapper_function(value):
+    return int(value)
+
 R = routine(
-    folder_name = "2025-05-05-answerdotai/ModernBERT-base-1e-05-data",
+    folder_name = "src3/2025-05-05-answerdotai/ModernBERT-base-1e-05-data",
     classifier = RandomForestClassifier, 
-    n_sample_range = [500, 750],
-    epoch_range = [0,1,2,3,4,5],
+    n_sample_range = [500],
+    epoch_range = [3],
     GA_parameters = {
         'num_genes' : 3,
         "gene_space" : [
@@ -31,15 +39,15 @@ R = routine(
     custom_mapping = cMapper(
         keys = ["n_estimators", "criterion","max_depth"],
         functions = [
-            lambda x : int(x),
-            lambda x : ["gini", "entropy", "log_loss"][x],
-            lambda x : int(x)
+            n_estimators_mapper_function,
+            criterion_mapper_function,
+            max_depth_mapper_function
         ] 
     )
 )
 
 R.run_all()
-R.save_to_csv("test.csv")
+R.save_to_csv("src3/results/test.csv")
 
 # routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-1e-05-data")
 # routineRandomForest("2025-05-05-answerdotai/ModernBERT-base-2e-05-data")
