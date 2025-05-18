@@ -31,7 +31,7 @@ class routine:
             d = DATA(self.folder_name,self.current_epoch, self.current_n_sample)
             optimizer = optimize_classifier(d, self.classifier, self.GAp, self.mapper)
             # run the optimisation process
-            optimum, value, evaluation_time  = optimizer.run()
+            optimum, value, evaluation_time, generations_completed = optimizer.run()
             # Save
             self.save.append({
                 "filename" : self.folder_name,
@@ -46,7 +46,8 @@ class routine:
             string_log = (f"{'%.0f'%(self.current_n_sample):<10}|"
                 f"{'%.0f'%(self.current_epoch):<10}|"
                 f"{'%.2f'%(evaluation_time):<10}|"
-                f"{'%.3f'%(float(value)):<10}|")
+                f"{'%.3f'%(float(value)):<10}|"
+                f"{'%.0f'%(generations_completed):<10}|")
             for idx, value in enumerate(optimum):
                 string_log += f"{'{}'.format(self.mapper.functions[idx](value)):<10}|"
             
@@ -78,7 +79,7 @@ class routine:
             gc.collect()
     
     def run_all(self):
-        width = 11 * (4 + self.GAp['num_genes'])
+        width = 11 * (5 + self.GAp['num_genes'])
         print("===  " * (1 + width // 5 ))
         print(self.folder_name,'\n')
         # Update the current values
@@ -90,7 +91,7 @@ class routine:
                 ###
                 self.optimisation_loop()
                 ###
-            print('-' * 11 * (4 + self.GAp['num_genes']))
+            print('-' * 11 * (5 + self.GAp['num_genes']))
             print()
 
     def save_to_csv(self, filename : str):
