@@ -17,6 +17,7 @@ class routine:
         self.folder_name : str = folder_name
         self.logger : CustomLogger = logger
         self.print_logs : bool = print_logs
+
         # Loop parameters
         self.mapper : cMapper = custom_mapping
         self.n_sample_range : list|range = n_sample_range;   
