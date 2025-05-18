@@ -3,10 +3,12 @@ from sklearn.neighbors import KNeighborsClassifier
 
 from toolbox import routine, cMapper, CustomLogger
 
+# Routine Random Forest, each model x lr x epoch x  is opitmised 3 times
+
 all_models = [
-    "src3/2025-05-05-answerdotai/ModernBERT-base",
-    "src3/2025-05-05-FacebookAI/roberta-base",
-    "src3/2025-05-05-google-bert/bert-base-uncased"
+    # "src3/2025-05-05-answerdotai/ModernBERT-base", #DONE
+    # "src3/2025-05-05-FacebookAI/roberta-base", # DONE
+    # "src3/2025-05-05-google-bert/bert-base-uncased" #DONE
 ]
 
 all_lrs = [
@@ -15,8 +17,6 @@ all_lrs = [
     "5e-05", 
     "5e-06"
 ]
-
-# Routine Random Forest, each model x lr x epoch x  is opitmised 3 times
 
 # Build cMapper
 def n_estimators_mapper_function(value):
@@ -68,6 +68,18 @@ del routineRandomForest, model, lr, GA_p, mapper, logger
 
 # Routine KNN, each model x lr x epoch x  is opitmised 3 times
 
+all_models = [
+    # "src3/2025-05-05-answerdotai/ModernBERT-base", #DONE
+    # "src3/2025-05-05-FacebookAI/roberta-base", # DONE
+    # "src3/2025-05-05-google-bert/bert-base-uncased" #DONE
+]
+
+all_lrs = [
+    "1e-05",
+    "2e-05", 
+    "5e-05", 
+    "5e-06"
+]
 # Build cMapper
 def n_neighbors_mapper_function(value):
     return int(value)
@@ -110,7 +122,7 @@ for model in all_models:
                 routineKNN.run_all()
                 routineKNN.save_to_csv("src3/results/2025-05-18-KNN-2.csv")
 
-CustomLogger().notify_when_done("The RandomForest routine is finished")
+CustomLogger().notify_when_done("The KNN routine is finished")
 
 
 # def basicML(d: DATA):
