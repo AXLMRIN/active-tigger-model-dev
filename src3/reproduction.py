@@ -38,11 +38,7 @@ R = routine(
     },
     custom_mapping = cMapper(
         keys = ["n_estimators", "criterion","max_depth"],
-        functions = [
-            n_estimators_mapper_function,
-            criterion_mapper_function,
-            max_depth_mapper_function
-        ] 
+        functions = [n_estimators_mapper_function,criterion_mapper_function,max_depth_mapper_function] 
     )
 )
 
