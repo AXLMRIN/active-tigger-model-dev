@@ -4,9 +4,26 @@ import ssl
 import smtplib
 
 class CustomLogger:
-    def __init__(self):
+    def __init__(self, text_filename : str = None):
         self.name = ""
+        self.text_filename = text_filename
 
+    def log(self, message, printing : bool = False):
+        if printing:
+            print(message)
+        # Save the message in the log
+        if self.text_filename is None:
+            print("-- No log file available --")
+        else: 
+            try : 
+                #log file already exists
+                with open(self.text_filename, "a") as file:
+                    file.write(message)
+            except : 
+                # log file does not exist
+                with open(self.text_filename, "w") as file:
+                    file.write(message)
+                    
     def notify_when_done(self, message : str = '') : 
         """send an email when finished"""
         subj = "Onyxia run — done"
