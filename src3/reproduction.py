@@ -9,9 +9,9 @@ from toolbox import routine, cMapper, CustomLogger, routineNotOptmisied
 ################################################################################
 
 all_models = [
-    "src3/2025-05-05-answerdotai/ModernBERT-base",
-    "src3/2025-05-05-FacebookAI/roberta-base", 
-    "src3/2025-05-05-google-bert/bert-base-uncased"
+    #"src3/2025-05-05-answerdotai/ModernBERT-base", # DONE
+    #"src3/2025-05-05-FacebookAI/roberta-base",  # DONE
+    #"src3/2025-05-05-google-bert/bert-base-uncased" # DONE
 ]
 
 all_lrs = [
@@ -55,7 +55,7 @@ del routineOneLayer, model, all_models, lr, all_lrs, logger
 ################################################################################
 
 all_models = [
-    "src3/2025-05-05-answerdotai/ModernBERT-base",
+    # "src3/2025-05-05-answerdotai/ModernBERT-base", # DONE
     "src3/2025-05-05-FacebookAI/roberta-base",
     "src3/2025-05-05-google-bert/bert-base-uncased"
 ]
@@ -121,9 +121,9 @@ del routineRandomForest, model, all_models, lr, all_lrs, GA_p, mapper, logger
 ################################################################################
 
 all_models = [
-    "src3/2025-05-05-answerdotai/ModernBERT-base",
-    "src3/2025-05-05-FacebookAI/roberta-base", 
-    "src3/2025-05-05-google-bert/bert-base-uncased"
+    # "src3/2025-05-05-answerdotai/ModernBERT-base", # DONE
+    # "src3/2025-05-05-FacebookAI/roberta-base",  # DONE
+    # "src3/2025-05-05-google-bert/bert-base-uncased" # DONE
 ]
 
 all_lrs = [
