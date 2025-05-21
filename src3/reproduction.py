@@ -56,8 +56,8 @@ del routineOneLayer, model, all_models, lr, all_lrs, logger
 
 all_models = [
     # "src3/2025-05-05-answerdotai/ModernBERT-base", # DONE
-    "src3/2025-05-05-FacebookAI/roberta-base",
-    "src3/2025-05-05-google-bert/bert-base-uncased"
+    #"src3/2025-05-05-FacebookAI/roberta-base", # DONE
+    #"src3/2025-05-05-google-bert/bert-base-uncased" # DONE
 ]
 
 all_lrs = [
@@ -97,21 +97,21 @@ logger = CustomLogger("src3/pers_logs/RoutineRandomForest.txt")
 routineRandomForest, model, lr = (None,) * 3
 for model in all_models:
     for lr in all_lrs:
-            for attempt in range(3):
+        for attempt in range(3):
 
-                routineRandomForest = routine(
-                    folder_name = f"{model}-{lr}-data",
-                    classifier = RandomForestClassifier, 
-                    n_sample_range = [500,1000,1500],
-                    epoch_range = [0,1,2,3,4,5],
-                    GA_parameters = GA_p,
-                    custom_mapping = mapper,
-                    logger = logger,
-                    print_logs = True
-                )
+            routineRandomForest = routine(
+                folder_name = f"{model}-{lr}-data",
+                classifier = RandomForestClassifier, 
+                n_sample_range = [500,1000,1500],
+                epoch_range = [0,1,2,3,4,5],
+                GA_parameters = GA_p,
+                custom_mapping = mapper,
+                logger = logger,
+                print_logs = True
+            )
 
-                routineRandomForest.run_all()
-                routineRandomForest.save_to_csv("src3/results/2025-05-18-RandomForest-2.csv")
+            routineRandomForest.run_all()
+            routineRandomForest.save_to_csv("src3/results/2025-05-18-RandomForest-2.csv")
 
 CustomLogger().notify_when_done("The RandomForest routine is finished")
 del routineRandomForest, model, all_models, lr, all_lrs, GA_p, mapper, logger
