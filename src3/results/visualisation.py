@@ -13,8 +13,19 @@ data = vt.genData({
     "KNN" : "2025-05-18-KNN-2.csv",
     "OneLayer" : "2025-05-18-MLPOneLayer-2.csv"
 })
-print(data.columns())
-all_figures = {}
 
+all_figures = {}
+all_figures["comparaison_plongement_classification_all"] = \
+    vt.f1_macro_per_model_and_method(data, N = None)
+all_figures["comparaison_plongement_classification_200"] = \
+    vt.f1_macro_per_model_and_method(data, N = 200)
+all_figures["comparaison_lr_model_method_all"] = \
+    vt.f1_macro_lr_per_model_and_method(data, N = None)
+all_figures["comparaison_lr_model_method_200"] = \
+    vt.f1_macro_lr_per_model_and_method(data, N = 200)
+# all_figures["comparaison_lr_all"] = \
+#     vt.f1_macro_lr_per_model_and_method(data, N = None)
+# all_figures["comparaison_lr_200"] = \
+#     vt.f1_macro_lr_per_model_and_method(data, N = 200)
 
 vt.export(all_figures)

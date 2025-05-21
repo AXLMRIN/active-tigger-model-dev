@@ -9,11 +9,48 @@
     
     <script src="https://cdn.plot.ly/plotly-3.0.0.min.js"></script>
     <script src="posting/index.js"></script>
+    <style>
+        div{
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        h1{
+            width: 70%;
+        }
+    </style>
     <title>visu test</title>
 </head>
 <body>
-    <h1>This is a template</h1>
-    <div>{{ test }}</div>
+    <div>
+        <h1>Score F1 macro par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
+        {{ comparaison_plongement_classification_all }}
+    </div>
+    <div>
+        <h1>200 meilleurs scores F1 macro par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
+        {{ comparaison_plongement_classification_200 }}
+    </div>
+    
+    <div>
+        <h1>Impact du learning rate pour chaque modèle et méthode indépendamment du n sample et epoch</h1>
+        {{ comparaison_lr_model_method_all }}
+    </div>
+    
+    <div>
+        <h1>Impact du learning rate pour chaque modèle et méthode indépendamment du n sample et epoch (200 meilleurs)</h1>
+        {{ comparaison_lr_model_method_200 }}
+    </div>
+    
+    <div>
+        <h1>Impact du learning rate pour chaque modèle et méthode indépendamment du n sample et epoch</h1>
+        {{ comparaison_lr_model_all }}
+    </div>
+    
+    <div>
+        <h1>Impact du learning rate pour chaque modèle et méthode indépendamment du n sample et epoch (200 meilleurs)</h1>
+        {{ comparaison_lr_model_200 }}
+    </div>
     
 </body>
 </html>
