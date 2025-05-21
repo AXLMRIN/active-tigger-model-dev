@@ -10,3 +10,4 @@ data/*
 *.crt
 box/
 src3/2025-05-05-*
+src3/results/interpretation_files/libs
