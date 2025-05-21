@@ -23,9 +23,18 @@ all_figures["comparaison_lr_model_method_all"] = \
     vt.f1_macro_lr_per_model_and_method(data, N = None)
 all_figures["comparaison_lr_model_method_200"] = \
     vt.f1_macro_lr_per_model_and_method(data, N = 200)
-# all_figures["comparaison_lr_all"] = \
-#     vt.f1_macro_lr_per_model_and_method(data, N = None)
-# all_figures["comparaison_lr_200"] = \
-#     vt.f1_macro_lr_per_model_and_method(data, N = 200)
+all_figures["comparaison_lr_model_all"] = \
+    vt.f1_macro_lr_per_model(data, N = None)
+all_figures["comparaison_lr_model_200"] = \
+    vt.f1_macro_lr_per_model(data, N = 200)
+
+all_figures["comparaison_epoch_model_method_all"] = \
+    vt.f1_macro_epoch_per_model_and_method(data, N = None)
+all_figures["comparaison_epoch_model_method_200"] = \
+    vt.f1_macro_epoch_per_model_and_method(data, N = 10)
+all_figures["comparaison_epoch_model_all"] = \
+    vt.f1_macro_epoch_per_model(data, N = None)
+all_figures["comparaison_epoch_model_200"] = \
+    vt.f1_macro_epoch_per_model(data, N = 10)
 
 vt.export(all_figures)
