@@ -33,7 +33,7 @@ for model in all_models:
                 routineOneLayer = routineNotOptmisied(
                      folder_name = f"{model}-{lr}-data",
                      classifier = MLPClassifier,
-                     n_sample_range = [500,1000,1500],
+                     n_sample_range = [500,1000,1500, 2000],
                      epoch_range = [0,1,2,3,4,5],
                      classifier_parameters = {
                           "hidden_layer_sizes" : (),
@@ -102,7 +102,7 @@ for model in all_models:
             routineRandomForest = routine(
                 folder_name = f"{model}-{lr}-data",
                 classifier = RandomForestClassifier, 
-                n_sample_range = [500,1000,1500],
+                n_sample_range = [500,1000,1500, 2000],
                 epoch_range = [0,1,2,3,4,5],
                 GA_parameters = GA_p,
                 custom_mapping = mapper,
@@ -164,7 +164,7 @@ for model in all_models:
                 routineKNN = routine(
                     folder_name = f"{model}-{lr}-data",
                     classifier = KNeighborsClassifier, 
-                    n_sample_range = [500,1000,1500],
+                    n_sample_range = [500,1000,1500, 2000],
                     epoch_range = [0,1,2,3,4,5],
                     GA_parameters = GA_p,
                     custom_mapping = mapper,
