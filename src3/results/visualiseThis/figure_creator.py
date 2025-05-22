@@ -191,7 +191,7 @@ def f1_macro_per_n_sample_and_method(
         N = N
     )
     listOfModels = SUL_string(to_print["model"])
-    listOfnSamples = list(set(to_print["n_samples"]))
+    listOfnSamples = SUL_string(to_print["n_samples"])
     N_models = len(listOfModels)
 
     # Create figure 
