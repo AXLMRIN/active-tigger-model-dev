@@ -52,7 +52,10 @@ class genData:
                 (existing_dataframe is not None)&\
                 isinstance(existing_dataframe, pd.DataFrame): 
             self.__df = existing_dataframe
+        
         else : print("WARNING : your object is empty")
+        # Reset the index : 
+        self.__df.index = [i for i in range(len(self.__df))]
                 
     def columns(self) -> list[str] : return self.__df.columns.to_list()
 
@@ -79,6 +82,8 @@ class genData:
     def __getitem__(self, key, filter):
         return self.__df.loc[:,key].to_list()
     
+    def __len__(self): return len(self.__df)
+
     def get_mean_and_half_band(self, 
             groupbyColumns : list[str]|str, 
             column : str = "f1_macro",
