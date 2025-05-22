@@ -89,8 +89,8 @@ class genData:
         Possible to rename the new_columns"""
         result =  self.__df.groupby(groupbyColumns, as_index=False).agg(
             f1_macro_mean = (column, lambda col : mean_over_N_bests(col, N)),
-            f1_macro_half_band = (column, lambda col : half_band_over_N_bests(
-                                                                   col,N,alpha))
+            CI_f1_macro_lower = (column,lambda col:half_band_over_N_bests(col,N,alpha)[0]),
+            CI_f1_macro_upper = (column,lambda col:half_band_over_N_bests(col,N,alpha)[1])
         )
         if new_columns is not None: 
             result.rename(mapper = new_columns, inplace = True)
@@ -101,7 +101,9 @@ class genData:
 # FUNCTIONS
 # === === === === === === === === === === === === === === === === === === === ==                    
 def mean_over_N_bests(col : list,N : int|None = None) -> float:
-    if N is not None : col = sorted(col,reverse=True)[:N]
+    if N is not None : N = min(N, len(col))
+    else : N = len(col)
+    col = sorted(col,reverse=True)[:N]
     return np.mean(col)
 
 def half_band_over_N_bests(
@@ -109,7 +111,15 @@ def half_band_over_N_bests(
         N : int|None = None, 
         alpha : float = 0.9
     ) -> float:
-    beta = 1-alpha/2
+
     if N is None : N = len(col)
-    else : col = sorted(col,reverse=True)[:N]
-    return np.std(col) 
+    else : N = min(N, len(col))
+    col = sorted(col,reverse=True)[:N]
+
+    sigma = np.std(col, ddof = 1)
+    t_crit = t.ppf(q = alpha, df = N)
+
+    M = np.mean(col)
+    EM = t_crit * sigma #/ np.sqrt(N)
+    return M + EM, M - EM
+
