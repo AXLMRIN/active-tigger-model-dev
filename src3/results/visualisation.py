@@ -8,12 +8,15 @@ import visualiseThis as vt
 
 
 
-data = vt.genData({
+data = vt.genData(
+    {
     "Random Forest" : "2025-05-18-RandomForest-2.csv",
     "KNN" : "2025-05-18-KNN-2.csv",
     "MLPClassifier (slkearn)" : "2025-05-18-MLPOneLayer-2.csv",
     "MLPClassifier (HF)" : "2025-05-20-HuggingFaceClassification.csv"
-})
+    },
+    concat_col = "method" 
+)
 
 N_best = 20
 

@@ -13,9 +13,11 @@ from scipy.stats import t
 class genData:
     def __init__(self, 
             filenames : str|list[str]|dict[str,str]|None = None,
-            existing_dataframe : pd.DataFrame|None = None
+            existing_dataframe : pd.DataFrame|None = None, 
+            concat_col : str|None = None
         ) -> None: 
         self.__df = None
+        concat_col = "filename_csv" if concat_col is None else concat_col
         if  (filenames is not None)&\
             (existing_dataframe is None): 
             if isinstance(filenames,str):
@@ -26,7 +28,7 @@ class genData:
                 for file in filenames : 
                     try : 
                         loop_df = pd.read_csv(f"{ROOT}/{file}")
-                        loop_df["filename_csv"] = [file] * len(loop_df)
+                        loop_df[concat_col] = [file] * len(loop_df)
                         self.__concat_to_df(loop_df)
                     except Exception as e: print(e); pass
 
@@ -34,7 +36,7 @@ class genData:
                 for key, file in filenames.items(): 
                     try : 
                         loop_df = pd.read_csv(f"{ROOT}/{file}")
-                        loop_df["filename_csv"] = [key] * len(loop_df)
+                        loop_df[concat_col] = [key] * len(loop_df) 
                         self.__concat_to_df(loop_df)
                     except Exception as e: print(e); pass
             # Add a model, lr columns : 
