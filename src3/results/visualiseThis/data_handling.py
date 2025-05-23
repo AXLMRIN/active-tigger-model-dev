@@ -69,12 +69,7 @@ def half_band_over_N_bests(
         alpha : float = 0.9
     ) -> float:
 
-    sigma = np.std(col, ddof = 1)
-    t_crit = t.ppf(q = alpha, df = len(col))
-
-    M = np.mean(col)
-    EM = t_crit * sigma #/ np.sqrt(N)
-    return M + EM, M - EM
+    return norm.interval(alpha, loc = np.mean(col), scale = np.std(col))
 
 def concat_to_df(concat_df, new_df):
     if concat_df is None : return new_df
@@ -96,7 +91,7 @@ def get_mean_and_half_band(
             col = sorted(col, reverse=True)[:local_N]
         mean = np.mean(col)
         band = norm.interval(alpha, loc=mean, scale=np.std(col))
-        
+
         out.append({
             **{key : value for key, value in zip(groupbyColumns, keyValues)},
             'f1_macro_mean' : mean,
