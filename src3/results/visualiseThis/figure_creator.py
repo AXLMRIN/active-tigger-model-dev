@@ -1,7 +1,7 @@
 # === === === === === === === === === === === === === === === === === === === ==
 # IMPORTS
 # === === === === === === === === === === === === === === === === === === === ==
-from .data_handling import get_mean_and_half_band
+from .data_handling import get_mean_and_half_band, SUL_string
 import plotly.graph_objects as go
 from plotly.graph_objs._figure import Figure
 import pandas as pd
@@ -74,6 +74,7 @@ def f1_macro_per_model_and_method(
         column = "f1_macro",
         N = N
     )
+
     listOfModels = SUL_string(to_print["model"])
     listOfMethods = SUL_string(to_print["method"])
     nModels = len(listOfModels)
@@ -273,6 +274,7 @@ def f1_macro_lr_per_model_and_method(
 
     # Create bars for each model and method
     grouped = to_print.groupby(["model","method"])
+    print_debug = True # TODELETE
     for idx, model in enumerate(listOfModels): 
         for method in listOfMethods : 
             sub_df = grouped.get_group((model,method))
@@ -403,9 +405,40 @@ def f1_macro_epoch_per_model(
         fig.add_trace(traces[1])
     return fig
 
-def SUL_string(vec) : 
-    '''return a sorted list of unique string items'''
-    return sorted(list(set(vec)), key = lambda x : str(x).lower())
+import plotly.express as px #TODELETE
+
+def f1_macro__f1_hf_per_model_and_method(    
+        df : pd.DataFrame, 
+        N : int|None = None) -> Figure:  
+    
+    fig = Figure(layout = layout_general_parameters)
+
+    # Process Data
+    selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "iteration", "n_samples", "epoch", "lr"]]
+    # keys : model, method, f1_HF, f1_macro
+    new_df = []
+    i = 1
+    for (model, lr, epoch), sub_df in selected_data.groupby(["model", "lr", "epoch"]):
+        f1_HF = 0
+        if epoch == 0 : f1_HF = 0.33
+        else: f1_HF = float(sub_df.loc[sub_df["method"] == "MLPClassifier (HF)", "f1_macro"].iloc[0])
+
+        for iRow in range(len(sub_df)) : 
+            new_df.append({
+                "model" : model,
+                "lr" : lr,
+                "epoch" : epoch,
+                "f1_HF" : f1_HF,
+                "f1_macro" : float(sub_df.iloc[iRow]["f1_macro"]),
+                "method" : str(sub_df.iloc[iRow]["method"]),
+                "n_samples" : str(sub_df.iloc[iRow]["n_samples"]),
+                "iteration" : int(sub_df.iloc[iRow]["iteration"]),
+            })
+
+    new_df = pd.DataFrame(new_df)
+    return px.scatter(new_df, x = "f1_HF", y = "f1_macro", color = "lr")
+    return fig
+
 
 def multiple_figures_layout(
         fig : Figure, 

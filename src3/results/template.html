@@ -31,68 +31,27 @@
         <h1>{{ N_best }} meilleurs scores F1 macro par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
         {{ comparaison_plongement_classification_N_best }}
     </div>
-    
-    <div>
-        <h1>A NE PAS INCLURE CAR MOCHE</h1>
-        <h1>Score F1 macro par modèle de plongement et n_samples, tout learning rate, n sample et epoch confondues</h1>
-        {{ comparaison_plongement_n_sample_all }}
-    </div>
-    <div>
-        <h1>A NE PAS INCLURE CAR MOCHE</h1>
-        <h1>{{ N_best }} meilleurs scores F1 macro par modèle de plongement et n_samples, tout learning rate, n sample et epoch confondues</h1>
-        {{ comparaison_plongement_n_sample_N_best }}
-    </div>
+
+    <!-- ------------------------------------ -->
 
     <div>
-        <h1>A NE PAS INCLURE CAR MOCHE</h1>
-        <h1>Score F1 macro par modèle de classification et n_samples, tout learning rate, n sample et epoch confondues</h1>
-        {{ comparaison_classification_n_sample_all }}
-    </div>
-    <div>
-        <h1>A NE PAS INCLURE CAR MOCHE</h1>
-        <h1>{{ N_best }} meilleurs scores F1 macro par modèle de classification et n_samples, tout learning rate, n sample et epoch confondues</h1>
-        {{ comparaison_classification_n_sample_N_all }}
-    </div>
-    
-    <div>
-        <h1>Impact du learning rate pour chaque modèle et méthode indépendamment du n sample et epoch</h1>
+        <h1>Score F1 macro en fonction du learning rate par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
         {{ comparaison_lr_model_method_all }}
     </div>
-    
     <div>
-        <h1>Impact du learning rate pour chaque modèle et méthode indépendamment du n sample et epoch ({{ N_best }} meilleurs)</h1>
-        {{ comparaison_lr_model_method_N_best }}
-    </div>
-    
-    <div>
-        <h1>Impact du learning rate pour chaque modèle indépendamment de la méthode,  du n sample et de l'epoch</h1>
-        {{ comparaison_lr_model_all }}
-    </div>
-    
-    <div>
-        <h1>Impact du learning rate pour chaque modèle indépendamment de la méthode,  du n sample et de l'epoch ({{ N_best }} meilleurs)</h1>
-        {{ comparaison_lr_model_N_best }}
+        <h1>{{ N_best }} meilleurs scores F1 macro en fonction du learning rate par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
+        {{ comparaison_lr_model_method_N_best}}
     </div>
 
+    <!-- ------------------------------------ -->
+
     <div>
-        <h1>Impact du nombre d'epoch pour chaque modèle et méthode indépendamment du n sample et epoch</h1>
-        {{ comparaison_epoch_model_method_all }}
+        <h1>f1_HF vs les autres</h1>
+        {{ f1_HF_vs_f1_autre }}
     </div>
-    
     <div>
-        <h1>Impact du nombre d'epoch pour chaque modèle et méthode indépendamment du n sample et epoch ({{ N_best }} meilleurs)</h1>
-        {{ comparaison_epoch_model_method_N_best }}
+        <h1>{{ N_best }} meilleurs scores F1 macro en fonction du learning rate par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
+        {{ comparaison_lr_model_method_N_best}}
     </div>
-    
-    <div>
-        <h1>Impact du nombre d'epoch pour chaque modèle indépendamment de la méthode,  du n sample et de l'epoch</h1>
-        {{ comparaison_epoch_model_all }}
-    </div>
-    
-    <div>
-        <h1>Impact du nombre d'epoch pour chaque modèle indépendamment de la méthode,  du n sample et de l'epoch ({{ N_best }} meilleurs)</h1>
-        {{ comparaison_epoch_model_N_best }}
-    </div>
-    
 </body>
 </html>
