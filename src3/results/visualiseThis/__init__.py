@@ -8,3 +8,4 @@ ROOT = "./src3/results"
 from .data_handling import *
 from .figure_creator import *
 from .export import *
+from .table_creator import *
