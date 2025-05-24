@@ -10,56 +10,21 @@ from scipy.stats import norm
 # FUNCTIONS
 # === === === === === === === === === === === === === === === === === === === ==
 
-def fetch_data(
-        filenames : str|list[str]|dict[str,str]|None = None,
-        existing_dataframe : pd.DataFrame|None = None, 
-        concat_col : str|None = None,
-        usecols : list[str]|None = None
-    ) -> None: 
-    
-    df = None
-
-    concat_col = "filename_csv" if concat_col is None else concat_col
-
-    if  (filenames is not None)&\
-        (existing_dataframe is None): 
-        if isinstance(filenames,str):
-                try : df = pd.read_csv(filenames, usecols = usecols)
-                except Exception: print(Exception)
-
-        elif isinstance(filenames, list):
-            for file in filenames : 
-                try : 
-                    loop_df = pd.read_csv(f"{ROOT}/{file}", usecols = usecols)
-                    loop_df[concat_col] = [file] * len(loop_df)
-                    df = concat_to_df(df, loop_df)
-                except Exception as e: print(e); pass
-
-        elif isinstance(filenames, dict):
-            for key, file in filenames.items(): 
-                try : 
-                    loop_df = pd.read_csv(f"{ROOT}/{file}", usecols = usecols)
-                    loop_df[concat_col] = [key] * len(loop_df) 
-                    df = concat_to_df(df, loop_df)
-                except Exception as e: print(e); pass
-
-        # Add a model, lr columns : 
-        df["model"] = df["filename"].\
-            apply(lambda x : '-'.join(x.split("-")[3:-3]))
-        df["lr"] = df["filename"].\
-            apply(lambda x : '-'.join(x.split("-")[-3:-1])).\
-            astype(float)
-        
-    elif    (filenames is None)&\
-            (existing_dataframe is not None)&\
-            isinstance(existing_dataframe, pd.DataFrame): 
-        df = existing_dataframe
-    
-    else : print("WARNING : your object is empty")
-    # Reset the index : 
-    df.index = [i for i in range(len(df))]
+def fetch_data(filename_dictionnary : dict[str:str], usecols : list[str]) : 
+    df : pd.DataFrame = None
+    for name, filename in filename_dictionnary.items():
+        print(f"{name:<45} : {filename}")
+        new_df = pd.read_csv(f"{ROOT}/{filename}", usecols=usecols)
+        new_df["method"] = [name] * len(new_df)
+        new_df["model"] = new_df["filename"].apply(lambda x : "-".join(x.split("-")[3:-3]))
+        new_df["lr"] = new_df["filename"].apply(lambda x : "-".join(x.split("-")[-3:-1]))
+        if df is None: df = new_df
+        else: df = pd.concat((df, new_df))
+        print(len(new_df), len(df))
 
     return df
+    
+
 
 def mean_over_N_bests(col : list) -> float:
     return np.mean(col)

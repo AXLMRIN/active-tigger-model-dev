@@ -7,19 +7,25 @@ import visualiseThis as vt
 
 
 
+#FIXME les visus sont pétés j'en peux plus bon courage à toi du futur
 
 data = vt.fetch_data(
     {
-    "Random Forest" : "2025-05-23-RandomForest-3.csv",
-    "KNN" : "2025-05-23-KNN-3.csv",
-    "MLPClassifier (slkearn)" : "2025-05-23-MLPOneLayer-3.csv",
-    "MLPClassifier (HF)" : "2025-05-23-HuggingFaceClassification-2.csv"
+        "Random Forest" : "2025-05-24-RandomForest-F.csv",
+        "KNN" : "2025-05-24-KNN-F.csv",
+        "MLPClassifier (slkearn)" : "2025-05-24-MLPOneLayer-F.csv",
+        "MLPClassifier (HF)" : "2025-05-24-HuggingFaceClassification-F.csv"
     },
-    concat_col = "method",
     usecols = ["filename", "n_samples", "epoch", "f1_macro", "iteration"]
 )
-data = data.groupby("epoch").get_group(5)
 
+# === === === ===  === ===  === ===  === ===  === ===  === ===  === ===  === ===
+# TESTS
+# === === === ===  === ===  === ===  === ===  === ===  === ===  === ===  === ===
+
+# === === === ===  === ===  === ===  === ===  === ===  === ===  === ===  === ===
+# VISUS
+# === === === ===  === ===  === ===  === ===  === ===  === ===  === ===  === ===
 N_best = 5
 
 all_figures = {}
@@ -29,32 +35,32 @@ all_figures["comparaison_plongement_classification_all"] = \
 all_figures["comparaison_plongement_classification_N_best"] = \
     vt.f1_macro_per_model_and_method(data, N = N_best)
 
-all_figures["comparaison_plongement_n_sample_all"] = \
-    vt.f1_macro_per_n_sample_and_model(data, N = None)
-all_figures["comparaison_plongement_n_sample_N_best"] = \
-    vt.f1_macro_per_n_sample_and_model(data, N = N_best)
+# all_figures["comparaison_plongement_n_sample_all"] = \
+#     vt.f1_macro_per_n_sample_and_model(data, N = None)
+# all_figures["comparaison_plongement_n_sample_N_best"] = \
+#     vt.f1_macro_per_n_sample_and_model(data, N = N_best)
 
-all_figures["comparaison_classification_n_sample_all"] = \
-    vt.f1_macro_per_n_sample_and_method(data, N = None)
-all_figures["comparaison_classification_n_sample_N_best"] = \
-    vt.f1_macro_per_n_sample_and_method(data, N = N_best)
+# all_figures["comparaison_classification_n_sample_all"] = \
+#     vt.f1_macro_per_n_sample_and_method(data, N = None)
+# all_figures["comparaison_classification_n_sample_N_best"] = \
+#     vt.f1_macro_per_n_sample_and_method(data, N = N_best)
 
-all_figures["comparaison_lr_model_method_all"] = \
-    vt.f1_macro_lr_per_model_and_method(data, N = None)
-all_figures["comparaison_lr_model_method_N_best"] = \
-    vt.f1_macro_lr_per_model_and_method(data, N = N_best)
-all_figures["comparaison_lr_model_all"] = \
-    vt.f1_macro_lr_per_model(data, N = None)
-all_figures["comparaison_lr_model_N_best"] = \
-    vt.f1_macro_lr_per_model(data, N = N_best)
+# all_figures["comparaison_lr_model_method_all"] = \
+#     vt.f1_macro_lr_per_model_and_method(data, N = None)
+# all_figures["comparaison_lr_model_method_N_best"] = \
+#     vt.f1_macro_lr_per_model_and_method(data, N = N_best)
+# all_figures["comparaison_lr_model_all"] = \
+#     vt.f1_macro_lr_per_model(data, N = None)
+# all_figures["comparaison_lr_model_N_best"] = \
+#     vt.f1_macro_lr_per_model(data, N = N_best)
 
-all_figures["comparaison_epoch_model_method_all"] = \
-    vt.f1_macro_epoch_per_model_and_method(data, N = None)
-all_figures["comparaison_epoch_model_method_N_best"] = \
-    vt.f1_macro_epoch_per_model_and_method(data, N = N_best)
-all_figures["comparaison_epoch_model_all"] = \
-    vt.f1_macro_epoch_per_model(data, N = None)
-all_figures["comparaison_epoch_model_N_best"] = \
-    vt.f1_macro_epoch_per_model(data, N = N_best)
+# all_figures["comparaison_epoch_model_method_all"] = \
+#     vt.f1_macro_epoch_per_model_and_method(data, N = None)
+# all_figures["comparaison_epoch_model_method_N_best"] = \
+#     vt.f1_macro_epoch_per_model_and_method(data, N = N_best)
+# all_figures["comparaison_epoch_model_all"] = \
+#     vt.f1_macro_epoch_per_model(data, N = None)
+# all_figures["comparaison_epoch_model_N_best"] = \
+#     vt.f1_macro_epoch_per_model(data, N = N_best)
 
 vt.export(all_figures, N_best)

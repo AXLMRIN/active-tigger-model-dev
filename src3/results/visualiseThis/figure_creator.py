@@ -29,7 +29,7 @@ colors = {
     "KNN"                    : "rgb(230,  57,  71)", 
     "Random Forest"          : "rgb(255, 183,   3)", 
     "MLPClassifier (slkearn)" : "rgb( 69, 123, 157)", 
-    "MLPClassifier (HF)"      : "rgb(150, 150, 150)", 
+    "MLPClassifier (HF)"      : "rgb(144, 190, 109)", 
     
     'answerdotai/ModernBERT-base'   : "rgb(255,   0,  85)", 
     'FacebookAI/roberta-base'       : "rgb(255,  85,   0)", 
@@ -38,7 +38,8 @@ colors = {
     500                         : "rgb(144, 225, 239)",
     1000                        : "rgb(  0, 180, 216)",
     1500                        : "rgb(  2,  61, 138)",
-    "Entraînement Hugging Face" : "rgb(150, 150, 150)", 
+    2000                        : "rgb(  0,  53,  84)",
+    "Entraînement Hugging Face" : "rgb(144, 190, 109)", 
 
     "error" : "#000000",
     "marker" : "#6b705c",
@@ -267,7 +268,8 @@ def f1_macro_lr_per_model_and_method(
 
     multiple_figures_layout(fig, nModels,listOfModels, 
         xaxis_kwargs={'tickvals' : [5e-6, 1e-5,2e-5,5e-5], 'range' : [-5.4,-4.2],\
-                      'type' : "log"})
+                      'type' : "log"},
+        xlabel_prefix = "Learning rate<br><br>")
 
     # Create bars for each model and method
     grouped = to_print.groupby(["model","method"])
@@ -409,7 +411,8 @@ def multiple_figures_layout(
         fig : Figure, 
         nFrames : int, 
         listOfFramesNames : list[str],  
-        xaxis_kwargs :dict = {}   
+        xaxis_kwargs : dict = {},   
+        xlabel_prefix : str = ""
     ):
     if nFrames >1:
         subplot_width =  0.9 / nFrames
@@ -418,7 +421,7 @@ def multiple_figures_layout(
             'xaxis'  : {
                 'anchor' : "x1" , 
                 'domain' : [0.0,subplot_width],
-                'title' : {'text' : listOfFramesNames[0]},
+                'title' : {'text' : f"{xlabel_prefix} {listOfFramesNames[0]}"},
                 'gridcolor' : gridcolor_x,
                 "zerolinecolor" : gridcolor_x,
                 **xaxis_kwargs
@@ -432,7 +435,7 @@ def multiple_figures_layout(
                         (subplot_width + gap) * i, 
                         min((subplot_width + gap) * i + subplot_width, 1)
                         ],
-                    'title' : {'text' : listOfFramesNames[i]},
+                    'title' : {'text' : f"{xlabel_prefix} {listOfFramesNames[i]}"},
                     'gridcolor' : gridcolor_x,
                     "zerolinecolor" : gridcolor_x,
                     **xaxis_kwargs
