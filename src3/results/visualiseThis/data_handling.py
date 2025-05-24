@@ -18,8 +18,7 @@ def fetch_data(filename_dictionnary : dict[str:str], usecols : list[str]) :
         new_df["model"] = new_df["filename"].apply(lambda x : "-".join(x.split("-")[3:-3]))
         new_df["lr"] = new_df["filename"].apply(lambda x : "-".join(x.split("-")[-3:-1]))
         if df is None: df = new_df
-
-        print(len(new_df), len(df))
+        else: df = pd.concat((df, new_df))
 
     return df
     
