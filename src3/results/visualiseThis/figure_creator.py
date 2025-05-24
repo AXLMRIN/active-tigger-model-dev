@@ -118,7 +118,7 @@ def f1_macro_per_model_and_method(
 
     return fig
 
-def f1_macro_per_n_sample_and_method(
+def f1_macro_per_n_sample_and_model(
         df : pd.DataFrame, 
         N : int|None = None) -> Figure:
     
@@ -178,6 +178,70 @@ def f1_macro_per_n_sample_and_method(
     
     return fig
 
+def f1_macro_per_n_sample_and_method(
+        df : pd.DataFrame, 
+        N : int|None = None) -> Figure:
+    
+    fig = Figure(layout = layout_general_parameters)
+
+    # Process Data
+    # Process Data
+    selected_data : pd.DataFrame = df.loc[:,["method", "n_samples", "f1_macro"]]
+    to_print : pd.DataFrame = get_mean_and_half_band(
+        df = selected_data,
+        groupbyColumns = ["method","n_samples"],
+        column = "f1_macro",
+        N = N
+    )
+    listOfMethods = SUL_string(to_print["method"])
+    # Remove "MLPClassifier (HF)" on purpose
+    listOfMethods = [method for method in listOfMethods if method != "MLPClassifier (HF)"]
+    listOfnSamples = SUL_string(to_print["n_samples"])
+    # Remove "Entraînement Hugging Face" on purpose
+    listOfnSamples = [n_samples for n_samples in listOfnSamples if n_samples != "Entraînement Hugging Face"]
+    nMethods = len(listOfMethods)
+
+    multiple_figures_layout(fig, nMethods,listOfMethods, 
+        xaxis_kwargs = {'categoryorder' : "trace", 'type' : "category"})
+
+    # Create bars for each model and method
+    to_print["upper_band"] = (to_print["CI_f1_macro_upper"] - 
+                              to_print["f1_macro_mean"])
+    to_print["lower_band"] = -(to_print["CI_f1_macro_lower"] - 
+                              to_print["f1_macro_mean"])
+    
+    grouped = to_print.groupby(["method","n_samples"])
+    for idx, method in enumerate(listOfMethods): 
+        for n_samples in listOfnSamples : 
+            sub_df = grouped.get_group((method,n_samples))
+            fig.add_trace(generic_bar(
+                sub_df = sub_df, 
+                col_x = "n_samples", 
+                col_y = "f1_macro_mean",
+                col_band_u = "upper_band", 
+                col_band_l = "lower_band",
+                name = n_samples, 
+                idx = idx
+            ))
+
+    # Create markers for each model and method
+    grouped = selected_data.groupby(["method","n_samples"])
+    showlegend = True
+    for idx, method in enumerate(listOfMethods):  
+        for n_samples in listOfnSamples:
+            sub_df = grouped.get_group((method,n_samples))
+            y = sub_df["f1_macro"].to_list()
+            if N is None: local_N = len(y)
+            else:
+                local_N = min(len(y), N)
+                y = sorted(y, reverse=True)[:local_N]
+            x = [n_samples] * local_N
+            fig.add_trace(generic_scatter(x = x, y = y, idx = idx, 
+                showlegend = showlegend))
+            showlegend = False
+    
+    return fig
+
 def f1_macro_lr_per_model_and_method(
         df : pd.DataFrame, 
         N : int|None = None) -> Figure:
@@ -185,7 +249,11 @@ def f1_macro_lr_per_model_and_method(
     fig = Figure(layout = layout_general_parameters)
 
     # Process Data
-    selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "lr"]]
+    selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "lr", "epoch", "n_samples", "iteration"]]
+    # keep, per model, method and lr, the best result for each epoch
+    selected_data = selected_data.groupby(["model","method","lr", "n_samples", "iteration"]).\
+        agg(f1_macro = ("f1_macro", lambda col : max(col)))
+    
     to_print : pd.DataFrame = get_mean_and_half_band(
         df = selected_data,
         groupbyColumns = ["model","method", "lr"],
@@ -343,34 +411,48 @@ def multiple_figures_layout(
         listOfFramesNames : list[str],  
         xaxis_kwargs :dict = {}   
     ):
-    subplot_width =  0.9 / nFrames
-    gap = 0.1 / (nFrames - 1)
-    fig.update_layout({
-        'xaxis'  : {
-            'anchor' : "x1" , 
-            'domain' : [0.0,subplot_width],
-            'title' : {'text' : listOfFramesNames[0]},
-            'gridcolor' : gridcolor_x,
-            "zerolinecolor" : gridcolor_x,
-            **xaxis_kwargs
-        },
-        "yaxis_title_text" : "Score F1 macro",
-        "yaxis_range" : [0,1],
-        **{
-            f'xaxis{i+1}' : {
-                'anchor' : f"x{i+1}" , 
-                'domain' : [
-                    (subplot_width + gap) * i, 
-                    (subplot_width + gap) * i + subplot_width
-                    ],
-                'title' : {'text' : listOfFramesNames[i]},
+    if nFrames >1:
+        subplot_width =  0.9 / nFrames
+        gap = 0.1 / (nFrames - 1)
+        fig.update_layout({
+            'xaxis'  : {
+                'anchor' : "x1" , 
+                'domain' : [0.0,subplot_width],
+                'title' : {'text' : listOfFramesNames[0]},
                 'gridcolor' : gridcolor_x,
                 "zerolinecolor" : gridcolor_x,
                 **xaxis_kwargs
+            },
+            "yaxis_title_text" : "Score F1 macro",
+            "yaxis_range" : [0,1],
+            **{
+                f'xaxis{i+1}' : {
+                    'anchor' : f"x{i+1}" , 
+                    'domain' : [
+                        (subplot_width + gap) * i, 
+                        min((subplot_width + gap) * i + subplot_width, 1)
+                        ],
+                    'title' : {'text' : listOfFramesNames[i]},
+                    'gridcolor' : gridcolor_x,
+                    "zerolinecolor" : gridcolor_x,
+                    **xaxis_kwargs
+                }
+                for i in range(1, nFrames)
             }
-            for i in range(1, nFrames)
-        }
-    })
+        })
+    else : 
+        fig.update_layout({
+            'xaxis'  : {
+                'anchor' : "x1" , 
+                'domain' : [0.0,1],
+                'title' : {'text' : listOfFramesNames[0]},
+                'gridcolor' : gridcolor_x,
+                "zerolinecolor" : gridcolor_x,
+                **xaxis_kwargs
+            },
+            "yaxis_title_text" : "Score F1 macro",
+            "yaxis_range" : [0,1]
+        })
 
 def one_figure_layout(
         fig : Figure, 
@@ -461,7 +543,7 @@ def add_baselines(fig : Figure, width : int, n_subplots : int) :
                 line={'color':"red",'width':2, 'dash' :dash_meilleurs_models[key]}
             )
 
-def generic_scatter_with_bands(df, col_x, col_y, col_u, col_l, name, idx = 1):
+def generic_scatter_with_bands(df, col_x, col_y, col_u, col_l, name, idx = 0):
     trace_1 = go.Scatter(
         x = df[col_x],
         y = df[col_y],
