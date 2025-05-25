@@ -341,6 +341,38 @@ def f1_macro_f1_hf_per_model_and_method(
             ))
     return fig
 
+def time_n_samples(df : pd.DataFrame) :
+    fig = Figure(layout = layout_general_parameters)
+
+    # Process Data
+    selected_data : pd.DataFrame = df.loc[:,["method", "time", "n_samples"]]
+    to_print = selected_data.drop(selected_data.loc[selected_data["method"] == "MLPClassifier (HF)",:].index)
+    
+    listOfMethods = SUL_string(to_print["method"])
+    nMethods = len(listOfMethods)
+
+    multiple_figures_layout(fig, nMethods,listOfMethods, 
+        xaxis_kwargs = {}, xlabel_prefix="Temps d'optimisation (s)<br><br>")
+    
+    fig.update_layout(yaxis_range = [0,300], barmode = 'stack')
+    
+    grouped = to_print.groupby(["method"])
+    for idx, method in enumerate(listOfMethods): 
+        sub_df = grouped.get_group((method,))
+        _, bins = np.histogram(sub_df["time"])
+        print(bins)
+        for (n_samples,), sub_df_n_samples in sub_df.groupby(["n_samples"]):
+            y, _ = np.histogram(sub_df_n_samples["time"], bins = bins)
+            print(y)
+            fig.add_trace(go.Bar(
+                x = bins, y = y, 
+                name = n_samples,
+                marker = {'color' : colors[n_samples],'cornerradius' : 5},
+                xaxis = f"x{idx+1}", yaxis = "y",
+                showlegend = (idx == 1) 
+            ))
+    return fig
+    
 
 def multiple_figures_layout(
         fig : Figure, 
