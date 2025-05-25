@@ -354,7 +354,7 @@ def time_n_samples(df : pd.DataFrame) :
     multiple_figures_layout(fig, nMethods,listOfMethods, 
         xaxis_kwargs = {}, xlabel_prefix="Temps d'optimisation (s)<br><br>")
     
-    fig.update_layout(yaxis_range = [0,300], barmode = 'stack')
+    fig.update_layout(yaxis_range = [0,300], yaxis_title_text = "Nombre d'occurences", barmode = 'stack')
     
     grouped = to_print.groupby(["method"])
     for idx, method in enumerate(listOfMethods): 
