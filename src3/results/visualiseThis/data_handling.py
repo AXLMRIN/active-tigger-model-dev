@@ -108,7 +108,6 @@ def f1_HF_vs_f1_all(df : pd.DataFrame) :
     new_df = None
 
     for (model, lr, epoch), sub_df in df.groupby(["model", "lr", "epoch"]):
-        print(sub_df.loc[sub_df["method"] == "MLPClassifier (HF)",:])
         f1_HF = 0
         if epoch == 0 : f1_HF = 0.33
         else: f1_HF = float(sub_df.loc[sub_df["method"] == "MLPClassifier (HF)", "f1_macro"].iloc[0])
