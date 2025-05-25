@@ -5,10 +5,6 @@ import plotly.graph_objects as go
 
 import visualiseThis as vt
 
-
-
-#FIXME les visus sont pétés j'en peux plus bon courage à toi du futur
-
 data = vt.fetch_data(
     {
         "Random Forest" : "2025-05-24-RandomForest-F.csv",
@@ -18,10 +14,6 @@ data = vt.fetch_data(
     },
     usecols = ["filename", "n_samples", "epoch", "f1_macro", "iteration", "time"]
 )
-
-# === === === ===  === ===  === ===  === ===  === ===  === ===  === ===  === ===
-# TESTS
-# === === === ===  === ===  === ===  === ===  === ===  === ===  === ===  === ===
 
 # === === === ===  === ===  === ===  === ===  === ===  === ===  === ===  === ===
 # VISUS
