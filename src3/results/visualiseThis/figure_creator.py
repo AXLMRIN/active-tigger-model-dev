@@ -1,7 +1,9 @@
 # === === === === === === === === === === === === === === === === === === === ==
 # IMPORTS
 # === === === === === === === === === === === === === === === === === === === ==
-from .data_handling import get_mean_and_half_band, SUL_string, onlyBestEpoch
+from .data_handling import (
+    get_mean_and_half_band, SUL_string, onlyBestEpoch, f1_HF_vs_f1_all
+)
 import plotly.graph_objects as go
 from plotly.graph_objs._figure import Figure
 import pandas as pd
@@ -301,8 +303,6 @@ def f1_macro_epoch_per_model_and_method_Table(
             ))
         print("-" * len(header))
 
-import plotly.express as px #TODELETE
-
 def f1_macro_f1_hf_per_model_and_method(    
         df : pd.DataFrame, 
         N : int|None = None) -> Figure:  
@@ -311,28 +311,35 @@ def f1_macro_f1_hf_per_model_and_method(
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "iteration", "n_samples", "epoch", "lr"]]
-    # keys : model, method, f1_HF, f1_macro
-    new_df = []
-    i = 1
-    for (model, lr, epoch), sub_df in selected_data.groupby(["model", "lr", "epoch"]):
-        f1_HF = 0
-        if epoch == 0 : f1_HF = 0.33
-        else: f1_HF = float(sub_df.loc[sub_df["method"] == "MLPClassifier (HF)", "f1_macro"].iloc[0])
+    to_print = f1_HF_vs_f1_all(selected_data)
 
-        for iRow in range(len(sub_df)) : 
-            new_df.append({
-                "model" : model,
-                "lr" : lr,
-                "epoch" : epoch,
-                "f1_HF" : f1_HF,
-                "f1_macro" : float(sub_df.iloc[iRow]["f1_macro"]),
-                "method" : str(sub_df.iloc[iRow]["method"]),
-                "n_samples" : str(sub_df.iloc[iRow]["n_samples"]),
-                "iteration" : int(sub_df.iloc[iRow]["iteration"]),
-            })
+    listOfModels = SUL_string(to_print["model"])
+    listOfMethods = SUL_string(to_print["method"])
+    nModels = len(listOfModels)
 
-    new_df = pd.DataFrame(new_df)
-    return px.scatter(new_df, x = "f1_HF", y = "f1_macro", color = "lr")
+    multiple_figures_layout(fig, nModels,listOfModels, 
+        xaxis_kwargs = {"range" : [0,1]}, xlabel_prefix="F1 Macro de MLPClassifier(HF)<br><br>")
+
+    # ÷px.scatter(new_df, x = "f1_HF", y = "f1_macro", color = "lr")
+    grouped = to_print.groupby(["model","method"])
+    for idx, model in enumerate(listOfModels): 
+        for method in listOfMethods : 
+            sub_df = grouped.get_group((model,method))
+            fig.add_trace(go.Scatter(
+                x = sub_df["f1_HF"],
+                y = sub_df["f1_macro"],
+                marker = {
+                    'color' : colors[method],
+                    'opacity' : 0.4,
+                    'symbol' : "circle"
+                },
+                mode = "markers",
+                xaxis = f"x{idx + 1}",
+                yaxis = "y",
+                name = method,
+                showlegend = (idx == 0)
+            ))
+    return fig
 
 
 def multiple_figures_layout(
