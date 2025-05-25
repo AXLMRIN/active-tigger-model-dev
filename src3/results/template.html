@@ -24,37 +24,20 @@
 </head>
 <body>
     <div>
-        <h1>Score F1 macro par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
-        {{ comparaison_plongement_classification_all }}
+        <h1>comparaison_plongement_classification</h1>
+        {{ comparaison_plongement_classification }}
     </div>
 
-    <!-- ------------------------------------ -->
-
     <div>
-        <h1>Score F1 macro en fonction du learning rate par modèle de plongement et modèle de classification, tout learning rate, n sample et epoch confondues</h1>
-        {{ comparaison_lr_model_method_all }}
-    </div>
-
-    <!-- ------------------------------------ -->
-
-    <div>
-        <h1>epoch</h1>
-        {{ comparaison_epoch_model_method_all }}
-    </div>
-
-    <!-- ------------------------------------ -->
-
-    <div>
-        <h1>f1_HF vs les autres</h1>
+        <h1>f1_HF_vs_f1_autre</h1>
         {{ f1_HF_vs_f1_autre }}
     </div>
 
-    <!-- ------------------------------------ -->
-
     <div>
-        <h1>N_samples</h1>
-        {{ comparaison_classification_n_sample_all }}
+        <h1>comparaison_lr_model_method</h1>
+        {{ comparaison_lr_model_method }}
     </div>
+
 
 </body>
 </html>
