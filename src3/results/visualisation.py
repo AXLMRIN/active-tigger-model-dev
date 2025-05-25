@@ -31,7 +31,7 @@ all_figures = {}
 
 # vt.estimate_time_to_process(data)
 
-all_figures["comparaison_plongement_classification_all"] = \
+all_figures["comparaison_plongement_classification"] = \
     vt.f1_macro_per_model_and_method(data, N = None, onlyDisplayBestEpoch = onlyDisplayBestEpoch)
 
 all_figures["f1_HF_vs_f1_autre"] = \
@@ -40,7 +40,7 @@ all_figures["f1_HF_vs_f1_autre"] = \
 vt.f1_macro_per_n_sample_and_method_Table(
     data, N = None, onlyDisplayBestEpoch = onlyDisplayBestEpoch)
 
-all_figures["comparaison_lr_model_method_all"] = \
+all_figures["comparaison_lr_model_method"] = \
     vt.f1_macro_lr_per_model_and_method(data, N = None, onlyDisplayBestEpoch = onlyDisplayBestEpoch)
 
 vt.f1_macro_epoch_per_model_and_method_Table(data, N = None)
