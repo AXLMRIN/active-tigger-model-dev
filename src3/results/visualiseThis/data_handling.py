@@ -94,3 +94,11 @@ def estimate_time_to_process(df : pd.DataFrame):
                 f"{'%i min %.1f s'%(q95MIN, q95S):^15}|"
                 f"{'%i h %i min'%(totH, totMIN):<15}"))
     print(hline)
+
+def onlyBestEpoch(df : pd.DataFrame) -> pd.DataFrame:
+    new_df = []
+    for _, sub_df  in df.groupby(["model","lr","method","n_samples","iteration"]):
+        bestF1idx = np.argmax(sub_df["f1_macro"])
+        new_df.append(sub_df.iloc[bestF1idx])
+
+    return pd.DataFrame(new_df)
