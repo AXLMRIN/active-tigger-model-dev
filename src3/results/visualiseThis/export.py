@@ -17,7 +17,7 @@ saving_kwargs = {
 # FUNCTIONS
 # === === === === === === === === === === === === === === === === === === === ==
 
-def export(all_figures : dict[str:Figure], N_best : int):
+def export(all_figures : dict[str:Figure], N_best : int = None ):
     plotly_jinja_data = {
         figure_name : all_figures[figure_name].to_html(**saving_kwargs)
         for figure_name in all_figures 

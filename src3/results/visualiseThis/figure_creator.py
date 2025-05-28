@@ -1,7 +1,7 @@
 # === === === === === === === === === === === === === === === === === === === ==
 # IMPORTS
 # === === === === === === === === === === === === === === === === === === === ==
-from .data_handling import get_mean_and_half_band
+from .data_handling import get_mean_and_half_band, SUL_string, onlyBestEpoch
 import plotly.graph_objects as go
 from plotly.graph_objs._figure import Figure
 import pandas as pd
@@ -29,7 +29,7 @@ colors = {
     "KNN"                    : "rgb(230,  57,  71)", 
     "Random Forest"          : "rgb(255, 183,   3)", 
     "MLPClassifier (slkearn)" : "rgb( 69, 123, 157)", 
-    "MLPClassifier (HF)"      : "rgb(150, 150, 150)", 
+    "MLPClassifier (HF)"      : "rgb(144, 190, 109)", 
     
     'answerdotai/ModernBERT-base'   : "rgb(255,   0,  85)", 
     'FacebookAI/roberta-base'       : "rgb(255,  85,   0)", 
@@ -38,7 +38,8 @@ colors = {
     500                         : "rgb(144, 225, 239)",
     1000                        : "rgb(  0, 180, 216)",
     1500                        : "rgb(  2,  61, 138)",
-    "Entraînement Hugging Face" : "rgb(150, 150, 150)", 
+    2000                        : "rgb(  0,  53,  84)",
+    "Entraînement Hugging Face" : "rgb(144, 190, 109)", 
 
     "error" : "#000000",
     "marker" : "#6b705c",
@@ -61,18 +62,24 @@ dash_meilleurs_models = {
 # === === === === === === === === === === === === === === === === === === === ==
 def f1_macro_per_model_and_method(
         df : pd.DataFrame, 
-        N : int|None = None) -> Figure:
+        N : int|None = None,
+        onlyDisplayBestEpoch : bool = False) -> Figure:
     
     fig = Figure(layout = layout_general_parameters)
 
     # Process Data
-    selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro"]]
+    selected_data : pd.DataFrame = df.loc[:,["model", "method", "n_samples", "f1_macro", "lr", "iteration", "epoch"]]
+    
+    if onlyDisplayBestEpoch : 
+        selected_data = onlyBestEpoch(selected_data)
+    
     to_print : pd.DataFrame = get_mean_and_half_band(
         df = selected_data,
         groupbyColumns = ["model","method"],
         column = "f1_macro",
         N = N
     )
+
     listOfModels = SUL_string(to_print["model"])
     listOfMethods = SUL_string(to_print["method"])
     nModels = len(listOfModels)
@@ -118,141 +125,87 @@ def f1_macro_per_model_and_method(
 
     return fig
 
-def f1_macro_per_n_sample_and_model(
+def f1_macro_per_n_sample_and_method_Table(
         df : pd.DataFrame, 
-        N : int|None = None) -> Figure:
-    
-    fig = Figure(layout = layout_general_parameters)
+        N : int|None = None,
+        onlyDisplayBestEpoch : bool = False) -> None:
 
     # Process Data
-    # Process Data
-    selected_data : pd.DataFrame = df.loc[:,["model", "n_samples", "f1_macro"]]
+    selected_data : pd.DataFrame = df.loc[:,["model", "method", "n_samples", "f1_macro", "lr", "iteration", "epoch"]]
+    
+    if onlyDisplayBestEpoch : 
+        selected_data = onlyBestEpoch(selected_data)
+    
     to_print : pd.DataFrame = get_mean_and_half_band(
         df = selected_data,
-        groupbyColumns = ["model","n_samples"],
+        groupbyColumns = ["model", "method","n_samples"],
         column = "f1_macro",
         N = N
     )
-    listOfModels = SUL_string(to_print["model"])
-    listOfnSamples = SUL_string(to_print["n_samples"])
-    nModels = len(listOfModels)
 
-    multiple_figures_layout(fig, nModels,listOfModels, 
-        xaxis_kwargs = {'categoryorder' : "trace", 'type' : "category"})
+    for (model,), sub_df in to_print.groupby(["model"]) : 
+        print(model)
+        header = f"| {'nSample':>30}|{'500':^15}|{'1000':^15}|{'1500':^15}|{'2000':^15}|{'Baseline':>15}|"
+        subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|"
+        print("-" * len(header))
+        print(header)
+        print(subHeader)
+        print("-" * len(header))
+        for (method,), sub_df_method in sub_df.groupby(["method"]):
 
-    # Create bars for each model and method
-    to_print["upper_band"] = (to_print["CI_f1_macro_upper"] - 
-                              to_print["f1_macro_mean"])
-    to_print["lower_band"] = -(to_print["CI_f1_macro_lower"] - 
-                              to_print["f1_macro_mean"])
-    
-    grouped = to_print.groupby(["model","n_samples"])
-    for idx, model in enumerate(listOfModels): 
-        for n_samples in listOfnSamples : 
-            sub_df = grouped.get_group((model,n_samples))
-            fig.add_trace(generic_bar(
-                sub_df = sub_df, 
-                col_x = "n_samples", 
-                col_y = "f1_macro_mean",
-                col_band_u = "upper_band", 
-                col_band_l = "lower_band",
-                name = n_samples, 
-                idx = idx
-            ))
+            def collect_mean(n_samples_value) : 
+                return float(sub_df_method.loc[
+                    sub_df_method["n_samples"] == n_samples_value,
+                    "f1_macro_mean"
+                    ].item())
+            def collect_ci(n_samples_value) : 
+                return collect_mean(n_samples_value) - float(sub_df_method.loc[
+                    sub_df_method["n_samples"] == n_samples_value,
+                    "CI_f1_macro_lower"
+                    ].item())
 
-    # Create markers for each model and method
-    grouped = selected_data.groupby(["model","n_samples"])
-    showlegend = True
-    for idx, model in enumerate(listOfModels):  
-        for n_samples in listOfnSamples:
-            sub_df = grouped.get_group((model,n_samples))
-            y = sub_df["f1_macro"].to_list()
-            if N is None: local_N = len(y)
+            M500, M1000, M1500, M2000, CI500, CI1000, CI1500, CI2000 = (0.00,) * 8
+            MBaseLine, CIBaseLine = (0.00,) * 2
+            if method == "MLPClassifier (HF)":
+                MBaseLine  = collect_mean("Entraînement Hugging Face")
+                CIBaseLine =   collect_ci("Entraînement Hugging Face")
+                print((
+                    f"| {'%s'%method:>30}|"
+                    f"{'':^15}|"
+                    f"{'':^15}|"
+                    f"{'':^15}|"
+                    f"{'':^15}|"
+                    f"{'%.3f ± %.3f'%(MBaseLine, CIBaseLine):>15}|"
+                ))
             else:
-                local_N = min(len(y), N)
-                y = sorted(y, reverse=True)[:local_N]
-            x = [n_samples] * local_N
-            fig.add_trace(generic_scatter(x = x, y = y, idx = idx, 
-                showlegend = showlegend))
-            showlegend = False
-    
-    return fig
+                # print(sub_df_method)
+                M500  = collect_mean(500);  CI500  = collect_ci(500)
+                M1000 = collect_mean(1000); CI1000 = collect_ci(1000)
+                M1500 = collect_mean(1500); CI1500 = collect_ci(1500)
+                M2000 = collect_mean(2000); CI2000 = collect_ci(2000)
 
-def f1_macro_per_n_sample_and_method(
-        df : pd.DataFrame, 
-        N : int|None = None) -> Figure:
-    
-    fig = Figure(layout = layout_general_parameters)
-
-    # Process Data
-    # Process Data
-    selected_data : pd.DataFrame = df.loc[:,["method", "n_samples", "f1_macro"]]
-    to_print : pd.DataFrame = get_mean_and_half_band(
-        df = selected_data,
-        groupbyColumns = ["method","n_samples"],
-        column = "f1_macro",
-        N = N
-    )
-    listOfMethods = SUL_string(to_print["method"])
-    # Remove "MLPClassifier (HF)" on purpose
-    listOfMethods = [method for method in listOfMethods if method != "MLPClassifier (HF)"]
-    listOfnSamples = SUL_string(to_print["n_samples"])
-    # Remove "Entraînement Hugging Face" on purpose
-    listOfnSamples = [n_samples for n_samples in listOfnSamples if n_samples != "Entraînement Hugging Face"]
-    nMethods = len(listOfMethods)
-
-    multiple_figures_layout(fig, nMethods,listOfMethods, 
-        xaxis_kwargs = {'categoryorder' : "trace", 'type' : "category"})
-
-    # Create bars for each model and method
-    to_print["upper_band"] = (to_print["CI_f1_macro_upper"] - 
-                              to_print["f1_macro_mean"])
-    to_print["lower_band"] = -(to_print["CI_f1_macro_lower"] - 
-                              to_print["f1_macro_mean"])
-    
-    grouped = to_print.groupby(["method","n_samples"])
-    for idx, method in enumerate(listOfMethods): 
-        for n_samples in listOfnSamples : 
-            sub_df = grouped.get_group((method,n_samples))
-            fig.add_trace(generic_bar(
-                sub_df = sub_df, 
-                col_x = "n_samples", 
-                col_y = "f1_macro_mean",
-                col_band_u = "upper_band", 
-                col_band_l = "lower_band",
-                name = n_samples, 
-                idx = idx
-            ))
-
-    # Create markers for each model and method
-    grouped = selected_data.groupby(["method","n_samples"])
-    showlegend = True
-    for idx, method in enumerate(listOfMethods):  
-        for n_samples in listOfnSamples:
-            sub_df = grouped.get_group((method,n_samples))
-            y = sub_df["f1_macro"].to_list()
-            if N is None: local_N = len(y)
-            else:
-                local_N = min(len(y), N)
-                y = sorted(y, reverse=True)[:local_N]
-            x = [n_samples] * local_N
-            fig.add_trace(generic_scatter(x = x, y = y, idx = idx, 
-                showlegend = showlegend))
-            showlegend = False
-    
-    return fig
+                print((
+                    f"| {'%s'%method:>30}|"
+                    f"{'%.3f ± %.3f'%(M500, CI500):^15}|"
+                    f"{'%.3f ± %.3f'%(M1000, CI1000):^15}|"
+                    f"{'%.3f ± %.3f'%(M1500, CI1500):^15}|"
+                    f"{'%.3f ± %.3f'%(M2000, CI2000):^15}|"
+                    f"{'':>15}|"
+                ))
+        print("-" * len(header))
 
 def f1_macro_lr_per_model_and_method(
         df : pd.DataFrame, 
-        N : int|None = None) -> Figure:
+        N : int|None = None,
+        onlyDisplayBestEpoch : bool = False) -> Figure:
     
     fig = Figure(layout = layout_general_parameters)
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "lr", "epoch", "n_samples", "iteration"]]
-    # keep, per model, method and lr, the best result for each epoch
-    selected_data = selected_data.groupby(["model","method","lr", "n_samples", "iteration"]).\
-        agg(f1_macro = ("f1_macro", lambda col : max(col)))
+    
+    if onlyDisplayBestEpoch:
+        selected_data = onlyBestEpoch(selected_data)
     
     to_print : pd.DataFrame = get_mean_and_half_band(
         df = selected_data,
@@ -267,7 +220,8 @@ def f1_macro_lr_per_model_and_method(
 
     multiple_figures_layout(fig, nModels,listOfModels, 
         xaxis_kwargs={'tickvals' : [5e-6, 1e-5,2e-5,5e-5], 'range' : [-5.4,-4.2],\
-                      'type' : "log"})
+                      'type' : "log"},
+        xlabel_prefix = "Learning rate<br><br>")
 
     # Create bars for each model and method
     grouped = to_print.groupby(["model","method"])
@@ -289,47 +243,9 @@ def f1_macro_lr_per_model_and_method(
     
     return fig
 
-def f1_macro_lr_per_model(
+def f1_macro_epoch_per_model_and_method_Table(
         df : pd.DataFrame, 
-        N : int|None = None) -> Figure:
-    # Create figure 
-    fig = Figure(layout = layout_general_parameters)
-    one_figure_layout(fig, "Learning Rate", xaxis_kwargs={"type" : "log"})
-
-    # Process Data
-    selected_data : pd.DataFrame = df.loc[:,["model", "f1_macro", "lr"]]
-    to_print : pd.DataFrame = get_mean_and_half_band(
-        df = selected_data,
-        groupbyColumns = ["model", "lr"],
-        column = "f1_macro",
-        N = N
-    )
-
-    listOfModels = SUL_string(to_print["model"])
-
-
-    # Create bars for each model 
-    grouped = to_print.groupby(["model"])
-    for model in listOfModels: 
-        sub_df = grouped.get_group((model,))
-        traces = generic_scatter_with_bands(
-            df = sub_df, 
-            col_x = "lr", 
-            col_y = "f1_macro_mean", 
-            col_u = "CI_f1_macro_upper", 
-            col_l = "CI_f1_macro_lower", 
-            name = model, 
-        )
-
-        fig.add_trace(traces[0])
-        fig.add_trace(traces[1])
-    return fig
-
-def f1_macro_epoch_per_model_and_method(
-        df : pd.DataFrame, 
-        N : int|None = None) -> Figure:
-    
-    fig = Figure(layout = layout_general_parameters)
+        N : int|None = None) -> None:
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "epoch"]]
@@ -340,76 +256,91 @@ def f1_macro_epoch_per_model_and_method(
         N = N
     )
 
-    listOfModels = SUL_string(to_print["model"])
-    listOfMethods = SUL_string(to_print["method"])
-    nModels = len(listOfModels)
+    # print table
+    for (model,), sub_df in to_print.groupby(["model"]):
+        print(model)
+        header = f"| {'Epoch':>30}|{'0':^15}|{'1':^15}|{'2':^15}|{'3':^15}|{'4':^15}|{'5':^15}|{'Rapport':^15}|"
+        subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|{'':>15}|{'':>15}|"
+        print("-" * len(header))
+        print(header)
+        print(subHeader)
+        print("-" * len(header))
+        for (method,), sub_df_method in sub_df.groupby(["method"]) : 
 
-    multiple_figures_layout(fig, nModels,listOfModels, 
-        xaxis_kwargs={})
+            def collect_mean(epoch) : 
+                return float(sub_df_method.loc[
+                    sub_df_method["epoch"] == epoch,
+                    "f1_macro_mean"
+                    ].item())
+            def collect_ci(epoch) : 
+                return collect_mean(epoch) - float(sub_df_method.loc[
+                    sub_df_method["epoch"] == epoch,
+                    "CI_f1_macro_lower"
+                    ].item())
+            M0, M1, M2, M3, M4, M5 = (0.00,) * 6
+            CI0, CI1, CI2, CI3, CI4, CI5 = (0.00,) * 6
+            
+            if method == "MLPClassifier (HF)":
+                M0, CI0 = 0.333, 0
+            else:
+                M0, CI0 = collect_mean(0), collect_ci(0)
+            M1, CI1 = collect_mean(1), collect_ci(1)
+            M2, CI2 = collect_mean(2), collect_ci(2)
+            M3, CI3 = collect_mean(3), collect_ci(3)
+            M4, CI4 = collect_mean(4), collect_ci(4)
+            M5, CI5 = collect_mean(5), collect_ci(5)
+            print((
+                f"| {'%s'%method:>30}|"
+                f"{'%.3f ± %.3f'%(M0, CI0):^15}|"
+                f"{'%.3f ± %.3f'%(M1, CI1):^15}|"
+                f"{'%.3f ± %.3f'%(M2, CI2):^15}|"
+                f"{'%.3f ± %.3f'%(M3, CI3):^15}|"
+                f"{'%.3f ± %.3f'%(M4, CI4):^15}|"
+                f"{'%.3f ± %.3f'%(M5, CI5):^15}|"
+                f"{'%.3f'%(max(M1, M2, M3, M4, M5)/M0):^15}|"
+            ))
+        print("-" * len(header))
 
-    # Create bars for each model and method
-    grouped = to_print.groupby(["model","method"])
-    for idx, model in enumerate(listOfModels): 
-        for method in listOfMethods : 
-            sub_df = grouped.get_group((model,method))
-            traces = generic_scatter_with_bands(
-                df = sub_df, 
-                col_x = "epoch", 
-                col_y = "f1_macro_mean", 
-                col_u = "CI_f1_macro_upper", 
-                col_l = "CI_f1_macro_lower", 
-                name = method, 
-                idx = idx
-            )
+import plotly.express as px #TODELETE
 
-            fig.add_trace(traces[0])
-            fig.add_trace(traces[1])
-    
-    return fig
-
-def f1_macro_epoch_per_model(
+def f1_macro_f1_hf_per_model_and_method(    
         df : pd.DataFrame, 
-        N : int|None = None) -> Figure:
-    # Create figure 
+        N : int|None = None) -> Figure:  
+    
     fig = Figure(layout = layout_general_parameters)
-    one_figure_layout(fig, "Nombre d'epochs")
 
     # Process Data
-    selected_data : pd.DataFrame = df.loc[:,["model", "f1_macro", "epoch"]]
-    to_print : pd.DataFrame = get_mean_and_half_band(
-        df = selected_data,
-        groupbyColumns = ["model", "epoch"],
-        column = "f1_macro",
-        N = N
-    )
-    listOfModels = SUL_string(to_print["model"])
+    selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "iteration", "n_samples", "epoch", "lr"]]
+    # keys : model, method, f1_HF, f1_macro
+    new_df = []
+    i = 1
+    for (model, lr, epoch), sub_df in selected_data.groupby(["model", "lr", "epoch"]):
+        f1_HF = 0
+        if epoch == 0 : f1_HF = 0.33
+        else: f1_HF = float(sub_df.loc[sub_df["method"] == "MLPClassifier (HF)", "f1_macro"].iloc[0])
 
-    # Create bars for each model 
-    grouped = to_print.groupby(["model"])
-    for model in listOfModels: 
-        sub_df = grouped.get_group((model,))
-        traces = generic_scatter_with_bands(
-            df = sub_df, 
-            col_x = "epoch", 
-            col_y = "f1_macro_mean", 
-            col_u = "CI_f1_macro_upper", 
-            col_l = "CI_f1_macro_lower", 
-            name = model
-        )
+        for iRow in range(len(sub_df)) : 
+            new_df.append({
+                "model" : model,
+                "lr" : lr,
+                "epoch" : epoch,
+                "f1_HF" : f1_HF,
+                "f1_macro" : float(sub_df.iloc[iRow]["f1_macro"]),
+                "method" : str(sub_df.iloc[iRow]["method"]),
+                "n_samples" : str(sub_df.iloc[iRow]["n_samples"]),
+                "iteration" : int(sub_df.iloc[iRow]["iteration"]),
+            })
 
-        fig.add_trace(traces[0])
-        fig.add_trace(traces[1])
-    return fig
+    new_df = pd.DataFrame(new_df)
+    return px.scatter(new_df, x = "f1_HF", y = "f1_macro", color = "lr")
 
-def SUL_string(vec) : 
-    '''return a sorted list of unique string items'''
-    return sorted(list(set(vec)), key = lambda x : str(x).lower())
 
 def multiple_figures_layout(
         fig : Figure, 
         nFrames : int, 
         listOfFramesNames : list[str],  
-        xaxis_kwargs :dict = {}   
+        xaxis_kwargs : dict = {},   
+        xlabel_prefix : str = ""
     ):
     if nFrames >1:
         subplot_width =  0.9 / nFrames
@@ -418,7 +349,7 @@ def multiple_figures_layout(
             'xaxis'  : {
                 'anchor' : "x1" , 
                 'domain' : [0.0,subplot_width],
-                'title' : {'text' : listOfFramesNames[0]},
+                'title' : {'text' : f"{xlabel_prefix} {listOfFramesNames[0]}"},
                 'gridcolor' : gridcolor_x,
                 "zerolinecolor" : gridcolor_x,
                 **xaxis_kwargs
@@ -432,7 +363,7 @@ def multiple_figures_layout(
                         (subplot_width + gap) * i, 
                         min((subplot_width + gap) * i + subplot_width, 1)
                         ],
-                    'title' : {'text' : listOfFramesNames[i]},
+                    'title' : {'text' : f"{xlabel_prefix} {listOfFramesNames[i]}"},
                     'gridcolor' : gridcolor_x,
                     "zerolinecolor" : gridcolor_x,
                     **xaxis_kwargs
