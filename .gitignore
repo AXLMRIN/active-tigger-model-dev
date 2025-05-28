@@ -9,5 +9,5 @@ data/*
 *.zip
 *.crt
 box/
-src3/2025-05-05-*
+src3/316_models/
 src3/results/interpretation_files/libs
