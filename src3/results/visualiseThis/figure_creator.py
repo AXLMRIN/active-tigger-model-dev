@@ -261,8 +261,8 @@ def f1_macro_epoch_per_model_and_method_Table(
     # print table
     for (model,), sub_df in to_print.groupby(["model"]):
         print(model)
-        header = f"| {'Epoch':>30}|{'0':^15}|{'1':^15}|{'2':^15}|{'3':^15}|{'4':^15}|{'5':^15}|{'Rapport':^15}|"
-        subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|{'':>15}|{'':>15}|"
+        header = f"| {'Epoch':>30}|{'0':^15}|{'1':^15}|{'2':^15}|{'3':^15}|{'4':^15}|{'5':^15}|{'Rapport':^15}|{'Rapport':^15}|"
+        subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|{'':>15}|{'fin / début':>15}|{'epoch 5 / 3':^15}|"
         print("-" * len(header))
         print(header)
         print(subHeader)
@@ -300,6 +300,7 @@ def f1_macro_epoch_per_model_and_method_Table(
                 f"{'%.3f ± %.3f'%(M4, CI4):^15}|"
                 f"{'%.3f ± %.3f'%(M5, CI5):^15}|"
                 f"{'%.3f'%(max(M1, M2, M3, M4, M5)/M0):^15}|"
+                f"{'%.3f'%(max(M4, M5)/max(M0,M1,M2,M3)):^15}|"
             ))
         print("-" * len(header))
 
@@ -354,16 +355,16 @@ def time_n_samples(df : pd.DataFrame) :
     multiple_figures_layout(fig, nMethods,listOfMethods, 
         xaxis_kwargs = {}, xlabel_prefix="Temps d'optimisation (s)<br><br>")
     
-    fig.update_layout(yaxis_range = [0,300], yaxis_title_text = "Nombre d'occurences", barmode = 'stack')
+    fig.update_layout(yaxis_range = [0,300], yaxis_title_text = "Nombre d'occurences",
+                     barmode = 'stack', legend_title_text = "nSample :")
     
+
     grouped = to_print.groupby(["method"])
     for idx, method in enumerate(listOfMethods): 
         sub_df = grouped.get_group((method,))
         _, bins = np.histogram(sub_df["time"])
-        print(bins)
         for (n_samples,), sub_df_n_samples in sub_df.groupby(["n_samples"]):
             y, _ = np.histogram(sub_df_n_samples["time"], bins = bins)
-            print(y)
             fig.add_trace(go.Bar(
                 x = bins, y = y, 
                 name = n_samples,
