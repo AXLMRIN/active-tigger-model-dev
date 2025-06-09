@@ -39,9 +39,9 @@ class dataset:
         return (f'Dataset : \n'
                 f'{self.data.groupby("label").size()}\n'
                 f'\n'
-                f'|{"N_train":>15} | {self.N_train:<5} |\n'
-                f'|{"N_eval":>15} | {self.N_eval:<5} |\n'
-                f'|{"N_test":>15} | {self.N_test:<5} |')
+                f'|{"N_train":>15} | {self.n_labels * self.N_train:<5} |\n'
+                f'|{"N_eval":>15} | {self.n_labels * self.N_eval:<5} |\n'
+                f'|{"N_test":>15} | {self.n_labels * self.N_test:<5} |')
     
     def concat_shuffle(self,start,finish) -> pd.DataFrame :
         grouped = self.data.groupby("label")
