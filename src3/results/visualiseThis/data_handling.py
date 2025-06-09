@@ -102,3 +102,18 @@ def onlyBestEpoch(df : pd.DataFrame) -> pd.DataFrame:
         new_df.append(sub_df.iloc[bestF1idx])
 
     return pd.DataFrame(new_df)
+
+def f1_HF_vs_f1_all(df : pd.DataFrame) :
+    # keys : model, method, f1_HF, f1_macro
+    new_df = None
+
+    for (model, lr, epoch), sub_df in df.groupby(["model", "lr", "epoch"]):
+        f1_HF = 0
+        if epoch == 0 : f1_HF = 0.33
+        else: f1_HF = float(sub_df.loc[sub_df["method"] == "MLPClassifier (HF)", "f1_macro"].iloc[0])
+        sub_df["f1_HF"] = [f1_HF] * len(sub_df)
+
+        if new_df is None: new_df = sub_df
+        else : new_df = pd.concat((new_df, sub_df))
+    
+    return new_df

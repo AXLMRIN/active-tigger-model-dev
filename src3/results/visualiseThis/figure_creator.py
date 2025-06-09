@@ -1,7 +1,9 @@
 # === === === === === === === === === === === === === === === === === === === ==
 # IMPORTS
 # === === === === === === === === === === === === === === === === === === === ==
-from .data_handling import get_mean_and_half_band, SUL_string, onlyBestEpoch
+from .data_handling import (
+    get_mean_and_half_band, SUL_string, onlyBestEpoch, f1_HF_vs_f1_all
+)
 import plotly.graph_objects as go
 from plotly.graph_objs._figure import Figure
 import pandas as pd
@@ -259,8 +261,8 @@ def f1_macro_epoch_per_model_and_method_Table(
     # print table
     for (model,), sub_df in to_print.groupby(["model"]):
         print(model)
-        header = f"| {'Epoch':>30}|{'0':^15}|{'1':^15}|{'2':^15}|{'3':^15}|{'4':^15}|{'5':^15}|{'Rapport':^15}|"
-        subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|{'':>15}|{'':>15}|"
+        header = f"| {'Epoch':>30}|{'0':^15}|{'1':^15}|{'2':^15}|{'3':^15}|{'4':^15}|{'5':^15}|{'Rapport':^15}|{'Rapport':^15}|"
+        subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|{'':>15}|{'fin / début':>15}|{'epoch 5 / 3':^15}|"
         print("-" * len(header))
         print(header)
         print(subHeader)
@@ -298,10 +300,9 @@ def f1_macro_epoch_per_model_and_method_Table(
                 f"{'%.3f ± %.3f'%(M4, CI4):^15}|"
                 f"{'%.3f ± %.3f'%(M5, CI5):^15}|"
                 f"{'%.3f'%(max(M1, M2, M3, M4, M5)/M0):^15}|"
+                f"{'%.3f'%(max(M4, M5)/max(M0,M1,M2,M3)):^15}|"
             ))
         print("-" * len(header))
-
-import plotly.express as px #TODELETE
 
 def f1_macro_f1_hf_per_model_and_method(    
         df : pd.DataFrame, 
@@ -311,29 +312,68 @@ def f1_macro_f1_hf_per_model_and_method(
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "iteration", "n_samples", "epoch", "lr"]]
-    # keys : model, method, f1_HF, f1_macro
-    new_df = []
-    i = 1
-    for (model, lr, epoch), sub_df in selected_data.groupby(["model", "lr", "epoch"]):
-        f1_HF = 0
-        if epoch == 0 : f1_HF = 0.33
-        else: f1_HF = float(sub_df.loc[sub_df["method"] == "MLPClassifier (HF)", "f1_macro"].iloc[0])
+    to_print = f1_HF_vs_f1_all(selected_data)
 
-        for iRow in range(len(sub_df)) : 
-            new_df.append({
-                "model" : model,
-                "lr" : lr,
-                "epoch" : epoch,
-                "f1_HF" : f1_HF,
-                "f1_macro" : float(sub_df.iloc[iRow]["f1_macro"]),
-                "method" : str(sub_df.iloc[iRow]["method"]),
-                "n_samples" : str(sub_df.iloc[iRow]["n_samples"]),
-                "iteration" : int(sub_df.iloc[iRow]["iteration"]),
-            })
+    listOfModels = SUL_string(to_print["model"])
+    listOfMethods = SUL_string(to_print["method"])
+    nModels = len(listOfModels)
 
-    new_df = pd.DataFrame(new_df)
-    return px.scatter(new_df, x = "f1_HF", y = "f1_macro", color = "lr")
+    multiple_figures_layout(fig, nModels,listOfModels, 
+        xaxis_kwargs = {"range" : [0,1]}, xlabel_prefix="F1 Macro de MLPClassifier(HF)<br><br>")
 
+    # ÷px.scatter(new_df, x = "f1_HF", y = "f1_macro", color = "lr")
+    grouped = to_print.groupby(["model","method"])
+    for idx, model in enumerate(listOfModels): 
+        for method in listOfMethods : 
+            sub_df = grouped.get_group((model,method))
+            fig.add_trace(go.Scatter(
+                x = sub_df["f1_HF"],
+                y = sub_df["f1_macro"],
+                marker = {
+                    'color' : colors[method],
+                    'opacity' : 0.4,
+                    'symbol' : "circle"
+                },
+                mode = "markers",
+                xaxis = f"x{idx + 1}",
+                yaxis = "y",
+                name = method,
+                showlegend = (idx == 0)
+            ))
+    return fig
+
+def time_n_samples(df : pd.DataFrame) :
+    fig = Figure(layout = layout_general_parameters)
+
+    # Process Data
+    selected_data : pd.DataFrame = df.loc[:,["method", "time", "n_samples"]]
+    to_print = selected_data.drop(selected_data.loc[selected_data["method"] == "MLPClassifier (HF)",:].index)
+    
+    listOfMethods = SUL_string(to_print["method"])
+    nMethods = len(listOfMethods)
+
+    multiple_figures_layout(fig, nMethods,listOfMethods, 
+        xaxis_kwargs = {}, xlabel_prefix="Temps d'optimisation (s)<br><br>")
+    
+    fig.update_layout(yaxis_range = [0,300], yaxis_title_text = "Nombre d'occurences",
+                     barmode = 'stack', legend_title_text = "nSample :")
+    
+
+    grouped = to_print.groupby(["method"])
+    for idx, method in enumerate(listOfMethods): 
+        sub_df = grouped.get_group((method,))
+        _, bins = np.histogram(sub_df["time"])
+        for (n_samples,), sub_df_n_samples in sub_df.groupby(["n_samples"]):
+            y, _ = np.histogram(sub_df_n_samples["time"], bins = bins)
+            fig.add_trace(go.Bar(
+                x = bins, y = y, 
+                name = n_samples,
+                marker = {'color' : colors[n_samples],'cornerradius' : 5},
+                xaxis = f"x{idx+1}", yaxis = "y",
+                showlegend = (idx == 1) 
+            ))
+    return fig
+    
 
 def multiple_figures_layout(
         fig : Figure, 
