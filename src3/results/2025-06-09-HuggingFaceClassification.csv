@@ -1,0 +1,2 @@
+model,lr,epoch,f1_macro,filename,n_samples,iteration,time
+answerdotai/ModernBERT-base,1e-06,1,0.20833333333333334,./src3/319_models/2025-06-09-answerdotai/ModernBERT-base-1e-06-data,Entraînement Hugging Face,1,
