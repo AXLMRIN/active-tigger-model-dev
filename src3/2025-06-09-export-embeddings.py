@@ -106,16 +106,27 @@ def embed_all(foldername : str, dataset_folder : str, epoch : int) -> Tensor:
         gc.collect()
     return "Done"
 
-folder = "2025-06-09-google-bert/bert-base-uncased-1e-06"
-checkpoints = os.listdir(f"./{folder}/")
-checkpoints = sorted(checkpoints, key = lambda x : int(x.split("-")[-1]))
-print(checkpoints)
+root = "./src3/319_models/2025-06-09"
+model_name = "answerdotai/ModernBERT-base"
+learning_rate = "0.0001"
 
-# for i, checkpoint in enumerate():
-#     print(i + 1, "\t", checkpoint)
-#     _ = embed_all(
-#         f"./{folder}/{checkpoint}",
-#         f"./{folder}-data",
-#         i+1
-#     )
-#     print("")
+for learning_rate in ["0.0001", "1e-05", "5e-05", "1e-06"]:
+    print("=" * 100)
+    print(learning_rate)
+
+    path = f"{root}-{model_name}-{learning_rate}"
+    checkpoints = os.listdir(path)
+    checkpoints = sorted(checkpoints, key = lambda x : int(x.split("-")[-1]))
+
+    # Embed for untrained model
+    _ = embed_all(model_name,f"{path}-data",0)
+
+    # Embed for trained models
+    for i, checkpoint in enumerate(checkpoints):
+        print(i + 1, "\t", checkpoint)
+        _ = embed_all(
+            f"{path}/{checkpoint}",
+            f"{path}-data",
+            i + 1
+        )
+        print("")
