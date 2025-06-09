@@ -12,3 +12,4 @@ box/
 src3/316_models/
 src3/319_models/
 src3/results/interpretation_files/libs
+!src3/2025-06-09-testing_models.py
