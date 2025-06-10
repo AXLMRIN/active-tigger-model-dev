@@ -9,31 +9,36 @@ from toolbox import routine, cMapper, CustomLogger, routineNotOptmisied
 ################################################################################
 
 all_models = [
-    #"src3/2025-05-05-answerdotai/ModernBERT-base", # DONE
-    #"src3/2025-05-05-FacebookAI/roberta-base",  # DONE
-    #"src3/2025-05-05-google-bert/bert-base-uncased" # DONE
+    #"src3/316_models/2025-05-05-answerdotai/ModernBERT-base", # DONE
+    #"src3/316_models/2025-05-05-FacebookAI/roberta-base",  # DONE
+    #"src3/316_models/2025-05-05-google-bert/bert-base-uncased" # DONE
+    # "src3/319_models/2025-06-09-answerdotai/ModernBERT-base", # DONE
+    # "src3/319_models/2025-06-09-FacebookAI/roberta-base",  # DONE
+    # "src3/319_models/2025-06-09-google-bert/bert-base-uncased" # DONE
 ]
 
 all_lrs = [
+    "0.0001",
     "1e-05",
-    "2e-05", 
+    # "2e-05", 
     "5e-05", 
-    "5e-06"
+    # "5e-06",
+    "1e-06"
 ]
 
 # Logger
-logger = CustomLogger("src3/pers_logs/MLPOneLayer.txt")
+logger = CustomLogger("src3/pers_logs/2025-06-09-MLPOneLayer.txt")
 
 #Loop
 routineOneLayer, model, lr = (None,) * 3
 for model in all_models:
-    for lr in ["1e-05", "2e-05", "5e-05", "5e-06"]:
+    for lr in all_lrs:
             for attempt in range(3):
 
                 routineOneLayer = routineNotOptmisied(
                      folder_name = f"{model}-{lr}-data",
                      classifier = MLPClassifier,
-                     n_sample_range = [500,1000,1500, 2000],
+                     n_sample_range = [100, 200, 300],
                      epoch_range = [0,1,2,3,4,5],
                      classifier_parameters = {
                           "hidden_layer_sizes" : (),
@@ -45,7 +50,7 @@ for model in all_models:
                 )
 
                 routineOneLayer.run_all()
-                routineOneLayer.save_to_csv("src3/results/2025-05-18-MLPOneLayer-2.csv")
+                routineOneLayer.save_to_csv("src3/results/2025-06-09-MLPOneLayer.csv")
 
 CustomLogger().notify_when_done("The MLPOneLayer routine is finished")
 del routineOneLayer, model, all_models, lr, all_lrs, logger
@@ -55,16 +60,21 @@ del routineOneLayer, model, all_models, lr, all_lrs, logger
 ################################################################################
 
 all_models = [
-    # "src3/2025-05-05-answerdotai/ModernBERT-base", # DONE
-    #"src3/2025-05-05-FacebookAI/roberta-base", # DONE
-    #"src3/2025-05-05-google-bert/bert-base-uncased" # DONE
+    # "src3/316_models/2025-05-05-answerdotai/ModernBERT-base", # DONE
+    # "src3/316_models/2025-05-05-FacebookAI/roberta-base", # DONE
+    # "src3/316_models/2025-05-05-google-bert/bert-base-uncased" # DONE
+    # "src3/319_models/2025-06-09-answerdotai/ModernBERT-base", # DONE
+    # "src3/319_models/2025-06-09-FacebookAI/roberta-base", # DONE
+    # "src3/319_models/2025-06-09-google-bert/bert-base-uncased" # DONE
 ]
 
 all_lrs = [
+    "0.0001",
     "1e-05",
-    "2e-05", 
+    # "2e-05", 
     "5e-05", 
-    "5e-06"
+    # "5e-06",
+    "1e-06"
 ]
 
 # Build cMapper
@@ -84,14 +94,14 @@ mapper = cMapper(keys = ["n_estimators", "criterion","max_depth"],
 GA_p = {
     'num_genes' : 3,
     "gene_space" : [
-        {'low' : 10, 'high' : 1000, 'step' : 50},
+        {'low' : 10, 'high' : 1000, 'step' : 110},
         [0,1,2],
         [30, 60, 90]
     ]
 }
 
 # logger 
-logger = CustomLogger("src3/pers_logs/RoutineRandomForest.txt")
+logger = CustomLogger("src3/pers_logs/2025-06-09-RoutineRandomForest.txt")
 
 #Loop
 routineRandomForest, model, lr = (None,) * 3
@@ -102,7 +112,7 @@ for model in all_models:
             routineRandomForest = routine(
                 folder_name = f"{model}-{lr}-data",
                 classifier = RandomForestClassifier, 
-                n_sample_range = [500,1000,1500, 2000],
+                n_sample_range = [100, 200, 300],
                 epoch_range = [0,1,2,3,4,5],
                 GA_parameters = GA_p,
                 custom_mapping = mapper,
@@ -111,7 +121,7 @@ for model in all_models:
             )
 
             routineRandomForest.run_all()
-            routineRandomForest.save_to_csv("src3/results/2025-05-18-RandomForest-2.csv")
+            routineRandomForest.save_to_csv("src3/results/2025-06-09-RandomForest.csv")
 
 CustomLogger().notify_when_done("The RandomForest routine is finished")
 del routineRandomForest, model, all_models, lr, all_lrs, GA_p, mapper, logger
@@ -121,16 +131,21 @@ del routineRandomForest, model, all_models, lr, all_lrs, GA_p, mapper, logger
 ################################################################################
 
 all_models = [
-    # "src3/2025-05-05-answerdotai/ModernBERT-base", # DONE
-    # "src3/2025-05-05-FacebookAI/roberta-base",  # DONE
-    # "src3/2025-05-05-google-bert/bert-base-uncased" # DONE
+    # "src3/316_models/2025-05-05-answerdotai/ModernBERT-base", # DONE
+    # "src3/316_models/2025-05-05-FacebookAI/roberta-base",  # DONE
+    # "src3/316_models/2025-05-05-google-bert/bert-base-uncased" # DONE
+    # "src3/319_models/2025-06-09-answerdotai/ModernBERT-base", 
+    # "src3/319_models/2025-06-09-FacebookAI/roberta-base",
+    # "src3/319_models/2025-06-09-google-bert/bert-base-uncased"
 ]
 
 all_lrs = [
+    "0.0001",
     "1e-05",
-    "2e-05", 
+    # "2e-05", 
     "5e-05", 
-    "5e-06"
+    # "5e-06",
+    "1e-06"
 ]
 # Build cMapper
 def n_neighbors_mapper_function(value):
@@ -153,18 +168,18 @@ GA_p = {
 }
 
 # Logger
-logger = CustomLogger("src3/pers_logs/RoutineKNN.txt")
+logger = CustomLogger("src3/pers_logs/2025-06-09-RoutineKNN.txt")
 
 #Loop
 routineKNN, model, lr = (None,) * 3
 for model in all_models:
-    for lr in ["1e-05", "2e-05", "5e-05", "5e-06"]:
+    for lr in all_lrs:
             for attempt in range(3):
                 
                 routineKNN = routine(
                     folder_name = f"{model}-{lr}-data",
                     classifier = KNeighborsClassifier, 
-                    n_sample_range = [500,1000,1500, 2000],
+                    n_sample_range = [100, 200, 300],
                     epoch_range = [0,1,2,3,4,5],
                     GA_parameters = GA_p,
                     custom_mapping = mapper,
@@ -173,7 +188,7 @@ for model in all_models:
                 )
 
                 routineKNN.run_all()
-                routineKNN.save_to_csv("src3/results/2025-05-18-KNN-2.csv")
+                routineKNN.save_to_csv("src3/results/2025-06-09-KNN.csv")
 
 CustomLogger().notify_when_done("The KNN routine is finished")
 del routineKNN, model, all_models, lr, all_lrs, GA_p, mapper, logger
