@@ -37,11 +37,15 @@ colors = {
     'FacebookAI/roberta-base'       : "rgb(255,  85,   0)", 
     'google-bert/bert-base-uncased' : "rgb( 56,   0, 153)",
 
-    500                         : "rgb(144, 225, 239)",
-    1000                        : "rgb(  0, 180, 216)",
-    1500                        : "rgb(  2,  61, 138)",
-    2000                        : "rgb(  0,  53,  84)",
-    "Entraînement Hugging Face" : "rgb(144, 190, 109)", 
+    100                         : "rgb(144, 225, 239)",
+    200                         : "rgb( 72, 202, 228)",
+    300                         : "rgb(  0, 180, 216)",
+    400                         : "rgb(  0, 149, 199)",
+    500                         : "rgb(  0, 118, 182)",
+    1000                        : "rgb(  2,  61, 138)",
+    1500                        : "rgb(  3,   5,  94)",
+    2000                        : "rgb(  0,   0,   0)",
+    "Entraînement Hugging Face" : "rgb(255, 209, 102)", 
 
     "error" : "#000000",
     "marker" : "#6b705c",
@@ -147,53 +151,81 @@ def f1_macro_per_n_sample_and_method_Table(
 
     for (model,), sub_df in to_print.groupby(["model"]) : 
         print(model)
-        header = f"| {'nSample':>30}|{'500':^15}|{'1000':^15}|{'1500':^15}|{'2000':^15}|{'Baseline':>15}|"
-        subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|"
+        header = f"| {'nSample':>30}"
+        subHeader =f"| {'Method':<30}"
+
+        def int_or_str(string : str) -> float: 
+            try : return float(string)
+            except : return np.nan
+
+        n_samples_sorted = sorted(list(sub_df["n_samples"].unique()), key= int_or_str)
+
+        for n_sample in n_samples_sorted : 
+            subHeader +=  f"|{'':>15}"
+            try : 
+                header += f"|{'%.0f'%n_sample : ^15}" 
+            except : 
+                header += f"|{'Baseline' : ^15}" 
+
+        header += "|"
+        subHeader += "|"
+
         print("-" * len(header))
         print(header)
         print(subHeader)
         print("-" * len(header))
+        
         for (method,), sub_df_method in sub_df.groupby(["method"]):
 
             def collect_mean(n_samples_value) : 
                 return float(sub_df_method.loc[
                     sub_df_method["n_samples"] == n_samples_value,
                     "f1_macro_mean"
-                    ].item())
+                    ].sum())
             def collect_ci(n_samples_value) : 
                 return collect_mean(n_samples_value) - float(sub_df_method.loc[
                     sub_df_method["n_samples"] == n_samples_value,
                     "CI_f1_macro_lower"
-                    ].item())
+                    ].sum())
+            row = f"| {'%s'%method:>30}|"
+            for n_sample in n_samples_sorted : 
+                M, CI = (0.00, 0.00)
+                M = collect_mean(n_sample)
+                CI = collect_ci(n_sample)
+                if (M, CI) == (0.00, 0.00):
+                    row += f"{'':^15}|"
+                else : 
+                    row += f"{'%.3f ± %.3f'%(M, CI):^15}|"
+            print(row)
 
-            M500, M1000, M1500, M2000, CI500, CI1000, CI1500, CI2000 = (0.00,) * 8
-            MBaseLine, CIBaseLine = (0.00,) * 2
-            if method == "MLPClassifier (HF)":
-                MBaseLine  = collect_mean("Entraînement Hugging Face")
-                CIBaseLine =   collect_ci("Entraînement Hugging Face")
-                print((
-                    f"| {'%s'%method:>30}|"
-                    f"{'':^15}|"
-                    f"{'':^15}|"
-                    f"{'':^15}|"
-                    f"{'':^15}|"
-                    f"{'%.3f ± %.3f'%(MBaseLine, CIBaseLine):>15}|"
-                ))
-            else:
-                # print(sub_df_method)
-                M500  = collect_mean(500);  CI500  = collect_ci(500)
-                M1000 = collect_mean(1000); CI1000 = collect_ci(1000)
-                M1500 = collect_mean(1500); CI1500 = collect_ci(1500)
-                M2000 = collect_mean(2000); CI2000 = collect_ci(2000)
+        #     M500, M1000, M1500, M2000, CI500, CI1000, CI1500, CI2000 = (0.00,) * 8
+        #     MBaseLine, CIBaseLine = (0.00,) * 2
+        #     if method == "MLPClassifier (HF)":
+        #         MBaseLine  = collect_mean("Entraînement Hugging Face")
+        #         CIBaseLine =   collect_ci("Entraînement Hugging Face")
+        #         print((
+        #             f"| {'%s'%method:>30}|"
+        #             f"{'':^15}|"
+        #             f"{'':^15}|"
+        #             f"{'':^15}|"
+        #             f"{'':^15}|"
+        #             f"{'%.3f ± %.3f'%(MBaseLine, CIBaseLine):>15}|"
+        #         ))
+        #     else:
+        #         # print(sub_df_method)
+        #         M500  = collect_mean(500);  CI500  = collect_ci(500)
+        #         M1000 = collect_mean(1000); CI1000 = collect_ci(1000)
+        #         M1500 = collect_mean(1500); CI1500 = collect_ci(1500)
+        #         M2000 = collect_mean(2000); CI2000 = collect_ci(2000)
 
-                print((
-                    f"| {'%s'%method:>30}|"
-                    f"{'%.3f ± %.3f'%(M500, CI500):^15}|"
-                    f"{'%.3f ± %.3f'%(M1000, CI1000):^15}|"
-                    f"{'%.3f ± %.3f'%(M1500, CI1500):^15}|"
-                    f"{'%.3f ± %.3f'%(M2000, CI2000):^15}|"
-                    f"{'':>15}|"
-                ))
+        #         print((
+        #             f"| {'%s'%method:>30}|"
+        #             f"{'%.3f ± %.3f'%(M500, CI500):^15}|"
+        #             f"{'%.3f ± %.3f'%(M1000, CI1000):^15}|"
+        #             f"{'%.3f ± %.3f'%(M1500, CI1500):^15}|"
+        #             f"{'%.3f ± %.3f'%(M2000, CI2000):^15}|"
+        #             f"{'':>15}|"
+        #         ))
         print("-" * len(header))
 
 def f1_macro_lr_per_model_and_method(
@@ -261,6 +293,7 @@ def f1_macro_epoch_per_model_and_method_Table(
     # print table
     for (model,), sub_df in to_print.groupby(["model"]):
         print(model)
+
         header = f"| {'Epoch':>30}|{'0':^15}|{'1':^15}|{'2':^15}|{'3':^15}|{'4':^15}|{'5':^15}|{'Rapport':^15}|{'Rapport':^15}|"
         subHeader =f"| {'Method':<30}|{'':^15}|{'':^15}|{'':^15}|{'':^15}|{'':>15}|{'':>15}|{'fin / début':>15}|{'epoch 5 / 3':^15}|"
         print("-" * len(header))
@@ -355,7 +388,7 @@ def time_n_samples(df : pd.DataFrame) :
     multiple_figures_layout(fig, nMethods,listOfMethods, 
         xaxis_kwargs = {}, xlabel_prefix="Temps d'optimisation (s)<br><br>")
     
-    fig.update_layout(yaxis_range = [0,300], yaxis_title_text = "Nombre d'occurences",
+    fig.update_layout(yaxis_range = [0,850], yaxis_title_text = "Nombre d'occurences",
                      barmode = 'stack', legend_title_text = "nSample :")
     
 

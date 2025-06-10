@@ -7,10 +7,10 @@ import visualiseThis as vt
 
 data = vt.fetch_data(
     {
-        "Random Forest" : "2025-05-24-RandomForest-F.csv",
-        "KNN" : "2025-05-24-KNN-F.csv",
-        "MLPClassifier (slkearn)" : "2025-05-24-MLPOneLayer-F.csv",
-        "MLPClassifier (HF)" : "2025-05-24-HuggingFaceClassification-F.csv"
+        "Random Forest" : "2025-06-09-RandomForest-3.csv",
+        "KNN" : "2025-06-09-KNN-3.csv",
+        "MLPClassifier (slkearn)" : "2025-06-09-MLPOneLayer-3.csv",
+        "MLPClassifier (HF)" : "2025-06-09-HuggingFaceClassification-2.csv"
     },
     usecols = ["filename", "n_samples", "epoch", "f1_macro", "iteration", "time"]
 )
