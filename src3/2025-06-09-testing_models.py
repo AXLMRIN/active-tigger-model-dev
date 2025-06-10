@@ -61,9 +61,7 @@ for learning_rate in ["1e-06", "5e-05","1e-05", "0.0001"]:
                     logits.detach().cpu().numpy()
                 labels_true.extend([np.argmax(row).item() for row in batch["labels"]])
                 labels_pred.extend([np.argmax(row).item() for row in result])
-                break
-
-            # Evaluate the score
+                # FIXME Attention il y avait un break ici refaire les tests
             score = f1_score(labels_true, labels_pred, average='macro')
 
             # Save the score
