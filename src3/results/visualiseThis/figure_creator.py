@@ -69,9 +69,12 @@ dash_meilleurs_models = {
 def f1_macro_per_model_and_method(
         df : pd.DataFrame, 
         N : int|None = None,
-        onlyDisplayBestEpoch : bool = False) -> Figure:
+        onlyDisplayBestEpoch : bool = False,
+        title : str = ""
+        ) -> Figure:
     
     fig = Figure(layout = layout_general_parameters)
+    fig.update_layout(title_text = title)
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "n_samples", "f1_macro", "lr", "iteration", "epoch"]]
@@ -134,7 +137,8 @@ def f1_macro_per_model_and_method(
 def f1_macro_per_n_sample_and_method_Table(
         df : pd.DataFrame, 
         N : int|None = None,
-        onlyDisplayBestEpoch : bool = False) -> None:
+        onlyDisplayBestEpoch : bool = False
+        ) -> None:
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "n_samples", "f1_macro", "lr", "iteration", "epoch"]]
@@ -197,43 +201,17 @@ def f1_macro_per_n_sample_and_method_Table(
                 else : 
                     row += f"{'%.3f ± %.3f'%(M, CI):^15}|"
             print(row)
-
-        #     M500, M1000, M1500, M2000, CI500, CI1000, CI1500, CI2000 = (0.00,) * 8
-        #     MBaseLine, CIBaseLine = (0.00,) * 2
-        #     if method == "MLPClassifier (HF)":
-        #         MBaseLine  = collect_mean("Entraînement Hugging Face")
-        #         CIBaseLine =   collect_ci("Entraînement Hugging Face")
-        #         print((
-        #             f"| {'%s'%method:>30}|"
-        #             f"{'':^15}|"
-        #             f"{'':^15}|"
-        #             f"{'':^15}|"
-        #             f"{'':^15}|"
-        #             f"{'%.3f ± %.3f'%(MBaseLine, CIBaseLine):>15}|"
-        #         ))
-        #     else:
-        #         # print(sub_df_method)
-        #         M500  = collect_mean(500);  CI500  = collect_ci(500)
-        #         M1000 = collect_mean(1000); CI1000 = collect_ci(1000)
-        #         M1500 = collect_mean(1500); CI1500 = collect_ci(1500)
-        #         M2000 = collect_mean(2000); CI2000 = collect_ci(2000)
-
-        #         print((
-        #             f"| {'%s'%method:>30}|"
-        #             f"{'%.3f ± %.3f'%(M500, CI500):^15}|"
-        #             f"{'%.3f ± %.3f'%(M1000, CI1000):^15}|"
-        #             f"{'%.3f ± %.3f'%(M1500, CI1500):^15}|"
-        #             f"{'%.3f ± %.3f'%(M2000, CI2000):^15}|"
-        #             f"{'':>15}|"
-        #         ))
         print("-" * len(header))
 
 def f1_macro_lr_per_model_and_method(
         df : pd.DataFrame, 
         N : int|None = None,
-        onlyDisplayBestEpoch : bool = False) -> Figure:
+        onlyDisplayBestEpoch : bool = False, 
+        title : str = ""
+        ) -> Figure:
     
     fig = Figure(layout = layout_general_parameters)
+    fig.update_layout(title_text = title)
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "lr", "epoch", "n_samples", "iteration"]]
@@ -253,7 +231,7 @@ def f1_macro_lr_per_model_and_method(
     nModels = len(listOfModels)
 
     multiple_figures_layout(fig, nModels,listOfModels, 
-        xaxis_kwargs={'tickvals' : [5e-6, 1e-5,2e-5,5e-5], 'range' : [-5.4,-4.2],\
+        xaxis_kwargs={'tickvals' : [1e-6, 1e-5,5e-5,1e-4], 'range' : [-6.2,-3.8],\
                       'type' : "log"},
         xlabel_prefix = "Learning rate<br><br>")
 
@@ -339,9 +317,12 @@ def f1_macro_epoch_per_model_and_method_Table(
 
 def f1_macro_f1_hf_per_model_and_method(    
         df : pd.DataFrame, 
-        N : int|None = None) -> Figure:  
+        N : int|None = None,
+        title : str = ""
+        ) -> Figure:  
     
     fig = Figure(layout = layout_general_parameters)
+    fig.update_layout(title_text = title)
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["model", "method", "f1_macro", "iteration", "n_samples", "epoch", "lr"]]
@@ -375,8 +356,9 @@ def f1_macro_f1_hf_per_model_and_method(
             ))
     return fig
 
-def time_n_samples(df : pd.DataFrame) :
+def time_n_samples(df : pd.DataFrame, title : str = "") :
     fig = Figure(layout = layout_general_parameters)
+    fig.update_layout(title_text = title)
 
     # Process Data
     selected_data : pd.DataFrame = df.loc[:,["method", "time", "n_samples"]]
@@ -388,7 +370,7 @@ def time_n_samples(df : pd.DataFrame) :
     multiple_figures_layout(fig, nMethods,listOfMethods, 
         xaxis_kwargs = {}, xlabel_prefix="Temps d'optimisation (s)<br><br>")
     
-    fig.update_layout(yaxis_range = [0,850], yaxis_title_text = "Nombre d'occurences",
+    fig.update_layout(yaxis_range = [0,500], yaxis_title_text = "Nombre d'occurences",
                      barmode = 'stack', legend_title_text = "nSample :")
     
 
