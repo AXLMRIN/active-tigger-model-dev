@@ -14,3 +14,8 @@ def pretty_printing_dictionnary(d : dict) -> str:
 def shuffle_list(l : list) -> list:
     shuffle(l)
     return l
+
+def pretty_number(n : int, n_digits : int = 3) -> str :
+    out = "0" * n_digits
+    out += str(n)
+    return out[-n_digits:]
