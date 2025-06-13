@@ -1,11 +1,12 @@
 # IMPORTS ######################################################################
 import pandas as pd
-from ..general import IdentityFunction, pretty_printing_dictionnary, shuffle_list
+from ..general import pretty_printing_dictionnary, shuffle_list
 from datasets import Dataset, DatasetDict
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from pandas.api.typing import DataFrameGroupBy
 from typing import Any
-
+from .. import ROOT_DATA
+from transformers.tokenization_utils_base import BatchEncoding
 # SCRIPTS ######################################################################
 class DataHandler : 
     """
@@ -21,7 +22,7 @@ class DataHandler :
         # Variables that will be define later
         (self.__df, self.len, self.columns, self.id2label, self.label2id, 
         self.n_labels, self.n_entries_per_label, self.N_train, self.N_eval, 
-        self.N_test, self.__ds ) = (None, ) * 11
+        self.N_test, self.__ds, self.__ds_encoded) = (None, ) * 12
         
         # Status
         self.status : dict[str:bool] = {
@@ -60,7 +61,7 @@ class DataHandler :
             self.__text_column : "TEXT",
             self.__label_column : "LABEL"
         }
-        self.__df : pd.DataFrame = pd.read_csv(self.__filename).\
+        self.__df : pd.DataFrame = pd.read_csv(f"{ROOT_DATA}/{self.__filename}").\
             rename(replace_columns, axis = 1).\
             loc[:, ["TEXT", "LABEL", *extra_columns_to_keep]].\
             sample(frac = 1) # Shuffle
@@ -132,6 +133,37 @@ class DataHandler :
         })
 
         self.status["split"] = True
+    
+    def encode(self, tokenizer, tokenizing_parameters : dict) :
+        """
+        """
+        self.__ds_encoded = DatasetDict()
+        for ds_name in ["train","eval", "test"] : 
+            ds_encoded_ds_name : dict[list[str|int]] = {
+                "INPUT_IDS" : [],
+                "ATTENTION_MASK" : [],
+                "LABELS" : []
+            }
+            for batch_of_rows in self.__ds[ds_name].batch(64) :
+                # row : {'text' : list[str], 'label' : list[str]} 
+                tokens : BatchEncoding = tokenizer(
+                    batch_of_rows["TEXT"], **tokenizing_parameters)
+                
+                ds_encoded_ds_name["INPUT_IDS"].extend(tokens.input_ids)
+                ds_encoded_ds_name["ATTENTION_MASK"].extend(tokens.attention_mask)
+
+                ds_encoded_ds_name["LABELS"].extend(
+                    self.make_labels_matrix(batch_of_rows["LABEL"]))
+
+            self.__ds_encoded[ds_name] = Dataset.from_dict(ds_encoded_ds_name)
+    
+    def make_labels_matrix(self, labels) -> list[list[float]]:
+        """
+        """
+        return [
+            [float(id == self.label2id[label]) for id in range(self.n_labels)]
+            for label in labels
+        ]
 
     def routine(self, 
         preprocess_function : Callable[[str], str]|None = None,
@@ -144,3 +176,6 @@ class DataHandler :
         self.preprocess(preprocess_function)
         self.split(ratio_train, ratio_eval, stratify_columns)
 
+    def debug(self):
+        #TODELETE
+        return self.__ds
