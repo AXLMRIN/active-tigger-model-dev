@@ -128,7 +128,7 @@ class CustomTransformersPipeline:
                 to(device = self.device)
             
             # update the max_length 
-            self.tokenizing_parameters["max_lenght"] = min(
+            self.tokenizing_parameters["max_length"] = min(
                 self.tokenizing_parameters["max_length"],
                 self.model.config.max_position_embeddings
             )
@@ -139,8 +139,8 @@ class CustomTransformersPipeline:
         trainer = Trainer(
             model = self.model,
             args = self.training_args,
-            train_dataset = self.encoded_dataset["train"],
-            eval_dataset = self.encoded_dataset["eval"],
+            train_dataset = self.__data.get_encoded_dataset("train"),
+            eval_dataset = self.__data.get_encoded_dataset("eval"),
             compute_metrics = compute_metrics
         )
         return trainer.train()
@@ -155,6 +155,7 @@ class CustomTransformersPipeline:
     def clean(self):
         del self.model, self.tokenizer
         empty_cache()
-        synchronize()
-        ipc_collect()
+        if cuda_available():
+            synchronize()
+            ipc_collect()
         gc_collect()
