@@ -15,6 +15,8 @@ from pandas import Timestamp
 import os
 from .. import ROOT_MODELS
 from ..general import pretty_number, pretty_printing_dictionnary
+from gc import collect as gc_collect
+from torch.cuda import empty_cache, synchronize, ipc_collect
 # SCRIPTS ######################################################################
 
 class CustomTransformersPipeline:
@@ -149,3 +151,10 @@ class CustomTransformersPipeline:
         if debug_mode : 
             self.__data.debug_mode()
         return self.train()
+    
+    def clean(self):
+        del self.model, self.tokenizer
+        empty_cache()
+        synchronize()
+        ipc_collect()
+        gc_collect()
