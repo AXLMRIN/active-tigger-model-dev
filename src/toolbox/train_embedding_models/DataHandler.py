@@ -184,13 +184,13 @@ class DataHandler :
         if os.path.exists(f"{foldername}/data") : 
             os.remove(f"{foldername}/data")
         os.mkdir(f"{foldername}/data")
-        with open(f"{foldername}/data/DataHandler_config.json", "w") as file:
+        with open(f"{foldername}/data/DataHandler_config.json", "w", encoding='utf-8') as file:
             config = {
                 "id2label" : self.id2label,
                 "label2id" : self.label2id
             }
-            json.dump(config, file)
-        
+            json.dump(config, file, ensure_ascii=False, indent=4)
+
         # Save the dataset
         self.__ds.save_to_disk(f"{foldername}/data")
 
