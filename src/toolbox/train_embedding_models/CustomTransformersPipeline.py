@@ -14,7 +14,7 @@ from .functions import compute_metrics
 from pandas import Timestamp
 import os
 from .. import ROOT_MODELS
-from ..general import pretty_number
+from ..general import pretty_number, pretty_printing_dictionnary
 # SCRIPTS ######################################################################
 
 class CustomTransformersPipeline:
@@ -97,6 +97,20 @@ class CustomTransformersPipeline:
             "loaded" : False,
             "trained" : False
         }
+    def __str__(self) -> str :
+        out = (
+            f"---------------------------\n"
+            f"CustomTransformersPipeline, {self.model_name}\n"
+            f"---------------------------\n"
+            f"{pretty_printing_dictionnary(self.status)}\n"
+            f"Main parameters :\n"
+            f"\t- Learning rate : {self.training_args.learning_rate}\n"
+            f"\t- Weight Decay : {self.training_args.weight_decay}\n"
+            f"\t- Warmup Ratio : {self.training_args.warmup_ratio}\n"
+            f"\t- Optimizer : {self.training_args.optim}\n"
+            f"\t- Output Directory : {self.training_args.output_dir}\n"
+        )
+        return out
 
     def load_tokenizer_and_model(self, skip_model : bool = False):
         # Load tokenizer and model
@@ -129,6 +143,9 @@ class CustomTransformersPipeline:
         )
         return trainer.train()
     
-    def routine(self):
+    def routine(self, debug_mode : bool = False):
         self.load_tokenizer_and_model()
+        self.__data.encode(self.tokenizer, self.tokenizing_parameters)
+        if debug_mode : 
+            self.__data.debug_mode()
         return self.train()
