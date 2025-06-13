@@ -1,4 +1,5 @@
 # IMPORTS ######################################################################
+import json
 import pandas as pd
 from ..general import pretty_printing_dictionnary, shuffle_list
 from datasets import Dataset, DatasetDict
@@ -6,7 +7,7 @@ from collections.abc import Callable
 from pandas.api.typing import DataFrameGroupBy
 from typing import Any
 from .. import ROOT_DATA
-from transformers.tokenization_utils_base import BatchEncoding
+# from transformers.tokenization_utils_base import BatchEncoding
 # SCRIPTS ######################################################################
 class DataHandler : 
     """
@@ -22,7 +23,7 @@ class DataHandler :
         # Variables that will be define later
         (self.__df, self.len, self.columns, self.id2label, self.label2id, 
         self.n_labels, self.n_entries_per_label, self.N_train, self.N_eval, 
-        self.N_test, self.__ds, self.__ds_encoded) = (None, ) * 12
+        self.N_test, self.__ds) = (None, ) * 11
         
         # Status
         self.status : dict[str:bool] = {
@@ -139,37 +140,32 @@ class DataHandler :
     def encode(self, tokenizer, tokenizing_parameters : dict) :
         """
         """
-        self.__ds_encoded = DatasetDict()
+        
         for ds_name in ["train","eval", "test"] : 
-            ds_encoded_ds_name : dict[list[str|int]] = {
-                "INPUT_IDS" : [],
-                "ATTENTION_MASK" : [],
-                "LABELS" : []
-            }
+            input_ids_list : list[list[int]] = []
+            attention_mask_list : list[list[bool]] = []
+            labels_list : list[list[bool]] = []
             for batch_of_rows in self.__ds[ds_name].batch(64) :
                 # row : {'text' : list[str], 'label' : list[str]} 
-                tokens : BatchEncoding = tokenizer(
+                tokens = tokenizer(
                     batch_of_rows["TEXT"], **tokenizing_parameters)
                 
-                ds_encoded_ds_name["INPUT_IDS"].extend(tokens.input_ids)
-                ds_encoded_ds_name["ATTENTION_MASK"].extend(tokens.attention_mask)
+                input_ids_list.extend(tokens.input_ids)
+                attention_mask_list.extend(tokens.attention_mask)
+                labels_list.extend(self.make_labels_matrix(batch_of_rows["LABEL"]))
 
-                ds_encoded_ds_name["LABELS"].extend(
-                    self.make_labels_matrix(batch_of_rows["LABEL"]))
-
-            self.__ds_encoded[ds_name] = Dataset.from_dict(ds_encoded_ds_name)
+            self.__ds[ds_name] = self.__ds[ds_name].add_column("input_ids", input_ids_list)
+            self.__ds[ds_name] = self.__ds[ds_name].add_column("attention_mask", attention_mask_list)
+            self.__ds[ds_name] = self.__ds[ds_name].add_column("labels", labels_list)
         
         self.status["encoded"] = True
     
     def debug_mode(self):
-        if self.__ds_encoded is None: 
-            print("the dataset is not yet encoded")
-        else : 
-            # Debug
-            self.__ds_encoded["train"] = \
-                self.__ds_encoded["train"].select(range(20))
-            self.__ds_encoded["eval"] = \
-                self.__ds_encoded["eval"].select(range(20))
+        # Debug
+        self.__ds["train"] = \
+            self.__ds["train"].select(range(20))
+        self.__ds["eval"] = \
+            self.__ds["eval"].select(range(20))
 
     def make_labels_matrix(self, labels) -> list[list[float]]:
         """
@@ -180,7 +176,17 @@ class DataHandler :
         ]
     
     def get_encoded_dataset(self, ds_name : str) -> Dataset :
-        return self.__ds_encoded[ds_name] 
+        return self.__ds[ds_name] 
+
+    def save_all(self, foldername : str) -> None:
+        # Save the config
+        with open(f"{foldername}/DataHandler_config.json", "w") as file:
+            config = {
+
+            }
+            json.dump(config, file)
+        
+        # Save the encoded_dataframe
 
     def routine(self, 
         preprocess_function : Callable[[str], str]|None = None,
@@ -192,3 +198,6 @@ class DataHandler :
         self.open_data()
         self.preprocess(preprocess_function)
         self.split(ratio_train, ratio_eval, stratify_columns)
+    
+    def debug(self):#TODELETE
+        return self.__ds
