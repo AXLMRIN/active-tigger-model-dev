@@ -63,8 +63,8 @@ class CustomTransformersPipeline:
                     os.listdir(output_dir)
                 )
             else : 
-                n_elements_in_output_dirs : int = 1
-            output_dir  += f"{pretty_number(n_elements_in_output_dirs)}"
+                n_elements_in_output_dirs : int = 0
+            output_dir  += f"{pretty_number(n_elements_in_output_dirs + 1)}"
 
         self.training_args = TrainingArguments(
             # bf16=True, # NOTE investigate
