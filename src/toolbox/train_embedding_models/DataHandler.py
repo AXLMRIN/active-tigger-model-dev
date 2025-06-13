@@ -180,13 +180,15 @@ class DataHandler :
 
     def save_all(self, foldername : str) -> None:
         # Save the config
-        with open(f"{foldername}/DataHandler_config.json", "w") as file:
+        with open(f"{foldername}/data/DataHandler_config.json", "w") as file:
             config = {
-
+                "id2label" : self.id2label,
+                "label2id" : self.label2id
             }
             json.dump(config, file)
         
-        # Save the encoded_dataframe
+        # Save the dataset
+        self.__ds.save_to_disk(f"{foldername}/data")
 
     def routine(self, 
         preprocess_function : Callable[[str], str]|None = None,
