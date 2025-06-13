@@ -178,6 +178,9 @@ class DataHandler :
             [float(id == self.label2id[label]) for id in range(self.n_labels)]
             for label in labels
         ]
+    
+    def get_encoded_dataset(self, ds_name : str) -> Dataset :
+        return self.__ds_encoded[ds_name] 
 
     def routine(self, 
         preprocess_function : Callable[[str], str]|None = None,
