@@ -150,7 +150,10 @@ class CustomTransformersPipeline:
         self.__data.encode(self.tokenizer, self.tokenizing_parameters)
         if debug_mode : 
             self.__data.debug_mode()
-        return self.train()
+        output = self.train()
+        self.__data.save_all(self.training_args.output_dir)
+        self.clean()
+        return output
     
     def clean(self):
         del self.model, self.tokenizer
