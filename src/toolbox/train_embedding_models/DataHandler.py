@@ -28,7 +28,8 @@ class DataHandler :
         self.status : dict[str:bool] = {
             'open' : False,
             'preprocess' : False,
-            'split' : False
+            'split' : False,
+            "encoded" : False
         }
     
     def __str__(self) -> str:
@@ -156,7 +157,19 @@ class DataHandler :
                     self.make_labels_matrix(batch_of_rows["LABEL"]))
 
             self.__ds_encoded[ds_name] = Dataset.from_dict(ds_encoded_ds_name)
+        
+        self.status["encoded"] = True
     
+    def debug_mode(self):
+        if self.__ds_encoded is None: 
+            print("the dataset is not yet encoded")
+        else : 
+            # Debug
+            self.__ds_encoded["train"] = \
+                self.__ds_encoded["train"].select(range(20))
+            self.__ds_encoded["eval"] = \
+                self.__ds_encoded["eval"].select(range(20))
+
     def make_labels_matrix(self, labels) -> list[list[float]]:
         """
         """
