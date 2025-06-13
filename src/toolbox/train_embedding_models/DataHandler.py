@@ -7,6 +7,7 @@ from collections.abc import Callable
 from pandas.api.typing import DataFrameGroupBy
 from typing import Any
 from .. import ROOT_DATA
+import os
 # from transformers.tokenization_utils_base import BatchEncoding
 # SCRIPTS ######################################################################
 class DataHandler : 
@@ -180,6 +181,9 @@ class DataHandler :
 
     def save_all(self, foldername : str) -> None:
         # Save the config
+        if os.path.exists(f"{foldername}/data") : 
+            os.remove(f"{foldername}/data")
+        os.mkdir(f"{foldername}/data")
         with open(f"{foldername}/data/DataHandler_config.json", "w") as file:
             config = {
                 "id2label" : self.id2label,
