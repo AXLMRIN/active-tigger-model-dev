@@ -34,14 +34,15 @@ class DataHandler :
     
     def __str__(self) -> str:
         return_string : str = (
+            f"------------\n"
             f"DataHandler, {self.__filename}\n"
+            f"------------\n"
             f"Status : {pretty_printing_dictionnary(self.status)}\n"
         )
         if self.status["open"] : 
             return_string += (
                 "\n"
-                f"Columns : {self.columns}\n"
-                f"Size : {self.len}\n"
+                f"DF : ({self.len} x {self.columns})\n"
                 f"{self.n_labels} labels ({list(self.label2id.keys())})\n"
                 f"Number of element per label : \n"
                 f"{pretty_printing_dictionnary(self.n_entries_per_label)}"
@@ -188,7 +189,3 @@ class DataHandler :
         self.open_data()
         self.preprocess(preprocess_function)
         self.split(ratio_train, ratio_eval, stratify_columns)
-
-    def debug(self):
-        #TODELETE
-        return self.__ds
