@@ -1,5 +1,6 @@
 ROOT_MODELS = "./models"
 ROOT_DATA = "./data"
+ROOT_RESULTS = "./results"
 
 from .train_embedding_models import *
 from .test_embedding_models import *
