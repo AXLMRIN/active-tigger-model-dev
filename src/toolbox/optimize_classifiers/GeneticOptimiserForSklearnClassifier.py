@@ -50,6 +50,11 @@ class GeneticOptimiserForSklearnClassifier :
             GA_param
         )
     
+    def __parameter_value_binder(self,idx, value : Any) -> dict[ind:Any] :
+        parameter_name : str = self.__parameters_mapper.keys()[idx]
+        function_to_apply = self.__parameters_mapper.values()[idx]
+        return {parameter_name : function_to_apply(value)}
+
     def fitness_func(self, GAI, SOL, SOLIDX) -> float :
         """
         """
