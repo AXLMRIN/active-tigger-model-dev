@@ -4,6 +4,7 @@ import pygad
 from time import time
 from mergedeep import merge
 import numpy as np
+from typing import Any
 from .DataHandlerForGeneticOptimiserForSklearnClassifier import DataHandlerForGeneticOptimiserForSklearnClassifier
 # CONSTANTS ####################################################################
 DEFAULT_GA_PARAMETERS : dict = {
@@ -28,26 +29,29 @@ class GeneticOptimiserForSklearnClassifier :
     def __init__(self, 
         data : DataHandlerForGeneticOptimiserForSklearnClassifier,
         classifier, 
-        GA_param : dict = {}, 
-        parameters_mapper = None) -> None: # FIXME parameters_mapper
+        parameters_mapper : dict,
+        gene_space : dict,
+        extra_GA_parameters : dict = {}) -> None: 
         """
         """
         self.__data = data
         self.__classifier = classifier
         self.__parameters_mapper = parameters_mapper
+        self.__num_genes = gene_space["num_genes"]
 
         # GA parameters
         deduced_parameters = {
             'fitness_func' : self.fitness_function,
-            'sol_per_pop' : int(4 * self.__parameters_mapper.n_parameters),
-            'keep_elitism' : int(max(0.5 * 0.5 * 4 * parameters_mapper.n_parameters, 2)),
-            'num_parents_mating' : int(max(0.2 * 4 * parameters_mapper.n_parameters, 1))
+            'sol_per_pop' : int(4 * self.__num_genes),
+            'keep_elitism' : int(max(0.5 * 0.5 * 4 * self.__num_genes, 2)),
+            'num_parents_mating' : int(max(0.2 * 4 * self.__num_genes, 1))
         }
 
         self.GA_instance_parameters = merge(
             DEFAULT_GA_PARAMETERS, 
             deduced_parameters,
-            GA_param
+            gene_space,
+            extra_GA_parameters
         )
     
     def __parameter_value_binder(self,idx, value : Any) -> dict[int:Any] :
