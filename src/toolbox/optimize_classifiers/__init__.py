@@ -1,1 +1,2 @@
+from .DataHandlerForGeneticOptimiserForSklearnClassifier import DataHandlerForGeneticOptimiserForSklearnClassifier
 from .GeneticOptimiserForSklearnClassifier import GeneticOptimiserForSklearnClassifier
