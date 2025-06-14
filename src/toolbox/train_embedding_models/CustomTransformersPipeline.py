@@ -150,5 +150,4 @@ class CustomTransformersPipeline:
             self.__data.debug_mode()
         output = self.train()
         self.__data.save_all(self.training_args.output_dir)
-        self.clean()
         return output
