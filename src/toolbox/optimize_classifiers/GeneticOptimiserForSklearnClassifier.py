@@ -4,6 +4,7 @@ import pygad
 from time import time
 from mergedeep import merge
 import numpy as np
+from .DataHandlerForGeneticOptimiserForSklearnClassifier import DataHandlerForGeneticOptimiserForSklearnClassifier
 # CONSTANTS ####################################################################
 DEFAULT_GA_PARAMETERS : dict = {
     #Must Specify
@@ -25,7 +26,7 @@ class GeneticOptimiserForSklearnClassifier :
     """
     """
     def __init__(self, 
-        data, #FIXME
+        data : DataHandlerForGeneticOptimiserForSklearnClassifier,
         classifier, 
         GA_param : dict = {}, 
         parameters_mapper = None) -> None: # FIXME parameters_mapper
