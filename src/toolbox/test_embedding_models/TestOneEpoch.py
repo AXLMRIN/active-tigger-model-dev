@@ -5,8 +5,6 @@ from torch import Tensor, load
 from sklearn.metrics import f1_score
 import numpy as np
 from torch.cuda import is_available as cuda_available
-import os
-import json
 from ..general import checkpoint_to_load
 # SCRIPTS ######################################################################
 class TestOneEpoch: 
