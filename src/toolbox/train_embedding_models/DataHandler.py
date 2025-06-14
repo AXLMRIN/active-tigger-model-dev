@@ -162,11 +162,14 @@ class DataHandler :
         self.status["encoded"] = True
     
     def debug_mode(self):
-        # Debug
+        """
+        """
         self.__ds["train"] = \
             self.__ds["train"].select(range(20))
         self.__ds["eval"] = \
             self.__ds["eval"].select(range(20))
+        self.__ds["test"] = \
+            self.__ds["test"].select(range(20))
 
     def make_labels_matrix(self, labels) -> list[list[float]]:
         """
