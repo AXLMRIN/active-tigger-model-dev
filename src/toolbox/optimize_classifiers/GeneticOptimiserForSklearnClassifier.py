@@ -1,0 +1,75 @@
+# IMPORTS ######################################################################
+from sklearn.metrics import f1_score
+import pygad
+from time import time
+from mergedeep import merge
+import numpy as np
+# CONSTANTS ####################################################################
+DEFAULT_GA_PARAMETERS : dict = {
+    #Must Specify
+    'num_generations' : 50,
+    
+    "stop_criteria" : "saturate_5",
+    "parallel_processing" : 5, 
+    
+    # Default
+    'mutation_type' : "random",
+    'parent_selection_type' : "sss",
+    'crossover_type' : "single_point",
+    'mutation_percent_genes' : 50,
+    # Other
+    'save_solutions' : False,
+}
+# SCRIPTS ######################################################################
+class GeneticOptimiserForSklearnClassifier :
+    """
+    """
+    def __init__(self, 
+        data, #FIXME
+        classifier, 
+        GA_param : dict = {}, 
+        parameters_mapper = None) -> None: # FIXME parameters_mapper
+        """
+        """
+        self.__data = data
+        self.__classifier = classifier
+        self.__parameters_mapper = parameters_mapper
+
+        # GA parameters
+        deduced_parameters = {
+            'fitness_func' : self.fitness_function,
+            'sol_per_pop' : int(4 * self.__parameters_mapper.n_parameters),
+            'keep_elitism' : int(max(0.5 * 0.5 * 4 * parameters_mapper.n_parameters, 2)),
+            'num_parents_mating' : int(max(0.2 * 4 * parameters_mapper.n_parameters, 1))
+        }
+
+        self.GA_instance_parameters = merge(
+            DEFAULT_GA_PARAMETERS, 
+            deduced_parameters,
+            GA_param
+        )
+    
+    def fitness_func(self, GAI, SOL, SOLIDX) -> float :
+        """
+        """
+        # TODO MAke it with cMAPPER 
+        params = {}
+        for idx,value in enumerate(SOL):
+            params = {**params, **self.param_mapping(idx, value)}
+        clf = self.classifier(**params)
+        clf.fit(self.__data.X_train, self.__data.y_train)
+
+        y_pred : np.ndarray = clf.predict(self.d.X_test)
+        y_true : np.ndarray = self.__data.y_test
+        return f1_score(y_true, y_pred, average='macro')
+    
+    def run(self) -> tuple[float,float,float,int]:
+        """
+        """
+        t1 = time()
+        instance = pygad.GA(**self.GA_parameters)
+        instance.run()
+        t2 = time()
+        optimum, value, _ = instance.best_solution()
+        number_of_completed_generations : int = instance.generations_completed
+        return optimum, value, t2-t1, number_of_completed_generations
