@@ -57,13 +57,18 @@ class GeneticOptimiserForSklearnClassifier :
         function_to_apply = self.__parameters_mapper.values()[idx]
         return {parameter_name : function_to_apply(value)}
 
-    def fitness_func(self, GAI, SOL, SOLIDX) -> float :
+    def __make_parameters_out_of_SOL(self, SOL : np.ndarray) -> dict[str:Any] :
         """
-        """
-        # TODO MAke it with cMAPPER 
+        """ 
         params = {}
         for idx, value in enumerate(SOL):
             params = merge(params, self.__parameter_value_binder(idx,value))
+        return params
+    
+    def fitness_func(self, GAI, SOL : np.ndarray, SOLIDX) -> float :
+        """
+        """
+        params = self.__make_parameters_out_of_SOL(SOL)
         clf = self.__classifier(**params)
         clf.fit(self.__data.X_train, self.__data.y_train)
 
