@@ -4,7 +4,7 @@ from .TestOneEpoch import TestOneEpoch
 import pandas as pd
 from .. import ROOT_RESULTS
 # SCRIPTS ######################################################################
-class TestAllEpocs:
+class TestAllEpochs:
     """
     """
     def __init__(self, foldername) -> None:
@@ -13,7 +13,7 @@ class TestAllEpocs:
         self.__foldername : str = foldername
         self.__n_epochs : int = len(
             [f for f in os.listdir(foldername) if f.startswith("checkpoint")])
-        self.__results : list[dict]
+        self.__results : list[dict] = []
 
     def run_tests(self, device : str|None = None, additional_tags : dict = {}):
         """
