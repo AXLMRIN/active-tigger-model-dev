@@ -13,12 +13,12 @@ class ExportEmbeddingsForAllEpochs:
             [f for f in os.listdir(foldername) if f.startswith("checkpoint")])
         self.__results : list[dict] = []
 
-        def export_all(self, device : str|None = None):
-            """
-            """
-            for epoch in range(self.__n_epochs) : 
-                ExportEmbeddingsForOneEpoch(self.__foldername, epoch, device).\
-                    routine()
-        
-        def routine(self, device : str|None = None) -> None: 
-            self.export_all(device)
+    def export_all(self, device : str|None = None):
+        """
+        """
+        for epoch in range(self.__n_epochs) : 
+            ExportEmbeddingsForOneEpoch(self.__foldername, epoch, device).\
+                routine()
+    
+    def routine(self, device : str|None = None) -> None: 
+        self.export_all(device)
