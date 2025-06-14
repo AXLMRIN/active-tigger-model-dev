@@ -5,6 +5,7 @@ from numpy.random import shuffle
 from gc import collect as gc_collect
 from torch.cuda import empty_cache, synchronize, ipc_collect
 from torch.cuda import is_available as cuda_available
+import os
 # SCRIPTS ######################################################################
 def IdentityFunction(x : Any) -> Any: 
     return x
@@ -27,3 +28,10 @@ def clean():
         synchronize()
         ipc_collect()
     gc_collect()
+
+def checkpoint_to_load(foldername : str, epoch : int) : 
+    all_checkpoints : list[str] = [folder 
+        for folder in os.listdir(foldername) if folder.startswith("checkpoint")]
+    sorted_checkpoints : list[str] = sorted(all_checkpoints, 
+        key = lambda file : int(file.split('-')[-1]))
+    return sorted_checkpoints[epoch - 1]
