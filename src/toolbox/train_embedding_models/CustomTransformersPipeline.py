@@ -1,4 +1,3 @@
-#NOTE date =  Timestamp.today().strftime("%Y-%M-%D")
 # IMPORTS ######################################################################
 from .DataHandler import DataHandler
 from torch.cuda import is_available as cuda_available
