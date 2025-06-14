@@ -62,9 +62,9 @@ class GeneticOptimiserForSklearnClassifier :
         """
         # TODO MAke it with cMAPPER 
         params = {}
-        for idx,value in enumerate(SOL):
-            params = {**params, **self.param_mapping(idx, value)}
-        clf = self.classifier(**params)
+        for idx, value in enumerate(SOL):
+            params = merge(params, self.__parameter_value_binder(idx,value))
+        clf = self.__classifier(**params)
         clf.fit(self.__data.X_train, self.__data.y_train)
 
         y_pred : np.ndarray = clf.predict(self.d.X_test)
