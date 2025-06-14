@@ -2,7 +2,7 @@
 import json
 import pandas as pd
 from ..general import pretty_printing_dictionnary, shuffle_list
-from datasets import Dataset, DatasetDict
+from datasets import Dataset, DatasetDict, load_from_disk
 from collections.abc import Callable
 from pandas.api.typing import DataFrameGroupBy
 from typing import Any
@@ -184,12 +184,18 @@ class DataHandler :
         if os.path.exists(f"{foldername}/data") : 
             os.remove(f"{foldername}/data")
         os.mkdir(f"{foldername}/data")
-        with open(f"{foldername}/data/DataHandler_config.json", "w", encoding='utf-8') as file:
+        with open(f"{foldername}/data/DataHandler_config.json", "w") as file:
             config = {
-                "id2label" : self.id2label,
-                "label2id" : self.label2id
+                "date" : pd.Timestamp.today().strftime("%Y-%m-%d"), # FIXME '2025-31-06/14/25'
+                "label2id" : self.label2id, 
+                "status" : self.status, 
+                "filename" : self.__filename,
+                "text_column" : self.__text_column,
+                "label_column" : self.__label_column, 
+                "len" : self.len,
+                "columns" : self.columns
             }
-            json.dump(config, file, ensure_ascii=False, indent=4)
+            json.dump(config, file, ensure_ascii=True, indent=4)
 
         # Save the dataset
         self.__ds.save_to_disk(f"{foldername}/data")
