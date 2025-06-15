@@ -67,7 +67,7 @@ class TestOneEpoch:
         """
         return {
             "folder" : self.__foldername,
-            "epoch" : self.__epoch,
+            "epoch" : int(self.__epoch) + 1,
             "score" : self.__score, 
             "measure" : self.__measure, 
             "learning_rate" : self.__training_args.learning_rate,
