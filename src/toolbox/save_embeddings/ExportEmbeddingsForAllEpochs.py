@@ -16,7 +16,7 @@ class ExportEmbeddingsForAllEpochs:
     def export_all(self, device : str|None = None):
         """
         """
-        for epoch in range(self.__n_epochs) : 
+        for epoch in range(1, self.__n_epochs + 1) :
             ExportEmbeddingsForOneEpoch(self.__foldername, epoch, device).\
                 routine()
     
