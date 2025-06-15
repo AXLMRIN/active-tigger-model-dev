@@ -1,2 +1,3 @@
-from .DataHandlerForGeneticOptimiserForSklearnClassifier import DataHandlerForGeneticOptimiserForSklearnClassifier
+from .DataHandlerForGOfSC import DataHandlerForGOfSC
 from .GeneticOptimiserForSklearnClassifier import GeneticOptimiserForSklearnClassifier
+from .RoutineGOfSC import RoutineGOfSC

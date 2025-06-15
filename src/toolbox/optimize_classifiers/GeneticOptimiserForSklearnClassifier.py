@@ -5,7 +5,7 @@ from time import time
 from mergedeep import merge
 import numpy as np
 from typing import Any
-from .DataHandlerForGeneticOptimiserForSklearnClassifier import DataHandlerForGeneticOptimiserForSklearnClassifier
+from .DataHandlerForGOfSC import DataHandlerForGOfSC
 # CONSTANTS ####################################################################
 DEFAULT_GA_PARAMETERS : dict = {
     #Must Specify
@@ -27,7 +27,7 @@ class GeneticOptimiserForSklearnClassifier :
     """
     """
     def __init__(self, 
-        data : DataHandlerForGeneticOptimiserForSklearnClassifier,
+        data : DataHandlerForGOfSC,
         classifier, 
         parameters_mapper : dict,
         gene_space : dict,
