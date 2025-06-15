@@ -5,7 +5,7 @@ from torch import load
 from sklearn.utils import resample
 from .. import ROOT_MODELS
 # SCRIPTS ######################################################################
-class DataHandlerForGeneticOptimiserForSklearnClassifier:
+class DataHandlerForGOfSC:
     """
     """
     def __init__(self, foldername) -> None:
