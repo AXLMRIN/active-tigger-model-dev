@@ -51,7 +51,7 @@ class RoutineGOfSC:
                     "warmup_ratio" : training_args.warmup_ratio,
                     "weight_decay" : training_args.weight_decay,
                     "path" : (f"{ROOT_MODELS}/{self.__foldername}/{folder}/"
-                              f"embeddings/epoch_{epoch}",)
+                              f"embeddings/epoch_{epoch}"),
                     "epoch" : epoch
                 })
         all_configs : pd.DataFrame = pd.DataFrame(all_configs)
