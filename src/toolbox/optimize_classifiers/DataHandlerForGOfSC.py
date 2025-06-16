@@ -29,5 +29,6 @@ class DataHandlerForGOfSC:
             
         self.X_test : np.ndarray = load(f"{root}/test_embeddings.pt",
                             weights_only=True).cpu().numpy()
-        self.y_test : np.ndarray = load(f"{root}/test_labels.pt",
+        labels : np.ndarray = load(f"{root}/test_labels.pt",
                             weights_only=True).cpu().numpy()
+        self.y_test = [np.argmax(row).item() for row in labels]
