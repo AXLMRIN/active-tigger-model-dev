@@ -5,7 +5,7 @@ from torch import Tensor, load
 from sklearn.metrics import f1_score
 import numpy as np
 from torch.cuda import is_available as cuda_available
-from ..general import checkpoint_to_load
+from ..general import checkpoint_to_load, clean
 # SCRIPTS ######################################################################
 class TestOneEpoch: 
     """
@@ -79,5 +79,8 @@ class TestOneEpoch:
 
     def routine(self, additional_tags : dict = {}) -> dict:
         self.run_test()
-        return self.return_result(additional_tags)
+        output = self.return_result(additional_tags)
+        del self.__model, self.__ds
+        clean()
+        return output
     
