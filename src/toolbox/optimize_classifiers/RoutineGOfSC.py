@@ -17,7 +17,7 @@ class RoutineGOfSC:
     def __init__(self, 
         foldername : str, 
         classifier, 
-        ranges_of_parameters : dict[str:list[Any]], 
+        ranges_of_configs : dict[str:list[Any]], 
         n_samples : int,
         parameters_mapper : dict,
         gene_space : dict,
@@ -26,7 +26,7 @@ class RoutineGOfSC:
         """
         self.__foldername : str = foldername
         self.__classifier = classifier
-        self.__ranges_of_parameters : dict[str:list] = ranges_of_parameters
+        self.__ranges_of_configs : dict[str:list] = ranges_of_configs
         self.__n_samples : int  = n_samples
         self.__parameters_mapper : dict = parameters_mapper
         self.__gene_space : dict = gene_space
@@ -69,7 +69,7 @@ class RoutineGOfSC:
         """
         """
         condition = True
-        for i, key in enumerate(self.__ranges_of_parameters) : 
+        for i, key in enumerate(self.__ranges_of_configs) : 
             condition = (condition) & (all_configs[key] == config_researched[i])
         config_found : pd.DataFrame = all_configs.loc[condition, :]
         return config_found
@@ -95,7 +95,7 @@ class RoutineGOfSC:
         # UPGRADE add some security
         all_configs : pd.DataFrame = self.__get_configs_of_the_folder()
 
-        for config_researched in product(*self.__ranges_of_parameters.values()) :
+        for config_researched in product(*self.__ranges_of_configs.values()) :
             config_found : pd.DataFrame = self.__find_config(config_researched, all_configs)
             if len(config_found) > 0 : 
                 path = config_found.iloc[0]["path"]
