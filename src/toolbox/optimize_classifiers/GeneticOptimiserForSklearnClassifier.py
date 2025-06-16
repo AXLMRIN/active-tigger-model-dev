@@ -36,7 +36,10 @@ class GeneticOptimiserForSklearnClassifier :
         """
         self.__data = data
         self.__classifier = classifier
-        self.__parameters_mapper = parameters_mapper
+        self.__parameters_mapper_keys : list[str]= \
+            list(parameters_mapper.keys())
+        self.__parameters_mapper_functions : list[Callable] = \
+            list(parameters_mapper.values())
         self.__num_genes = gene_space["num_genes"]
 
         # GA parameters
@@ -57,8 +60,8 @@ class GeneticOptimiserForSklearnClassifier :
     def __parameter_value_binder(self,idx, value : Any) -> dict[int:Any] :
         """
         """
-        parameter_name : str = self.__parameters_mapper.keys()[idx]
-        function_to_apply = self.__parameters_mapper.values()[idx]
+        parameter_name : str = self.__parameters_mapper_keys[idx]
+        function_to_apply : Any = self.__parameters_mapper_functions[idx]
         return {parameter_name : function_to_apply(value)}
 
     def __make_parameters_out_of_SOL(self, SOL : np.ndarray) -> dict[str:Any] :
