@@ -5,10 +5,11 @@ from typing import Any
 from itertools import product
 import os
 from .. import ROOT_MODELS, ROOT_RESULTS
-from ..general import clean
+from ..general import clean, get_checkpoints
 from torch import load
 import pandas as pd
 import numpy as np
+import json
 # SCRIPTS ######################################################################
 class RoutineGOfSC:
     """
@@ -38,11 +39,14 @@ class RoutineGOfSC:
         for folder in all_posible_folders : 
             # One checkpoint per epoch
             all_checkpoints : list[str] = \
-                os.listdir(f"{ROOT_MODELS}/{self.__foldername}/{folder}") 
+                get_checkpoints(f"{ROOT_MODELS}/{self.__foldername}/{folder}") 
             first_checkpoint : str = all_checkpoints[0]
             training_args = load((f"{ROOT_MODELS}/{self.__foldername}/{folder}/"
                                   f"{first_checkpoint}/training_args.bin"),
                                   weights_only=False)
+            with open(f"{ROOT_MODELS}/{self.__foldername}/{folder}/model_name.txt","r") as file : 
+                model_name : str = file.read()
+
             # add one row per epoch
             for epoch in range(1, len(all_posible_folders) + 1):
                 all_configs.append({
@@ -52,7 +56,8 @@ class RoutineGOfSC:
                     "weight_decay" : training_args.weight_decay,
                     "path" : (f"{ROOT_MODELS}/{self.__foldername}/{folder}/"
                               f"embeddings/epoch_{epoch}"),
-                    "epoch" : epoch
+                    "epoch" : epoch,
+                    "model_name" : model_name
                 })
         all_configs : pd.DataFrame = pd.DataFrame(all_configs)
         return all_configs
@@ -87,6 +92,7 @@ class RoutineGOfSC:
         """
         # UPGRADE add some security
         all_configs : pd.DataFrame = self.__get_configs_of_the_folder()
+
         # TODO implement different iterations
         for config_researched in product(*self.__ranges_of_parameters.values()) :
             config_found : pd.DataFrame = self.__find_config(config_researched, all_configs)
@@ -116,7 +122,8 @@ class RoutineGOfSC:
                     "weight_decay" : config_found.iloc[0]["weight_decay"],
                     "path" : config_found.iloc[0]["path"],
                     "epoch" : config_found.iloc[0]["epoch"],
-                    "classifier" : self.__classifier.__name__
+                    "classifier" : self.__classifier.__name__,
+                    "embedding_model" : config_found.iloc[0]["model_name"]
                 })
 
                 del optimum, f1_max, optimisation_time, n_optim_iterations, optimiser, data
@@ -125,7 +132,7 @@ class RoutineGOfSC:
             else :
                 print(f"{config_researched} : None found")
                 pass           
-             
+
     def save_results(self, filename : str) -> None: 
         """
         """
