@@ -50,7 +50,7 @@ class RoutineGOfSC:
                 model_name : str = file.read()
 
             # add one row per epoch
-            for epoch in range(1, len(all_posible_folders) + 1):
+            for epoch in range(1, len(all_checkpoints) + 1):
                 all_configs.append({
                     "learning_rate" : training_args.learning_rate,
                     "optim" : training_args.optim,
