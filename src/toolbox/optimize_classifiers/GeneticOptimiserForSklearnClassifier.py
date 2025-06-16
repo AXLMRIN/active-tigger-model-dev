@@ -4,7 +4,7 @@ import pygad
 from time import time
 from mergedeep import merge
 import numpy as np
-from typing import Any
+from typing import Any, Callable
 from .DataHandlerForGOfSC import DataHandlerForGOfSC
 # CONSTANTS ####################################################################
 DEFAULT_GA_PARAMETERS : dict = {
@@ -44,7 +44,7 @@ class GeneticOptimiserForSklearnClassifier :
 
         # GA parameters
         deduced_parameters = {
-            'fitness_func' : self.fitness_function,
+            'fitness_func' : self.fitness_func,
             'sol_per_pop' : int(4 * self.__num_genes),
             'keep_elitism' : int(max(0.5 * 0.5 * 4 * self.__num_genes, 2)),
             'num_parents_mating' : int(max(0.2 * 4 * self.__num_genes, 1))
@@ -79,7 +79,7 @@ class GeneticOptimiserForSklearnClassifier :
         clf = self.__classifier(**params)
         clf.fit(self.__data.X_train, self.__data.y_train)
 
-        y_pred : np.ndarray = clf.predict(self.d.X_test)
+        y_pred : np.ndarray = clf.predict(self.__data.X_test)
         y_true : np.ndarray = self.__data.y_test
         return f1_score(y_true, y_pred, average='macro')
     
@@ -87,7 +87,7 @@ class GeneticOptimiserForSklearnClassifier :
         """
         """
         t1 = time()
-        instance = pygad.GA(**self.GA_parameters)
+        instance = pygad.GA(**self.GA_instance_parameters)
         instance.run()
         t2 = time()
         optimum, value, _ = instance.best_solution()
