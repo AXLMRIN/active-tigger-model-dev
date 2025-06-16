@@ -12,7 +12,6 @@ DEFAULT_GA_PARAMETERS : dict = {
     'num_generations' : 50,
     
     "stop_criteria" : "saturate_5",
-    # "parallel_processing" : 5, 
     
     # Default
     'mutation_type' : "random",
