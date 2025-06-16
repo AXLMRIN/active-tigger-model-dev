@@ -96,6 +96,7 @@ class CustomTransformersPipeline:
             "loaded" : False,
             "trained" : False
         }
+
     def __str__(self) -> str :
         out = (
             f"---------------------------\n"
@@ -110,6 +111,10 @@ class CustomTransformersPipeline:
             f"\t- Output Directory : {self.training_args.output_dir}\n"
         )
         return out
+
+    def __save_model_name(self) -> None : 
+        with open(f"{self.training_args.output_dir}/model_name.txt", "w") as file:
+            file.write(self.model_name)
 
     def load_tokenizer_and_model(self, skip_model : bool = False):
         # Load tokenizer and model
@@ -143,6 +148,7 @@ class CustomTransformersPipeline:
         return trainer.train()
     
     def routine(self, debug_mode : bool = False):
+        self.__save_model_name()
         self.load_tokenizer_and_model()
         self.__data.encode(self.tokenizer, self.tokenizing_parameters)
         if debug_mode : 
