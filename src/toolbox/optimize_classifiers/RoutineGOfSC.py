@@ -16,16 +16,18 @@ class RoutineGOfSC:
     """
     def __init__(self, 
         foldername : str, 
-        ranges_of_parameters : dict[str:list[Any]], 
         classifier, 
+        ranges_of_parameters : dict[str:list[Any]], 
+        n_samples : int,
         parameters_mapper : dict,
         gene_space : dict,
         extra_GA_parameters : dict = {}) -> None:
         """
         """
         self.__foldername : str = foldername
-        self.__ranges_of_parameters : dict[str:list] = ranges_of_parameters
         self.__classifier = classifier
+        self.__ranges_of_parameters : dict[str:list] = ranges_of_parameters
+        self.__n_samples : int  = n_samples
         self.__parameters_mapper : dict = parameters_mapper
         self.__gene_space : dict = gene_space
         self.__extra_GA_parameters : dict = extra_GA_parameters
@@ -100,7 +102,7 @@ class RoutineGOfSC:
                 path = config_found.iloc[0]["path"]
                 print(f"{config_researched} : {path}")
 
-                data = DataHandlerForGOfSC(path) # TODO implement n_sample
+                data = DataHandlerForGOfSC(path, self.__n_samples)
 
                 optimiser = GeneticOptimiserForSklearnClassifier(
                     data = data, 
@@ -123,7 +125,8 @@ class RoutineGOfSC:
                     "path" : config_found.iloc[0]["path"],
                     "epoch" : config_found.iloc[0]["epoch"],
                     "classifier" : self.__classifier.__name__,
-                    "embedding_model" : config_found.iloc[0]["model_name"]
+                    "embedding_model" : config_found.iloc[0]["model_name"],
+                    "n_samples" : self.__n_samples
                 })
 
                 del optimum, f1_max, optimisation_time, n_optim_iterations, optimiser, data
