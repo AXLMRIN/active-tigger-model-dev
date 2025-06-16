@@ -114,7 +114,8 @@ class RoutineGOfSC:
 
                 self.__results.append({
                     **optimum,
-                    "f1_macro" : f1_max, 
+                    "score" : f1_max, 
+                    "measure" : "f1_macro", # NOTE would need some additional work to select another measure
                     "time" : optimisation_time,
                     "n_optim_iterations" : n_optim_iterations,
                     "learning_rate" : config_found.iloc[0]["learning_rate"],
