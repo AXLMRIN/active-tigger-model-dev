@@ -8,14 +8,18 @@ from .. import ROOT_MODELS
 class DataHandlerForGOfSC:
     """
     """
-    def __init__(self, foldername) -> None:
+    def __init__(self, foldername : str) -> None:
         """
         """
-        self.X_train : np.ndarray = load(f"{ROOT_MODELS}/{foldername}/train_embedded.pt",
-                            weights_only=True).cpu().numpy
-        self.y_train : np.ndarray = load(f"{ROOT_MODELS}/{foldername}/train_labels.pt",
-                            weights_only=True).cpu().numpy
-        self.X_test : np.ndarray = load(f"{ROOT_MODELS}/{foldername}/test_embedded.pt",
-                            weights_only=True).cpu().numpy
-        self.y_test : np.ndarray = load(f"{ROOT_MODELS}/{foldername}/test_labels.pt",
-                            weights_only=True).cpu().numpy
+        if foldername.startswith("./") : 
+            root = foldername
+        else :
+            root = f"{ROOT_MODELS}/{foldername}"
+        self.X_train : np.ndarray = load(f"{root}/train_embeddings.pt",
+                            weights_only=True).cpu().numpy()
+        self.y_train : np.ndarray = load(f"{root}/train_labels.pt",
+                            weights_only=True).cpu().numpy()
+        self.X_test : np.ndarray = load(f"{root}/test_embeddings.pt",
+                            weights_only=True).cpu().numpy()
+        self.y_test : np.ndarray = load(f"{root}/test_labels.pt",
+                            weights_only=True).cpu().numpy()
