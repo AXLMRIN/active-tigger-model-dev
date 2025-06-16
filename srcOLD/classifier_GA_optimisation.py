@@ -80,9 +80,9 @@ all_lrs = [
 # Build cMapper
 def n_estimators_mapper_function(value):
     return int(value)
-def criterion_mapper_function(idx):
+def criterion_mapper_function(value):
     crits = ["gini", "entropy", "log_loss"]
-    return crits[int(idx)]
+    return crits[int(value)]
 def max_depth_mapper_function(value):
     return int(value)
 
