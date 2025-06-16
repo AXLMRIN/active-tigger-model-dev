@@ -2,3 +2,4 @@ from .DataHandlerForGOfSC import DataHandlerForGOfSC
 from .GeneticOptimiserForSklearnClassifier import GeneticOptimiserForSklearnClassifier
 from .RoutineGOfSC import RoutineGOfSC
 from .RoutineGOfKNN import RoutineGOfKNN
+from .RoutineGOfRF import RoutineGOfRF
