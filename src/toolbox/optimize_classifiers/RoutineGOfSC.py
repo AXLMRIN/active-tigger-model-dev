@@ -125,7 +125,9 @@ class RoutineGOfSC:
                 df.to_csv(f"{ROOT_RESULTS}/{filename}", index = False)
             
 
-    def routine(self, filename : str):
+    def routine(self, filename : str) -> None:
+        """
+        """
         self.run_all()
         self.save_results(filename)
 
