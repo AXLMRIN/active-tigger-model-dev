@@ -30,6 +30,42 @@ class RoutineGOfSC:
         self.__extra_GA_parameters : dict = extra_GA_parameters
         self.__results : list[dict[str:Any]] = []
     
+    def __get_configs_of_the_folder(self) -> pd.DataFrame:
+        """
+        """
+        all_posible_folders : list[str] = os.listdir(f"{ROOT_MODELS}/{self.__foldername}")
+        all_configs: list[dict[str:Any]] = []
+        for folder in all_posible_folders : 
+            # One checkpoint per epoch
+            all_checkpoints : list[str] = \
+                os.listdir(f"{ROOT_MODELS}/{self.__foldername}/{folder}") 
+            first_checkpoint : str = all_checkpoints[0]
+            training_args = load((f"{ROOT_MODELS}/{self.__foldername}/{folder}/"
+                                  f"{first_checkpoint}/training_args.bin"),
+                                  weights_only=False)
+            # add one row per epoch
+            for epoch in range(1, len(all_posible_folders) + 1):
+                all_configs.append({
+                    "learning_rate" : training_args.learning_rate,
+                    "optim" : training_args.optim,
+                    "warmup_ratio" : training_args.warmup_ratio,
+                    "weight_decay" : training_args.weight_decay,
+                    "path" : f"{ROOT_MODELS}/{self.__foldername}/{folder}/embeddings/epoch_{epoch}",
+                    "epoch" : epoch
+                })
+        all_configs : pd.DataFrame = pd.DataFrame(all_configs)
+        return all_configs
+
+    def __find_config(self, config_researched : dict[str:Any], 
+            all_configs : pd.DataFrame) -> pd.DataFrame:
+        """
+        """
+        condition = True
+        for i, key in enumerate(self.__ranges_of_parameters) : 
+            condition = (condition) & (all_configs[key] == config_researched[i])
+        config_found : pd.DataFrame = all_configs.loc[condition, :]
+        return config_found
+    
     def run_all(self) -> None:
         """
         In the foldername we expect : 
@@ -49,37 +85,13 @@ class RoutineGOfSC:
                     L ...
         """
         # UPGRADE add some security
-        all_posible_folders : list[str] = os.listdir(f"{ROOT_MODELS}/{self.__foldername}")
-        all_possible_parameters : list[dict[str:Any]] = []
-        for folder in all_posible_folders : 
-            all_checkpoints : list[str] = os.listdir(f"{ROOT_MODELS}/{self.__foldername}/{folder}") # One checkpoint per epoch
-            first_checkpoint : str = all_checkpoints[0]
-            training_args = load((f"{ROOT_MODELS}/{self.__foldername}/{folder}/"
-                                  f"{first_checkpoint}/training_args.bin"),
-                                  weights_only=False)
-            # add one row per epoch
-            for epoch in range(1, len(all_posible_folders) + 1):
-                all_possible_parameters.append({
-                    "learning_rate" : training_args.learning_rate,
-                    "optim" : training_args.optim,
-                    "warmup_ratio" : training_args.warmup_ratio,
-                    "weight_decay" : training_args.weight_decay,
-                    "path" : f"{ROOT_MODELS}/{self.__foldername}/{folder}/embeddings/epoch_{epoch}",
-                    "epoch" : epoch
-                })
-        all_possible_parameters : pd.DataFrame = pd.DataFrame(all_possible_parameters)
-        print(all_possible_parameters)
+        all_configs : pd.DataFrame = self.__get_configs_of_the_folder()
         # TODO implement different iterations
-        for x in product(*self.__ranges_of_parameters.values()) :
-            condition = True
-            for i, key in enumerate(self.__ranges_of_parameters) : 
-                condition = (condition) & (all_possible_parameters[key] == x[i])
-            # TODO rename the variables
-            corresponding_path : pd.Series = \
-                all_possible_parameters.loc[condition, :]
-            if len(corresponding_path) > 0 : 
-                path = corresponding_path.iloc[0]["path"]
-                print(f"{x} : {path}")
+        for config_researched in product(*self.__ranges_of_parameters.values()) :
+            config_found : pd.DataFrame = self.__find_config(config_researched, all_configs)
+            if len(config_found) > 0 : 
+                path = config_found.iloc[0]["path"]
+                print(f"{config_researched} : {path}")
 
                 data = DataHandlerForGOfSC(path) # TODO implement n_sample
 
@@ -91,17 +103,18 @@ class RoutineGOfSC:
                     extra_GA_parameters = self.__extra_GA_parameters
                 )
                 optimum, f1_max, optimisation_time, n_optim_iterations = optimiser.run()
+
                 self.__results.append({
                     **optimum,
                     "f1_macro" : f1_max, 
                     "time" : optimisation_time,
                     "n_optim_iterations" : n_optim_iterations,
-                    "learning_rate" : corresponding_path.iloc[0]["learning_rate"],
-                    "optim" : corresponding_path.iloc[0]["optim"],
-                    "warmup_ratio" : corresponding_path.iloc[0]["warmup_ratio"],
-                    "weight_decay" : corresponding_path.iloc[0]["weight_decay"],
-                    "path" : corresponding_path.iloc[0]["path"],
-                    "epoch" : corresponding_path.iloc[0]["epoch"],
+                    "learning_rate" : config_found.iloc[0]["learning_rate"],
+                    "optim" : config_found.iloc[0]["optim"],
+                    "warmup_ratio" : config_found.iloc[0]["warmup_ratio"],
+                    "weight_decay" : config_found.iloc[0]["weight_decay"],
+                    "path" : config_found.iloc[0]["path"],
+                    "epoch" : config_found.iloc[0]["epoch"],
                     "classifier" : self.__classifier.__name__
                 })
 
@@ -109,8 +122,9 @@ class RoutineGOfSC:
                 clean()
                 
             else :
-                print(f"{x} : PASS")
-                pass            
+                print(f"{config_researched} : None found")
+                pass           
+             
     def save_results(self, filename : str) -> None: 
         """
         """
