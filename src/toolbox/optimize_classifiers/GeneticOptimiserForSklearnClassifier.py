@@ -83,7 +83,7 @@ class GeneticOptimiserForSklearnClassifier :
         y_true : np.ndarray = self.__data.y_test
         return f1_score(y_true, y_pred, average='macro')
     
-    def run(self) -> tuple[float,float,float,int]:
+    def run(self) -> tuple[dict[str:Any],float,float,int]:
         """
         """
         t1 = time()
@@ -92,4 +92,13 @@ class GeneticOptimiserForSklearnClassifier :
         t2 = time()
         optimum, value, _ = instance.best_solution()
         number_of_completed_generations : int = instance.generations_completed
+        
+        # Format outputs
+        zipped = zip(self.__parameters_mapper_keys, self.__parameters_mapper_functions,
+                      optimum)
+        optimum : dict[str:Any] = {
+            key : mapper(value) for key, mapper, value in zipped
+        }
+        value = float(value) 
+        
         return optimum, value, t2-t1, number_of_completed_generations
