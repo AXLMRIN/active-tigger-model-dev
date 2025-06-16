@@ -74,7 +74,7 @@ class RoutineGOfSC:
         config_found : pd.DataFrame = all_configs.loc[condition, :]
         return config_found
     
-    def run_all(self) -> None:
+    def run_all(self, iteration : int) -> None:
         """
         In the foldername we expect : 
             foldername
@@ -95,7 +95,6 @@ class RoutineGOfSC:
         # UPGRADE add some security
         all_configs : pd.DataFrame = self.__get_configs_of_the_folder()
 
-        # TODO implement different iterations
         for config_researched in product(*self.__ranges_of_parameters.values()) :
             config_found : pd.DataFrame = self.__find_config(config_researched, all_configs)
             if len(config_found) > 0 : 
@@ -126,7 +125,8 @@ class RoutineGOfSC:
                     "epoch" : config_found.iloc[0]["epoch"],
                     "classifier" : self.__classifier.__name__,
                     "embedding_model" : config_found.iloc[0]["model_name"],
-                    "n_samples" : self.__n_samples
+                    "n_samples" : self.__n_samples,
+                    "iteration" : iteration
                 })
 
                 del optimum, f1_max, optimisation_time, n_optim_iterations, optimiser, data
@@ -150,11 +150,12 @@ class RoutineGOfSC:
                 df.to_csv(f"{ROOT_RESULTS}/{filename}", index = False)
             
 
-    def routine(self, filename : str) -> None:
+    def routine(self, filename : str, n_iterations : int = 1) -> None:
         """
         """
-        self.run_all()
-        self.save_results(filename)
+        for iteration in range(1, n_iterations + 1) : 
+            self.run_all(iteration)
+            self.save_results(filename)
 
         
 
