@@ -3,7 +3,7 @@ from datasets import load_from_disk, Dataset, DatasetDict, concatenate_datasets
 from transformers import AutoModelForSequenceClassification
 from torch import Tensor, no_grad, cat, save
 from torch.cuda import is_available as cuda_available
-from ..general import checkpoint_to_load
+from ..general import checkpoint_to_load, clean
 import os
 # SCRIPTS ######################################################################
 class ExportEmbeddingsForOneEpoch: 
@@ -73,4 +73,6 @@ class ExportEmbeddingsForOneEpoch:
     def routine(self) -> None:
         self.export_train_embeddings()
         self.export_test_embeddings()
+        del self.__ds, self.__model
+        clean()
     
