@@ -29,6 +29,9 @@ class TestOneEpoch:
 
         self.__training_args : TrainingArguments = load(
             f"{foldername}/{checkpoint}/training_args.bin", weights_only=False)
+        
+        with open(f"{foldername}/model_name.txt", "r") as file:
+            self.__model_name : str = file.read()
 
         self.__measure : str = "f1_macro" #UPGRADE
 
@@ -74,6 +77,7 @@ class TestOneEpoch:
             "optim" : self.__training_args.optim,
             "warmup_ratio" : self.__training_args.warmup_ratio,
             "weight_decay" : self.__training_args.weight_decay,
+            "embedding_model" : self.__model_name,
             **additional_tags
         }
 
