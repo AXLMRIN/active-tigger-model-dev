@@ -7,13 +7,12 @@ from transformers import (
     TrainingArguments, 
     Trainer
 )
-from transformers.tokenization_utils_base import BatchEncoding
 from transformers.trainer_utils import TrainOutput
 from .functions import compute_metrics
-from pandas import Timestamp
 import os
 from .. import ROOT_MODELS
 from ..general import pretty_number, pretty_printing_dictionnary, clean
+from time import time
 # SCRIPTS ######################################################################
 
 class CustomTransformersPipeline:
@@ -138,6 +137,7 @@ class CustomTransformersPipeline:
         self.status["loaded"] = True
      
     def train(self) -> TrainOutput:
+        t1 = time()
         trainer = Trainer(
             model = self.model,
             args = self.training_args,
@@ -145,6 +145,8 @@ class CustomTransformersPipeline:
             eval_dataset = self.__data.get_encoded_dataset("eval"),
             compute_metrics = compute_metrics
         )
+        t2 = time() 
+        # Find a way to do something about it
         return trainer.train()
     
     def routine(self, debug_mode : bool = False):
