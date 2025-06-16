@@ -53,3 +53,7 @@ def get_checkpoints(foldername : str) -> list[str]:
     """
     return [checkpoint_folder for checkpoint_folder in os.listdir(foldername) 
             if checkpoint_folder.startswith("checkpoint")]
+
+def SUL_string(vec) : 
+    '''return a sorted list of unique string items'''
+    return sorted(list(set(vec)), key = lambda x : str(x).lower())
