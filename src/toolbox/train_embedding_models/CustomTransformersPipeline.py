@@ -13,7 +13,7 @@ from .functions import compute_metrics
 from pandas import Timestamp
 import os
 from .. import ROOT_MODELS
-from ..general import pretty_number, pretty_printing_dictionnary
+from ..general import pretty_number, pretty_printing_dictionnary, clean
 # SCRIPTS ######################################################################
 
 class CustomTransformersPipeline:
@@ -148,11 +148,13 @@ class CustomTransformersPipeline:
         return trainer.train()
     
     def routine(self, debug_mode : bool = False):
-        self.__save_model_name()
         self.load_tokenizer_and_model()
         self.__data.encode(self.tokenizer, self.tokenizing_parameters)
         if debug_mode : 
             self.__data.debug_mode()
         output = self.train()
         self.__data.save_all(self.training_args.output_dir)
+        self.__save_model_name()
+        del self.model, self.__data, self.tokenizer
+        clean()
         return output
