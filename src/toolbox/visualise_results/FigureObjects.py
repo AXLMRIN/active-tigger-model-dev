@@ -267,9 +267,7 @@ class Visualisation :
         
         (self.__list_of_frames, self.__list_of_traces) = (None,) * 2
 
-    def preprocess_data(self, 
-        
-        alpha : float = 0.9) -> None:
+    def preprocess_data(self, alpha : float = 0.9) -> None:
         """
         """
         # Select columns
@@ -430,3 +428,9 @@ class Visualisation :
             self.__add_scatter()
         else:
             raise(TypeError,"type must be equal to 'bar' or 'scatter'")
+    
+    def routine(self, alpha : float = 0.9, additional_xaxis_kwargs : dict = {}, 
+                figure_layout_kwargs : dict = {}) -> Figure:
+        self.preprocess_data(alpha)
+        self.build_figure(figure_layout_kwargs)
+        return self.__fig
