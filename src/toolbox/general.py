@@ -65,7 +65,8 @@ def SUL_string(vec) :
 def get_band(vec : list[float], type : str, alpha : float = 0.9) -> float :
     """
     """
+    mean = np.mean(vec)
     band = norm.interval(alpha, loc=np.mean(vec), scale=np.std(vec))
-    if type == "lower" : return band[0]
-    elif type == "upper" : return band[1]
+    if type == "lower" : return mean - band[0]
+    elif type == "upper" : return band[1] - mean
     else : return np.nan
