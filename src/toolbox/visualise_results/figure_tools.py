@@ -98,7 +98,7 @@ def error_band_color(rgb_color, error_band_opacity = 0.2):
     out = rgb_color[:3] + "a" + rgb_color[3:-1] + f",{error_band_opacity})"
     return out
 
-def generic_scatter_with_bands(df, col_x, col_y, col_ci_u, col_ci_l, name, idx = 0):
+def generic_scatter_with_bands(df, col_x, col_y, col_band_u, col_band_l, name, idx = 0):
     """
     """
     trace_1 = go.Scatter(
@@ -114,8 +114,8 @@ def generic_scatter_with_bands(df, col_x, col_y, col_ci_u, col_ci_l, name, idx =
         zorder = 1
     )
     
-    upper = df.loc[:,col_y] + df.loc[:,col_ci_u]
-    lower = df.loc[:,col_y] - df.loc[:,col_ci_l]
+    upper = df.loc[:,col_y] + df.loc[:,col_band_u]
+    lower = df.loc[:,col_y] - df.loc[:,col_band_l]
     trace_2 = go.Scatter(
         x = [*df[col_x],*df[col_x][::-1]],
         y = [*upper, *lower[::-1]],
