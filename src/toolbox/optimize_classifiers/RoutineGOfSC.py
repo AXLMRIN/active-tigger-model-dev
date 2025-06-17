@@ -149,6 +149,8 @@ class RoutineGOfSC:
                 df = pd.DataFrame(self.__results)
             finally:
                 df.to_csv(f"{ROOT_RESULTS}/{filename}", index = False)
+                # Reinit results
+                self.__results = []
             
 
     def routine(self, filename : str, n_iterations : int = 1) -> None:
