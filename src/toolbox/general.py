@@ -84,3 +84,8 @@ def auto_log_range(vec_1, vec_2, window_frac : float = 0.1) -> tuple[float,float
     max_vecs = np.log(max(max(vec_1), max(vec_2))) / np.log(10)
     print(min_vecs, max_vecs)
     return [min_vecs - window_frac, max_vecs + window_frac]
+
+def get_uniques_values(vec_1, vec_2) -> list[float] : 
+    """
+    """
+    return list(set([*vec_1, *vec_2]))
