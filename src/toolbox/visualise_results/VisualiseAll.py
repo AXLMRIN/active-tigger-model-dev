@@ -1,7 +1,8 @@
 # IMPORTS ######################################################################
 import pandas as pd
 from .. import ROOT_RESULTS
-from .FigureObjects import ScorePerModelAndClassifier, ScorePerLearningRateAndModelAndClassifier
+from .FigureObjects import (ScorePerModelAndClassifier, 
+    ScorePerLearningRateAndModelAndClassifier, Visualisation)
 # SCRIPTS ######################################################################
 class VisualiseAll : 
     """
@@ -24,11 +25,11 @@ class VisualiseAll :
 
     def create_figures(self) -> None : 
         ScorePerModelAndClassifier(self.__baseline, self.__others).\
-            routine().\
-            show()
+            routine()
         ScorePerLearningRateAndModelAndClassifier(self.__baseline, self.__others).\
-            routine().\
-            show()
+            routine()
+        Visualisation(self.__baseline, self.__others,"bar").routine().show()
+        
         
     def routine(self) -> None : 
         self.open_data()
