@@ -6,6 +6,8 @@ from gc import collect as gc_collect
 from torch.cuda import empty_cache, synchronize, ipc_collect
 from torch.cuda import is_available as cuda_available
 import os
+import numpy as np
+from scipy.stats import norm
 # SCRIPTS ######################################################################
 def IdentityFunction(x : Any) -> Any: 
     """
@@ -55,5 +57,15 @@ def get_checkpoints(foldername : str) -> list[str]:
             if checkpoint_folder.startswith("checkpoint")]
 
 def SUL_string(vec) : 
-    '''return a sorted list of unique string items'''
+    """
+    return a sorted list of unique string items
+    """
     return sorted(list(set(vec)), key = lambda x : str(x).lower())
+
+def get_band(vec : list[float], type : str, alpha : float = 0.9) -> float :
+    """
+    """
+    band = norm.interval(alpha, loc=np.mean(vec), scale=np.std(vec))
+    if type == "lower" : return band[0]
+    elif type == "upper" : return band[1]
+    else : return np.nan
