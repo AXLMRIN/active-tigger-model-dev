@@ -122,7 +122,7 @@ def generic_scatter_with_bands(df, col_x, col_y, col_band_u, col_band_l, name, i
         name = name,
         xaxis = f"x{idx + 1}",
         yaxis = "y",
-        showlegend = True,
+        showlegend = False,
         #Filling
         fill ='toself',
         fillcolor = error_band_color(COLORS[name]),

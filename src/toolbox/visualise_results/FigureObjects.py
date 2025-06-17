@@ -271,15 +271,16 @@ class Visualisation :
         """
         """
         # Select columns
+        columns_to_retrieve = [col for col in [self.__column_frame,
+            self.__column_trace, self.__column_score, self.__column_measure, 
+            self.__column_x_axis] if col is not None]
         self.__data_baseline = self.__data_baseline.\
-            loc[:,[self.__column_frame,self.__column_trace, self.__column_score, 
-                   self.__column_measure]]
+            loc[:,columns_to_retrieve]
         self.__baseline_trace_value = get_most_frequent_item(
             self.__data_baseline[self.__column_trace]
         )
         self.__data_others = self.__data_others.\
-            loc[:,[self.__column_frame,self.__column_trace, self.__column_score, 
-                   self.__column_measure]]
+            loc[:,columns_to_retrieve]
         
         # Select rows where the measure matches
         measure_condition = \
@@ -307,7 +308,7 @@ class Visualisation :
             if col is not None
         ]
         self.__data_baseline_M_and_CI = self.__data_baseline.\
-            groupby([columns_to_groupby], as_index = False).\
+            groupby(columns_to_groupby, as_index = False).\
             agg(
                 mean = (self.__column_score, "mean"),
                 lower_band = (self.__column_score, get_lower_band),
@@ -315,7 +316,7 @@ class Visualisation :
             )
 
         self.__data_others_M_and_CI = self.__data_others.\
-            groupby([columns_to_groupby], as_index = False).\
+            groupby(columns_to_groupby, as_index = False).\
             agg(
                 mean = (self.__column_score, "mean"),
                 lower_band = (self.__column_score, get_lower_band),
@@ -342,25 +343,19 @@ class Visualisation :
 
         # Create the bars for the other classifiers
         grouped_others = self.__data_others_M_and_CI.\
-            groupby([self.__column_frame, self.__column_trace])
-        for idx, frame in enumerate(self.__list_of_frames): 
-            for trace in self.__list_of_traces:
-                # NOTE some classifiers are not tested accross all empedding models
-                # ex : 'Baseline - HF Classifier'
-                try : 
-                    sub_df = grouped_others.get_group((frame, trace))
-                    bars = generic_bar(
-                        df = sub_df, 
-                        col_x = self.__column_trace, 
-                        col_y = "mean",
-                        col_band_u = "upper_band", 
-                        col_band_l = "lower_band",
-                        name = trace,
-                        idx = idx
-                    )
-                    self.__fig.add_trace(bars)
-                except : 
-                    pass
+            groupby([self.__column_frame, self.__column_trace], as_index=False)
+        for (frame, trace), sub_df in grouped_others:
+            idx = self.__list_of_frames.index(frame)
+            bars = generic_bar(
+                df = sub_df, 
+                col_x = self.__column_trace, 
+                col_y = "mean",
+                col_band_u = "upper_band", 
+                col_band_l = "lower_band",
+                name = trace,
+                idx = idx
+            )
+            self.__fig.add_trace(bars)
     
     def __add_scatter(self) -> None:
         """
@@ -385,35 +380,28 @@ class Visualisation :
 
         # Create the scatter for the other classifiers
         grouped_others = self.__data_others_M_and_CI.\
-            groupby([self.__column_frame, self.__column_trace])
-        for idx, frame in enumerate(self.__list_of_frames): 
-            for trace in self.__list_of_traces:
-                # NOTE some classifiers are not tested accross all empedding models
-                # ex : 'Baseline - HF Classifier'
-                try : 
-                    sub_df = grouped_others.get_group((frame, trace))
-                    trace_mean, trace_bands = generic_scatter_with_bands(
-                        df = sub_df, 
-                        col_x = frame, 
-                        col_y = "mean",
-                        col_band_u = "upper_band", 
-                        col_band_l = "lower_band",
-                        name = trace, 
-                        idx = idx
-                    )
+            groupby([self.__column_frame, self.__column_trace], as_index = False)
+        for (frame, trace), sub_df in grouped_others:
+            idx = self.__list_of_frames.index(frame)
+            trace_mean, trace_bands = generic_scatter_with_bands(
+                df = sub_df, 
+                col_x = self.__column_x_axis, 
+                col_y = "mean",
+                col_band_u = "upper_band", 
+                col_band_l = "lower_band",
+                name = trace, 
+                idx = idx
+            )
 
-                    self.__fig.add_trace(trace_mean)
-                    self.__fig.add_trace(trace_bands)
-                except : 
-                    pass
-
+            self.__fig.add_trace(trace_mean)
+            self.__fig.add_trace(trace_bands)
     def build_figure(self, additional_xaxis_kwargs : dict = {},
         figure_layout_kwargs : dict = {}) -> None : 
         """
         """
         multiple_figures_layout(
             self.__fig, 
-            self.__list_of_embedding_models, 
+            self.__list_of_frames, 
             xaxis_kwargs = merge(
                 {'categoryorder' : "trace", 'type' : "category"},
                 additional_xaxis_kwargs),
@@ -422,9 +410,9 @@ class Visualisation :
         self.__fig.update_layout(figure_layout_kwargs)
         
         # Create the bars for the baseline
-        if type == "bar" : 
+        if self.__type == "bar" : 
             self.__add_bar()
-        elif type == "scatter" : 
+        elif self.__type == "scatter" : 
             self.__add_scatter()
         else:
             raise(TypeError,"type must be equal to 'bar' or 'scatter'")

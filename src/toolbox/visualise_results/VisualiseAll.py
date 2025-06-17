@@ -24,11 +24,11 @@ class VisualiseAll :
             pd.read_csv(f"{ROOT_RESULTS}/{self.__filename_others}")
 
     def create_figures(self) -> None : 
-        ScorePerModelAndClassifier(self.__baseline, self.__others).\
-            routine()
-        ScorePerLearningRateAndModelAndClassifier(self.__baseline, self.__others).\
-            routine()
-        Visualisation(self.__baseline, self.__others,"bar").routine().show()
+        Visualisation(self.__baseline, self.__others,"bar").\
+            routine().show()
+        Visualisation(self.__baseline, self.__others,"scatter", 
+                      x_axis_column="learning_rate").\
+            routine().show()
         
         
     def routine(self) -> None : 
