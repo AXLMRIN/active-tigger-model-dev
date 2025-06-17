@@ -24,7 +24,8 @@ class VisualiseAll :
 
     def create_figures(self) -> None : 
         ScorePerModelAndClassifier(self.__baseline, self.__others).\
-            routine()
+            routine().\
+            show()
         ScorePerLearningRateAndModelAndClassifier(self.__baseline, self.__others).\
             routine().\
             show()
