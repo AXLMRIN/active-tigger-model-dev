@@ -1,4 +1,6 @@
 from toolbox import TestAllEpochs
 
-TestAllEpochs("./models/FacebookAI/roberta-base/002").\
-    routine("2025-06-14-TEST.csv")
+
+TestAllEpochs("./models/google-bert/bert-base-uncased/001").\
+    routine("2025-06-14-TEST.csv", 
+            additional_tags = {"classifier" : "Baseline - HF Classifier"})
