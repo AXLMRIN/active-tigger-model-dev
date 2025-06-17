@@ -181,8 +181,11 @@ class ScorePerLearningRateAndModelAndClassifier:
             self.__fig, 
             self.__list_of_embedding_models, 
             xaxis_kwargs = {
-                'tickvals' : [1e-6, 1e-5,5e-5,1e-4], 
-                'range' : [-6.2,-3.8],
+                "tickvals" : get_uniques_values(
+                    self.__data_baseline["learning_rate"],
+                    self.__data_others["learning_rate"]),
+                'range' : auto_log_range(self.__data_baseline["learning_rate"],
+                                          self.__data_others["learning_rate"]),
                 'type' : "log"},
             y_label = self.__measure,
             xlabel_prefix = "Learning rate<br><br>"
