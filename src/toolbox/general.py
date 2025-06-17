@@ -66,7 +66,11 @@ def get_band(vec : list[float], type : str, alpha : float = 0.9) -> float :
     """
     """
     mean = np.mean(vec)
-    band = norm.interval(alpha, loc=np.mean(vec), scale=np.std(vec))
+    ## If vec == a * np.ones(n), returns an error.
+    if np.prod(vec - mean) == 0: 
+        band = (0, 0)
+    else : 
+        band = norm.interval(alpha, loc=np.mean(vec), scale=np.std(vec))
     if type == "lower" : return mean - band[0]
     elif type == "upper" : return band[1] - mean
     else : return np.nan
