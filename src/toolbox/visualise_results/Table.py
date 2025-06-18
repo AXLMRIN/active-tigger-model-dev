@@ -16,7 +16,7 @@ class Table :
         data_others : pd.DataFrame, 
         column_row : str = "classifier", 
         column_column : str = "epoch",
-        column_color : str = "embedding_model",
+        column_group : str = "embedding_model",
         column_score : str = "score", 
         measure : str = "f1_macro", 
         column_measure : str = "measure") -> None:
@@ -26,10 +26,10 @@ class Table :
         self.__data_others : pd.DataFrame = data_others
         self.__column_row : str = column_row
         self.__column_column : str = column_column
-        self.__column_color : str = column_color
+        self.__column_group : str = column_group
         self.__column_score : str = column_score
-        self.__measure : str = measure
         self.__column_measure : str = column_measure
+        self.__measure : str = measure
         self.__fig = None
 
     def preprocess(self, alpha : float = 0.9) -> None:
@@ -37,7 +37,7 @@ class Table :
         """
         # Select columns
         columns_to_retrieve = [col for col in [self.__column_row,
-        self.__column_column, self.__column_color, self.__column_score, 
+        self.__column_column, self.__column_group, self.__column_score, 
             self.__column_measure] if col is not None]
         
         self.__data_baseline = self.__data_baseline.\
@@ -55,7 +55,7 @@ class Table :
         get_lower_band = lambda col : get_band(col, "lower", alpha)
         get_upper_band = lambda col : get_band(col, "upper", alpha)
         columns_to_groupby : list[str] = [col 
-            for col in [self.__column_color, self.__column_row, self.__column_column]
+            for col in [self.__column_group, self.__column_row, self.__column_column]
             if col is not None
         ]
         data_M_and_CI = data.\
@@ -70,7 +70,7 @@ class Table :
         
         # Drop unnecessary columns
         data_M_and_CI = data_M_and_CI.\
-            loc[:,[self.__column_color, self.__column_column, self.__column_row,
+            loc[:,[self.__column_group, self.__column_column, self.__column_row,
                 "text"]]
         
         # Only work with strings
@@ -81,10 +81,10 @@ class Table :
         self.__list_of_columns = SUL_string(data_M_and_CI[self.__column_column])
 
         data_table_format = []
-        data_M_and_CI_grouped = data_M_and_CI.groupby([self.__column_color, self.__column_row], as_index = False)
+        data_M_and_CI_grouped = data_M_and_CI.groupby([self.__column_group, self.__column_row], as_index = False)
         for (color, row), sub_df in data_M_and_CI_grouped:
             data_table_format.append({
-                self.__column_color : color,
+                self.__column_group : color,
                 self.__column_row : row,
                 **{
                     column : sub_df.loc[
@@ -115,7 +115,7 @@ class Table :
             GT(self.__data_table_format)
             .tab_stub(
                 rowname_col=self.__column_row,
-                groupname_col=self.__column_color
+                groupname_col=self.__column_group
             )
             .tab_stubhead(
                 label = self.__column_row
