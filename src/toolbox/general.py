@@ -95,3 +95,12 @@ def get_most_frequent_item(vec : pd.Series) -> Any:
     """
     """
     return vec.mode().iloc[0]
+
+def pretty_mean_and_ci(row : dict[str:float], precision : int = 3
+    ) -> str: 
+    """
+    """
+    ten_to_the_precision : str = pow(10,precision)
+    M = int(row["mean"] * ten_to_the_precision) / ten_to_the_precision
+    CI = int(row["upper_band"] * ten_to_the_precision) / ten_to_the_precision
+    return f"{M}±{CI}"
