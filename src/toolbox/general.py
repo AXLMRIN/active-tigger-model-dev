@@ -61,7 +61,8 @@ def SUL_string(vec) :
     """
     return a sorted list of unique string items
     """
-    return sorted(list(set(vec)), key = lambda x : str(x).lower())
+    sort = sorted(list(set(vec)), key = lambda x : str(x).lower())
+    return [str(x) for x in sort]
 
 def get_band(vec : list[float], type : str, alpha : float = 0.9) -> float :
     """
