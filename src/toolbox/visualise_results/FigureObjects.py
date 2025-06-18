@@ -209,6 +209,8 @@ def plot_score_per_embedding_model_and_classifier(data_baseline : pd.DataFrame,
 
 def plot_score_against_learning_rate_per_embedding_model_and_classifier(
         data_baseline : pd.DataFrame, data_others : pd.DataFrame) -> Figure:
+    """
+    """
     visu = Visualisation(
         data_baseline = data_baseline,
         data_others = data_others,
@@ -216,7 +218,7 @@ def plot_score_against_learning_rate_per_embedding_model_and_classifier(
         column_frame = "embedding_model",
         column_trace = "classifier",
         score_column = "score",
-        x_axis_column = None,
+        x_axis_column = "learning_rate",
         measure = "f1_macro",
         column_measure = "measure"
     )
