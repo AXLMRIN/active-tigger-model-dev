@@ -209,9 +209,20 @@ class DataHandler :
         ) -> None: 
         """
         """
-        self.open_data()
-        self.preprocess(preprocess_function)
-        self.split(ratio_train, ratio_eval, stratify_columns)
+        try : 
+            self.open_data()
+        except Exception as e:
+            raise ValueError(f"Data could not be open.\n\nError:\n{e}")
+        ###
+        try : 
+            self.preprocess(preprocess_function)
+        except Exception as e:
+            raise ValueError(f"Data could not be preprocessed.\n\nError:\n{e}")
+        ###f
+        try:
+            self.split(ratio_train, ratio_eval, stratify_columns)
+        except Exception as e:
+            raise ValueError(f"Data could not be split.\n\nError:\n{e}")
     
     def debug(self):#TODELETE
         return self.__ds
