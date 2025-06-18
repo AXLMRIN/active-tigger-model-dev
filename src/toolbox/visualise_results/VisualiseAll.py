@@ -1,8 +1,9 @@
 # IMPORTS ######################################################################
 import pandas as pd
 from .. import ROOT_RESULTS
-from .FigureObjects import (ScorePerModelAndClassifier, 
-    ScorePerLearningRateAndModelAndClassifier, Visualisation)
+from .FigureObjects import (plot_score_per_embedding_model_and_classifier,
+    plot_score_per_classifier_and_embedding_model,
+    plot_score_against_learning_rate_per_embedding_model_and_classifier)
 # SCRIPTS ######################################################################
 class VisualiseAll : 
     """
@@ -24,15 +25,18 @@ class VisualiseAll :
             pd.read_csv(f"{ROOT_RESULTS}/{self.__filename_others}")
 
     def create_figures(self) -> None : 
-        Visualisation(self.__baseline, self.__others,"bar").\
-            routine().show()
-        Visualisation(self.__baseline, self.__others,"scatter", 
-                      x_axis_column="learning_rate").\
-            routine().show()
+        input = {
+            "data_baseline" : self.__baseline,
+            "data_others" : self.__others
+        }
+        plot_score_per_embedding_model_and_classifier(**input).show()
+        plot_score_per_classifier_and_embedding_model(**input).show()
+        plot_score_against_learning_rate_per_embedding_model_and_classifier(**input).show()
+        
         
         
     def routine(self) -> None : 
         self.open_data()
-        print(self.__baseline) #TODELTE
+        print(self.__baseline) #TODELETE
         print(self.__others) #TODELETE
         self.create_figures()
