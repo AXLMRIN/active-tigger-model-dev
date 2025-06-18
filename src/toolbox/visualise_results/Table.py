@@ -4,6 +4,7 @@ from ..general import SUL_string, get_band, pretty_mean_and_ci
 from plotly.graph_objs._figure import Figure
 import plotly.graph_objects as go
 from great_tables import GT, style, loc
+from great_tables.gt import GT as gt_table
 # CONSTANT #####################################################################
 LIGHT_GREY = "#F0F0F0"
 # SCRIPTS ######################################################################
@@ -143,7 +144,7 @@ class Table :
 
         )
 
-    def routine(self, alpha : float = 0.9) -> None:
+    def routine(self, alpha : float = 0.9) -> gt_table:
         self.preprocess(alpha)
         self.build_table()
         return self.__fig
