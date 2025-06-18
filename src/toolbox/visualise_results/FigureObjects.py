@@ -45,9 +45,6 @@ class Visualisation :
             self.__column_x_axis] if col is not None]
         self.__data_baseline = self.__data_baseline.\
             loc[:,columns_to_retrieve]
-        self.__baseline_trace_value = get_most_frequent_item(
-            self.__data_baseline[self.__column_trace]
-        )
         self.__data_others = self.__data_others.\
             loc[:,columns_to_retrieve]
         
@@ -96,16 +93,16 @@ class Visualisation :
         """
         """
         grouped_baseline = self.__data_baseline_M_and_CI.\
-            groupby([self.__column_frame, self.__column_trace])
-        for idx, frame in enumerate(self.__list_of_frames): 
-            sub_df = grouped_baseline.get_group((frame, self.__baseline_trace_value))
+            groupby([self.__column_frame, self.__column_trace],as_index = False)
+        for (frame,trace), sub_df in grouped_baseline: 
+            idx = self.__list_of_frames.index(frame)
             bars = generic_bar(
                 df = sub_df, 
                 col_x = self.__column_trace, 
                 col_y = "mean",
                 col_band_u = "upper_band", 
                 col_band_l = "lower_band",
-                name = self.__baseline_trace_value, 
+                name = trace, 
                 idx = idx
             )
             self.__fig.add_trace(bars)
@@ -131,16 +128,16 @@ class Visualisation :
         """
         # Create the scatter for the baseline
         grouped_baseline = self.__data_baseline_M_and_CI.\
-            groupby([self.__column_frame, self.__column_trace])
-        for idx, frame in enumerate(self.__list_of_frames): 
-            sub_df = grouped_baseline.get_group((frame, self.__baseline_trace_value))
+            groupby([self.__column_frame, self.__column_trace],as_index = False)
+        for (frame,trace), sub_df in grouped_baseline: 
+            idx = self.__list_of_frames.index(frame)
             trace_mean, trace_bands = generic_scatter_with_bands(
                 df = sub_df, 
                 col_x = self.__column_x_axis, 
                 col_y = "mean",
                 col_band_u = "upper_band", 
                 col_band_l = "lower_band",
-                name = self.__baseline_trace_value,
+                name = trace,
                 idx = idx
             )
             
