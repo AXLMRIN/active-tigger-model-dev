@@ -1,5 +1,6 @@
 # IMPORTS ######################################################################
 from typing import Any, Iterable
+import pandas as pd
 from json import dumps
 from numpy.random import shuffle
 from gc import collect as gc_collect
@@ -90,7 +91,7 @@ def get_uniques_values(vec_1, vec_2) -> list[float] :
     """
     return list(set([*vec_1, *vec_2]))
 
-def get_most_frequent_item(vec : Iterable[Any]) -> Any:
+def get_most_frequent_item(vec : pd.Series) -> Any:
     """
     """
-    return np.argmax(np.bincount(vec))
+    return vec.mode().iloc[0]
