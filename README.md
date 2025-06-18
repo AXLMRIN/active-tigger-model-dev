@@ -13,6 +13,7 @@ pip install mergedeep
 conda install plotly
 pip install -U kaleido
 pip install pygad
+conda install great_tables
 ```
 Si sur GPU : 
 ```
