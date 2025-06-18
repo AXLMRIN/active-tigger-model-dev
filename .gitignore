@@ -14,5 +14,4 @@ src3/results/interpretation_files/libs
 !src3/2025-06-09-testing_models.py
 !src/s2-test_embedding_models.py
 src/toolbox/secrets.py
-models/
-!models/README.md
+models/*/
