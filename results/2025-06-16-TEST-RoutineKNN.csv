@@ -1,0 +1,10 @@
+n_neighbors,metric,score,measure,time,n_optim_iterations,learning_rate,optim,warmup_ratio,weight_decay,path,epoch,classifier,embedding_model,n_samples,iteration
+11,l1,0.321078431372549,f1_macro,0.4602210521697998,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_1,1,KNeighborsClassifier,FacebookAI/roberta-base,500,1
+19,l1,0.3486842105263157,f1_macro,0.3621218204498291,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_2,2,KNeighborsClassifier,FacebookAI/roberta-base,500,1
+16,l1,0.2888888888888889,f1_macro,0.4223527908325195,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_3,3,KNeighborsClassifier,FacebookAI/roberta-base,500,1
+11,l1,0.32107843137254904,f1_macro,0.4602210521697998,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_1,1,KNeighborsClassifier,FacebookAI/roberta-base,500,1
+19,l1,0.34868421052631576,f1_macro,0.3621218204498291,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_2,2,KNeighborsClassifier,FacebookAI/roberta-base,500,1
+16,l1,0.2888888888888889,f1_macro,0.42235279083251953,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_3,3,KNeighborsClassifier,FacebookAI/roberta-base,500,1
+14,l1,0.32107843137254904,f1_macro,0.6322779655456543,6,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_1,1,KNeighborsClassifier,FacebookAI/roberta-base,500,2
+3,l1,0.2888888888888889,f1_macro,0.4331059455871582,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_2,2,KNeighborsClassifier,FacebookAI/roberta-base,500,2
+10,l1,0.2888888888888889,f1_macro,0.5387840270996094,5,5e-05,adamw_torch,0.1,0.01,./models/FacebookAI/roberta-base/002/embeddings/epoch_3,3,KNeighborsClassifier,FacebookAI/roberta-base,500,2
