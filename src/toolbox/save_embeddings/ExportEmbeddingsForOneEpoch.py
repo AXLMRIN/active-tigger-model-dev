@@ -22,9 +22,9 @@ class ExportEmbeddingsForOneEpoch:
         else :
             self.device = device
 
-        checkpoint : str = checkpoint_to_load(foldername, epoch)
+        self.__checkpoint : str = checkpoint_to_load(foldername, epoch)
         self.__model = AutoModelForSequenceClassification.\
-            from_pretrained(f"{foldername}/{checkpoint}")
+            from_pretrained(f"{foldername}/{self.__checkpoint}")
         
         if not(os.path.exists(f"{foldername}/embeddings/epoch_{epoch}")):
             os.makedirs(f"{foldername}/embeddings/epoch_{epoch}")
@@ -70,9 +70,24 @@ class ExportEmbeddingsForOneEpoch:
         save(labels, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/test_labels.pt")
         save(embeddings, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/test_embeddings.pt")
 
-    def routine(self) -> None:
-        self.export_train_embeddings()
-        self.export_test_embeddings()
+    def __delete_files(self) -> None:
+        """
+        """
+        print((f"WARNING: {self.__foldername}/{self.__checkpoint}/"
+               "(model.safetensors and optimizer.pt) are permanently deleted."))
+        for file in ["model.safetensors", "optimizer.pt"]:
+            try : 
+                os.remove(f"{self.__foldername}/{self.__checkpoint}/{file}")
+            except Exception as e:
+                print((f"File {self.__foldername}/{self.__checkpoint}/{file} "
+                       "could not be deleted because : \n{e}"))
+
+
+    def routine(self, delete_files_after_routine : bool = False) -> None:
+        # self.export_train_embeddings()
+        # self.export_test_embeddings()
         del self.__ds, self.__model
         clean()
+        if delete_files_after_routine:
+            self.__delete_files()
     
