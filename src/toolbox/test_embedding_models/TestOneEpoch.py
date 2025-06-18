@@ -82,7 +82,12 @@ class TestOneEpoch:
         }
 
     def routine(self, additional_tags : dict = {}) -> dict:
-        self.run_test()
+        """
+        """
+        try: 
+            self.run_test()
+        except Exception as e:
+            raise ValueError(f"Test One Epoch could not run the test.\n\nError:\n{e}")
         output = self.return_result(additional_tags)
         del self.__model, self.__ds
         clean()
