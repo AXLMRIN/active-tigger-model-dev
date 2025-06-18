@@ -1,9 +1,10 @@
 # IMPORTS ######################################################################
 import pandas as pd
-from .. import ROOT_RESULTS
-from .FigureObjects import (plot_score_per_embedding_model_and_classifier,
+from .. import ROOT_RESULTS, ROOT_FIGURES
+from .Visualisation import (plot_score_per_embedding_model_and_classifier,
     plot_score_per_classifier_and_embedding_model,
     plot_score_against_learning_rate_per_embedding_model_and_classifier)
+from .Table import (table_score_against_epoch_per_classifier_and_embedding_model)
 # SCRIPTS ######################################################################
 class VisualiseAll : 
     """
@@ -29,11 +30,10 @@ class VisualiseAll :
             "data_baseline" : self.__baseline,
             "data_others" : self.__others
         }
-        plot_score_per_embedding_model_and_classifier(**input).show()
-        plot_score_per_classifier_and_embedding_model(**input).show()
-        plot_score_against_learning_rate_per_embedding_model_and_classifier(**input).show()
-        
-        
+        plot_score_per_embedding_model_and_classifier(**input)
+        plot_score_per_classifier_and_embedding_model(**input)
+        plot_score_against_learning_rate_per_embedding_model_and_classifier(**input)
+        table_score_against_epoch_per_classifier_and_embedding_model(**input)
         
     def routine(self) -> None : 
         self.open_data()
