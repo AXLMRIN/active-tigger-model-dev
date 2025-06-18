@@ -148,3 +148,17 @@ class Table :
         self.preprocess(alpha)
         self.build_table()
         return self.__fig
+    
+def table_score_against_epoch_per_classifier_and_embedding_model(
+    data_baseline : pd.DataFrame, data_others : pd.DataFrame) -> Figure:
+    t = Table(
+        data_baseline=data_baseline, 
+        data_others = data_others,
+        column_row = "classifier",
+        column_column= "epoch",
+        column_group = "embedding_model",
+        column_score = "score",
+        measure = "f1_macro",
+        column_measure = "measure"
+    )
+    return t.routine()
