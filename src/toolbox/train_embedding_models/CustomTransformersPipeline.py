@@ -52,7 +52,7 @@ class CustomTransformersPipeline:
         }
 
         if output_dir is None : 
-            output_dir = (f"{self.model_name}/")
+            output_dir = (f"./models/{self.model_name}/") # FIXME could be done in a cleaner way
             if os.path.isdir(output_dir) : 
                 n_elements_in_output_dirs : int = len(
                     os.listdir(output_dir)
@@ -159,7 +159,7 @@ class CustomTransformersPipeline:
             raise ValueError((f"Training Pipeline could not load the tokenizer "
                               f"and model.\n\nError:\n{e}"))
         ###
-        try : 
+        try :
             self.__data.encode(self.tokenizer, self.tokenizing_parameters)
         except Exception as e:
             del self.model, self.__data, self.tokenizer
