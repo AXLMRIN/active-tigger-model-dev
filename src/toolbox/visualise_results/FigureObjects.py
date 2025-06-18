@@ -194,6 +194,25 @@ class Visualisation :
     
 def plot_score_per_embedding_model_and_classifier(data_baseline : pd.DataFrame, 
         data_others : pd.DataFrame) -> Figure:
+    """
+    """
+    visu = Visualisation(
+        data_baseline = data_baseline,
+        data_others = data_others,
+        type = "bar",
+        column_frame = "embedding_model",
+        column_trace = "classifier",
+        score_column = "score",
+        x_axis_column = None,
+        measure = "f1_macro",
+        column_measure = "measure"
+    )
+    return visu.routine()
+
+def plot_score_per_classifier_and_embedding_model(data_baseline : pd.DataFrame, 
+        data_others : pd.DataFrame) -> Figure:
+    """
+    """
     visu = Visualisation(
         data_baseline = data_baseline,
         data_others = data_others,
