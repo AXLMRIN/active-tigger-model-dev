@@ -84,8 +84,8 @@ class ExportEmbeddingsForOneEpoch:
 
 
     def routine(self, delete_files_after_routine : bool = False) -> None:
-        # self.export_train_embeddings()
-        # self.export_test_embeddings()
+        self.export_train_embeddings()
+        self.export_test_embeddings()
         del self.__ds, self.__model
         clean()
         if delete_files_after_routine:
