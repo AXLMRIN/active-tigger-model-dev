@@ -2,7 +2,6 @@
 import pandas as pd
 from mergedeep import merge
 from typing import Union
-from .. import ROOT_RESULTS
 from . import LAYOUT
 from .figure_tools import multiple_figures_layout, generic_bar, generic_scatter_with_bands
 from ..general import SUL_string, get_band, auto_log_range, get_uniques_values, get_most_frequent_item

@@ -2,7 +2,6 @@
 import os
 from .TestOneEpoch import TestOneEpoch
 import pandas as pd
-from .. import ROOT_RESULTS
 # SCRIPTS ######################################################################
 class TestAllEpochs:
     """
@@ -28,12 +27,12 @@ class TestAllEpochs:
         """
         """
         try : 
-            df = pd.read_csv(f"{ROOT_RESULTS}/{filename}")
+            df = pd.read_csv(f"{filename}")
             df = pd.concat((df, pd.DataFrame(self.__results)))
         except:
             df = pd.DataFrame(self.__results)
         finally:
-            df.to_csv(f"{ROOT_RESULTS}/{filename}", index = False)
+            df.to_csv(f"{filename}", index = False)
     
     def routine(self, filename : str, device : str|None = None, 
         additional_tags : dict = {}):

@@ -10,7 +10,6 @@ from transformers import (
 from transformers.trainer_utils import TrainOutput
 from .functions import compute_metrics
 import os
-from .. import ROOT_MODELS
 from ..general import pretty_number, pretty_printing_dictionnary, clean
 from time import time
 # SCRIPTS ######################################################################
@@ -53,7 +52,7 @@ class CustomTransformersPipeline:
         }
 
         if output_dir is None : 
-            output_dir = (f"{ROOT_MODELS}/{self.model_name}/")
+            output_dir = (f"{self.model_name}/")
             if os.path.isdir(output_dir) : 
                 n_elements_in_output_dirs : int = len(
                     os.listdir(output_dir)

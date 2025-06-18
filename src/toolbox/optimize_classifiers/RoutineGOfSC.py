@@ -4,7 +4,6 @@ from .DataHandlerForGOfSC import DataHandlerForGOfSC
 from typing import Any
 from itertools import product
 import os
-from .. import ROOT_MODELS, ROOT_RESULTS
 from ..general import clean, get_checkpoints
 from torch import load
 import pandas as pd
@@ -36,17 +35,17 @@ class RoutineGOfSC:
     def __get_configs_of_the_folder(self) -> pd.DataFrame:
         """
         """
-        all_posible_folders : list[str] = os.listdir(f"{ROOT_MODELS}/{self.__foldername}")
+        all_posible_folders : list[str] = os.listdir(f"{self.__foldername}")
         all_configs: list[dict[str:Any]] = []
         for folder in all_posible_folders : 
             # One checkpoint per epoch
             all_checkpoints : list[str] = \
-                get_checkpoints(f"{ROOT_MODELS}/{self.__foldername}/{folder}") 
+                get_checkpoints(f"{self.__foldername}/{folder}") 
             first_checkpoint : str = all_checkpoints[0]
-            training_args = load((f"{ROOT_MODELS}/{self.__foldername}/{folder}/"
+            training_args = load((f"{self.__foldername}/{folder}/"
                                   f"{first_checkpoint}/training_args.bin"),
                                   weights_only=False)
-            with open(f"{ROOT_MODELS}/{self.__foldername}/{folder}/model_name.txt","r") as file : 
+            with open(f"{self.__foldername}/{folder}/model_name.txt","r") as file : 
                 model_name : str = file.read()
 
             # add one row per epoch
@@ -56,7 +55,7 @@ class RoutineGOfSC:
                     "optim" : training_args.optim,
                     "warmup_ratio" : training_args.warmup_ratio,
                     "weight_decay" : training_args.weight_decay,
-                    "path" : (f"{ROOT_MODELS}/{self.__foldername}/{folder}/"
+                    "path" : (f"{self.__foldername}/{folder}/"
                               f"embeddings/epoch_{epoch}"),
                     "epoch" : epoch,
                     "model_name" : model_name
@@ -143,12 +142,12 @@ class RoutineGOfSC:
         if len(self.__results) > 0 : 
             try : 
                 # if file already exists
-                df = pd.read_csv(f"{ROOT_RESULTS}/{filename}")
+                df = pd.read_csv(f"{filename}")
                 df = pd.concat((df, pd.DataFrame(self.__results)))
             except:
                 df = pd.DataFrame(self.__results)
             finally:
-                df.to_csv(f"{ROOT_RESULTS}/{filename}", index = False)
+                df.to_csv(f"{filename}", index = False)
                 # Reinit results
                 self.__results = []
             

@@ -1,6 +1,5 @@
 # IMPORTS ######################################################################
 import pandas as pd
-from .. import ROOT_RESULTS, ROOT_FIGURES
 from .Visualisation import (plot_score_per_embedding_model_and_classifier,
     plot_score_per_classifier_and_embedding_model,
     plot_score_against_learning_rate_per_embedding_model_and_classifier)
@@ -21,9 +20,9 @@ class VisualiseAll :
 
     def open_data(self) : 
         self.__baseline : pd.DataFrame = \
-            pd.read_csv(f"{ROOT_RESULTS}/{self.__filename_baseline}")
+            pd.read_csv(f"{self.__filename_baseline}")
         self.__others : pd.DataFrame = \
-            pd.read_csv(f"{ROOT_RESULTS}/{self.__filename_others}")
+            pd.read_csv(f"/{self.__filename_others}")
 
     def create_figures(self) -> None : 
         input = {

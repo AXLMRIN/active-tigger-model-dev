@@ -1,6 +1,5 @@
 # IMPORTS ######################################################################
 import pandas as pd
-from .. import ROOT_RESULTS
 from . import GRIDCOLOR_X, COLORS
 from ..general import SUL_string
 from plotly.graph_objs._figure import Figure

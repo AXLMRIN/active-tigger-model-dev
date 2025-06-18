@@ -6,7 +6,6 @@ from datasets import Dataset, DatasetDict, load_from_disk
 from collections.abc import Callable
 from pandas.api.typing import DataFrameGroupBy
 from typing import Any
-from .. import ROOT_DATA
 import os
 # from transformers.tokenization_utils_base import BatchEncoding
 # SCRIPTS ######################################################################
@@ -65,7 +64,7 @@ class DataHandler :
             self.__text_column : "TEXT",
             self.__label_column : "LABEL"
         }
-        self.__df : pd.DataFrame = pd.read_csv(f"{ROOT_DATA}/{self.__filename}").\
+        self.__df : pd.DataFrame = pd.read_csv(f"{self.__filename}").\
             rename(replace_columns, axis = 1).\
             loc[:, ["TEXT", "LABEL", *extra_columns_to_keep]].\
             sample(frac = 1) # Shuffle
