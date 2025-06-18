@@ -181,6 +181,8 @@ class DataHandler :
         return self.__ds[ds_name] 
 
     def save_all(self, foldername : str) -> None:
+        """
+        """
         # Save the config
         if os.path.exists(f"{foldername}/data") : 
             os.remove(f"{foldername}/data")
