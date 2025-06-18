@@ -104,3 +104,8 @@ def pretty_mean_and_ci(row : dict[str:float], precision : int = 3
     M = int(row["mean"] * ten_to_the_precision) / ten_to_the_precision
     CI = int(row["upper_band"] * ten_to_the_precision) / ten_to_the_precision
     return f"{M}±{CI}"
+
+def header_format(columns : list[str]) -> list[str] : 
+    """
+    """
+    return [f"<b>{col}</b>" for col in columns]
