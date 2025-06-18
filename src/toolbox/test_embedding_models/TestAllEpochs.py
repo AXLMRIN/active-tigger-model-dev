@@ -39,4 +39,7 @@ class TestAllEpochs:
         """
         """
         self.run_tests(device,additional_tags)
-        self.save_results(filename) 
+        try:
+            self.save_results(filename) 
+        except Exception as e:
+            raise ValueError(f"Test All Epochs failed saving.\n\nError:\n{e}")
