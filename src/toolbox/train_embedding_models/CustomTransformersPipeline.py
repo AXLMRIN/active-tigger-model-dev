@@ -145,7 +145,7 @@ class CustomTransformersPipeline:
             compute_metrics = compute_metrics
         )
         t2 = time() 
-        # Find a way to do something about it
+        # TODO Find a way to do something about it
         return trainer.train()
     
     def routine(self, debug_mode : bool = False):
