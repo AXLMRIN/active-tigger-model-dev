@@ -149,13 +149,57 @@ class CustomTransformersPipeline:
         return trainer.train()
     
     def routine(self, debug_mode : bool = False):
-        self.load_tokenizer_and_model()
-        self.__data.encode(self.tokenizer, self.tokenizing_parameters)
+        """
+        """
+        try : 
+            self.load_tokenizer_and_model()
+        except Exception as e:
+            del self.model, self.__data, self.tokenizer
+            clean()
+            raise ValueError((f"Training Pipeline could not load the tokenizer "
+                              f"and model.\n\nError:\n{e}"))
+        ###
+        try : 
+            self.__data.encode(self.tokenizer, self.tokenizing_parameters)
+        except Exception as e:
+            del self.model, self.__data, self.tokenizer
+            clean()
+            raise ValueError((f"Training Pipeline could not encode the dataset."
+                              f"\n\nError:\n{e}"))
+        ###
         if debug_mode : 
-            self.__data.debug_mode()
-        output = self.train()
-        self.__data.save_all(self.training_args.output_dir)
-        self.__save_model_name()
+            try : 
+                self.__data.debug_mode()
+            except Exception as e:
+                del self.model, self.__data, self.tokenizer
+                clean()
+                raise ValueError((f"Training Pipeline could not set data into"
+                                  f" debugging mode.\n\nError:\n{e}"))
+        ###
+        try:
+            output = self.train()
+        except Exception as e:
+            del self.model, self.__data, self.tokenizer
+            clean()
+            raise ValueError((f"Training Pipeline could not train the model."
+                              f"\n\nError:\n{e}"))
+        ###
+        try:
+            self.__data.save_all(self.training_args.output_dir)
+        except Exception as e:
+            del self.model, self.__data, self.tokenizer
+            clean()
+            raise ValueError((f"Training Pipeline (Data) could not save data."
+                              f"\n\nError:\n{e}"))
+        ###
+        try: 
+            self.__save_model_name()
+        except Exception as e:
+            del self.model, self.__data, self.tokenizer
+            clean()
+            raise ValueError((f"Training Pipeline could not save the model name."
+                              f"\n\nError:\n{e}"))
+        ###
         del self.model, self.__data, self.tokenizer
         clean()
         return output
