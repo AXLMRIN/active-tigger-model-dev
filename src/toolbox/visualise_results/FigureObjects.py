@@ -161,9 +161,9 @@ class Visualisation :
                 name = trace, 
                 idx = idx
             )
-
             self.__fig.add_trace(trace_mean)
             self.__fig.add_trace(trace_bands)
+
     def build_figure(self, additional_xaxis_kwargs : dict = {},
         figure_layout_kwargs : dict = {}) -> None : 
         """
@@ -191,3 +191,33 @@ class Visualisation :
         self.preprocess_data(alpha)
         self.build_figure(figure_layout_kwargs)
         return self.__fig
+    
+def plot_score_per_embedding_model_and_classifier(data_baseline : pd.DataFrame, 
+        data_others : pd.DataFrame) -> Figure:
+    visu = Visualisation(
+        data_baseline = data_baseline,
+        data_others = data_others,
+        type = "bar",
+        column_frame = "classifier",
+        column_trace = "embedding_model",
+        score_column = "score",
+        x_axis_column = None,
+        measure = "f1_macro",
+        column_measure = "measure"
+    )
+    return visu.routine()
+
+def plot_score_against_learning_rate_per_embedding_model_and_classifier(
+        data_baseline : pd.DataFrame, data_others : pd.DataFrame) -> Figure:
+    visu = Visualisation(
+        data_baseline = data_baseline,
+        data_others = data_others,
+        type = "scatter",
+        column_frame = "embedding_model",
+        column_trace = "classifier",
+        score_column = "score",
+        x_axis_column = None,
+        measure = "f1_macro",
+        column_measure = "measure"
+    )
+    return visu.routine()
