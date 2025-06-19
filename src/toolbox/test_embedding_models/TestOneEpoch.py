@@ -25,7 +25,8 @@ class TestOneEpoch:
 
         checkpoint : str = checkpoint_to_load(foldername, epoch)
         self.__model = AutoModelForSequenceClassification.\
-            from_pretrained(f"{foldername}/{checkpoint}")
+            from_pretrained(f"{foldername}/{checkpoint}").\
+            to(device = self.device)
 
         self.__training_args : TrainingArguments = load(
             f"{foldername}/{checkpoint}/training_args.bin", weights_only=False)
