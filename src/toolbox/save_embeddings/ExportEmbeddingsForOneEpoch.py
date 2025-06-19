@@ -24,7 +24,8 @@ class ExportEmbeddingsForOneEpoch:
 
         self.__checkpoint : str = checkpoint_to_load(foldername, epoch)
         self.__model = AutoModelForSequenceClassification.\
-            from_pretrained(f"{foldername}/{self.__checkpoint}")
+            from_pretrained(f"{foldername}/{self.__checkpoint}").\
+            to(device = self.device)
         
         if not(os.path.exists(f"{foldername}/embeddings/epoch_{epoch}")):
             os.makedirs(f"{foldername}/embeddings/epoch_{epoch}")
