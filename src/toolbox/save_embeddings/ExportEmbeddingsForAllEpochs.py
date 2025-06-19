@@ -11,7 +11,6 @@ class ExportEmbeddingsForAllEpochs:
         self.__foldername : str = foldername
         self.__n_epochs : int = len(
             [f for f in os.listdir(foldername) if f.startswith("checkpoint")])
-        self.__results : list[dict] = []
 
     def export_all(self, device : str|None = None, 
         delete_files_after_routine : bool = False) -> None:
