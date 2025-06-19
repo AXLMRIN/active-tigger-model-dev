@@ -22,7 +22,7 @@ class VisualiseAll :
         self.__baseline : pd.DataFrame = \
             pd.read_csv(f"{self.__filename_baseline}")
         self.__others : pd.DataFrame = \
-            pd.read_csv(f"/{self.__filename_others}")
+            pd.read_csv(f"{self.__filename_others}")
 
     def create_figures(self) -> None : 
         input = {
