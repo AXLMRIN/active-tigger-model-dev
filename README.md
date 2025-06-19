@@ -1,13 +1,4 @@
----
-title: "Test"
-author: "me"
-date: "1/27/2019"
-output: 
-  pdf_document: 
-    keep_tex: yes
-header-includes:
-  \usepackage{dcolumn}
----
+
 # Text Classification: exploring hyper parameters and classifying techniques
 
 ## TLDR
@@ -17,25 +8,38 @@ header-includes:
 - **⚙️ How:** Proposing a pipeline allowing users to choose a set of parameters to test and visualise the results for further analysis. The pipeline uses state of the art libraries such as 🤗 Hugging Face transformers, PyTorch and Scikit-learn.
 - **💻 Setup:** The repository contains an `environment.yml` file for easy setup. The pipeline can be run on CPU or (single) GPU.
 
+## Setting up the environment 
+
 ## Parameters tested
 
-```{r}
-library(knitr)
-library(kableExtra)
-df <- data.frame(Cat = c("Short", "Tall"), 
-                 Sad = linebreak(c("Sam\nBeth", "Erin\nTed")), 
-                 Happy = linebreak(c("Jim\nSara", "Bob\nAva")))
-kable(df, col.names = c("", "Sad", "Happy"), escape = F, caption = "My caption") %>%
-  kable_styling(latex_options = "hold_position")
+```mermaid
+---
+config:
+  logLevel: 'debug'
+  theme: 'forest'
+---
+timeline
+    title The parameters explored during the pipeline
+    section Parameters of the embedding model
+        Step 1<br>Train embedding model: Embedding model<br>(name): Number of epochs: Learning rate: Weight decay: Optimizer: Tokenizer max length: Total batch size
+
+        Step 2<br>Test embedding model: Measure
+        
+        Step 3<br>Save embeddings
+    
+    section Parameters of the classifier
+        Step 4<br>Optimise scikit-learn classifiers: Classifier (sklearn): Number of samples: Hyper parameters to optimise and their optimisation space 
+    section <br>
+        Step 5<br>Visualisation
 ```
-
-## Setting up the environment
-
 ## Libraries used
 
 ## 
 
-## Explaining the pipeline
+## The pipeline
+
+
+## The architecture
 
 
 [^1]: Computational Social Science.
