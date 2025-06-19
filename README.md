@@ -1,5 +1,12 @@
 # Text Classification: exploring hyper parameters and classifying techniques
-Goal :dart: Explore
+
+## TLDR
+
+- **🎯 Goal:** Exploring the impact of hyperparameter tuning and classifying techniques on text classification performances. 
+- **🗂️ Framework:** The classification tasks were chosen to fit in the CSS[^1] context. The tasks were gatheres by [Ziems et al. (2024)](https://direct.mit.edu/coli/article/50/1/237/118498/Can-Large-Language-Models-Transform-Computational).
+- **⚙️ How:** 
+
+[^1]: Computational Social Science.
 # active-tigger-model-dev
 This repository is used to develop models to be used in [active tigger](https://github.com/emilienschultz/activetigger)
 
