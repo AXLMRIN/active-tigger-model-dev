@@ -1,4 +1,4 @@
-name: nVENV
+name: VENV
 channels:
   - conda-forge
 dependencies:

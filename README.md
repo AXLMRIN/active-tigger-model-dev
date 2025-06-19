@@ -9,8 +9,13 @@
 - **💻 Setup:** The repository contains an `environment.yml` file for easy setup. The pipeline can be run on CPU or (single) GPU.
 
 ## Setting up the environment 
+To set up the environment, use the `requirements.yml` file as such : 
 ```bash
-conda create -n VENV python=3.11
+conda env create -f requirements.yml -n ENV_NAME
+```
+Alternatively, you can create the environment manually by typing : 
+```bash
+conda create -n ENV_NAME python=3.11
 pip install -qU transformers datasets 'accelerate>=0.26.0' mergedeep pygad kaleido flash_attn
 conda install pytorch scikit-learn plotly great_tables pandas
 ```
