@@ -10,6 +10,7 @@ from ..general import checkpoint_to_load, clean
 class TestOneEpoch: 
     """
     """
+    # UPGRADE make possible to change the measure
     def __init__(self, foldername: str, epoch : int, 
         device : str|None = None) -> None:
         """
