@@ -6,17 +6,19 @@ from sklearn.metrics import f1_score
 import numpy as np
 from torch.cuda import is_available as cuda_available
 from ..general import checkpoint_to_load, clean
+from ..CustomLogger import CustomLogger
 # SCRIPTS ######################################################################
 class TestOneEpoch: 
     """
     """
     # UPGRADE make possible to change the measure
-    def __init__(self, foldername: str, epoch : int, 
+    def __init__(self, foldername: str, epoch : int, logger : CustomLogger,
         device : str|None = None) -> None:
         """
         """
         self.__foldername : str = foldername
         self.__epoch : str = epoch
+        self.__logger : CustomLogger = logger
         self.__ds : DatasetDict = load_from_disk(f"{foldername}/data/")
 
         if device is None : 
@@ -66,6 +68,9 @@ class TestOneEpoch:
             labels_pred.extend(batch_of_pred_label)
             
         self.__score = f1_score(labels_true, labels_pred, average='macro')
+
+        # Logging
+        self.__logger(f"(Epoch {self.__epoch}) Testing - Done (score : {self.__score})")
         
     def return_result(self, additional_tags : dict = {}) -> dict:
         """

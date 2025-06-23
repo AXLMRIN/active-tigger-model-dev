@@ -2,14 +2,16 @@
 import os
 from .TestOneEpoch import TestOneEpoch
 import pandas as pd
+from ..CustomLogger import CustomLogger
 # SCRIPTS ######################################################################
 class TestAllEpochs:
     """
     """
-    def __init__(self, foldername) -> None:
+    def __init__(self, foldername, logger : CustomLogger) -> None:
         """
         """
         self.__foldername : str = foldername
+        self.__logger : CustomLogger = logger
         self.__n_epochs : int = len(
             [f for f in os.listdir(foldername) if f.startswith("checkpoint")])
         self.__results : list[dict] = []
@@ -19,7 +21,8 @@ class TestAllEpochs:
         """
         for epoch in range(self.__n_epochs) : 
             self.__results.append(
-                TestOneEpoch(self.__foldername, epoch, device).\
+                TestOneEpoch(foldername = self.__foldername, epoch = epoch, 
+                    logger = self.__logger, device = device).\
                     routine(additional_tags)
             )
     
@@ -38,8 +41,13 @@ class TestAllEpochs:
         additional_tags : dict = {}):
         """
         """
+        self.__logger(f"[TestAllEpochs] Routine start {self.__n_epochs} epochs---", 
+            skip_line="before")
+        
         self.run_tests(device,additional_tags)
         try:
             self.save_results(filename) 
         except Exception as e:
             raise ValueError(f"Test All Epochs failed saving.\n\nError:\n{e}")
+        
+        self.__logger("[TestAllEpochs] Routine finish ---", skip_line="after")
