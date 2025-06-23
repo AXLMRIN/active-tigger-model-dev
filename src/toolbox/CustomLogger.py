@@ -3,28 +3,28 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 from .secrets import EMAIL_FROM, EMAIL_TO, EMAIL_FROM_PWD, URL_ONYXIA
+import os
 # SCRIPTS ######################################################################
 class CustomLogger:
-    def __init__(self, text_filename : str = None):
+    def __init__(self, foldername : str = None):
         self.name = ""
-        self.text_filename = text_filename
+        self.foldername = foldername
 
-    def log(self, message, printing : bool = False):
+    def initialise_log(self, type : str):
+        # Initialise the log file if it doesn't exist
+        
+            with open(f"{self.foldername}/{type}.log", "w") as file : 
+                file.write(f"### {type} ###\n")
+
+    def log(self, message, printing : bool = False, type : str = "INFO"):
         if printing:
             print(message)
-        # Save the message in the log
-        if self.text_filename is None:
-            print("-- No log file available --")
-        else: 
-            try : 
-                #log file already exists
-                with open(self.text_filename, "a") as file:
-                    file.write(message)
-            except : 
-                # log file does not exist
-                with open(self.text_filename, "w") as file:
-                    file.write(message)
-                    
+
+        if f"{type}.log" not in os.listdir(self.foldername):
+            self.initialise_log(type)
+        
+        with open(f"{self.foldername}/{type}.log", "a") as file:
+            file.write(message)
 
     def notify_when_done(self, message : str = '') : 
         """send an email when finished"""
