@@ -17,7 +17,8 @@ class CustomLogger:
             with open(f"{self.foldername}/{type}.log", "w") as file : 
                 file.write(f"### {type} logs ###\n")
 
-    def __call__(self, message, printing : bool = False, type : str = "LOOP_INFO"):
+    def __call__(self, message, printing : bool = False, type : str = "LOOP_INFO",
+        skip_line : str = None) -> None:
         if printing:
             print(message)
 
@@ -25,8 +26,10 @@ class CustomLogger:
             self.initialise_log(type)
         
         with open(f"{self.foldername}/{type}.log", "a") as file:
+            if skip_line == "before" : file.write("\n")
             file.write(f"[{type}] ({Timestamp.now().strftime('%Y-%m-%d %X')}): "
                       f"{message}\n")
+            if skip_line == "after" : file.write("\n")
 
     def notify_when_done(self, message : str = '') : 
         """send an email when finished"""
