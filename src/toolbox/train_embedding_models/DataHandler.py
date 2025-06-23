@@ -240,7 +240,7 @@ class DataHandler :
         ) -> None: 
         """
         """
-        self.__logger("[DataHandler] Routine start ---")
+        self.__logger("[DataHandler] Routine start ---", skip_line = "before")
         try : 
             self.open_data()
         except Exception as e:
@@ -256,7 +256,7 @@ class DataHandler :
         except Exception as e:
             raise ValueError(f"Data could not be split.\n\nError:\n{e}")
         
-        self.__logger("[DataHandler] Routine finish ---")
+        self.__logger("[DataHandler] Routine finish ---", skip_line = "after")
     
     def debug(self):#TODELETE
         return self.__ds
