@@ -14,9 +14,9 @@ class CustomLogger:
         # Initialise the log file if it doesn't exist
         
             with open(f"{self.foldername}/{type}.log", "w") as file : 
-                file.write(f"### {type} ###\n")
+                file.write(f"### {type} logs ###\n")
 
-    def log(self, message, printing : bool = False, type : str = "INFO"):
+    def __call__(self, message, printing : bool = False, type : str = "INFO"):
         if printing:
             print(message)
 
@@ -24,7 +24,7 @@ class CustomLogger:
             self.initialise_log(type)
         
         with open(f"{self.foldername}/{type}.log", "a") as file:
-            file.write(message)
+            file.write(f"[{type}] : {message}\n")
 
     def notify_when_done(self, message : str = '') : 
         """send an email when finished"""
