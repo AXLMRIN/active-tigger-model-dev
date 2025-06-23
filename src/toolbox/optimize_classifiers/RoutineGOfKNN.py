@@ -1,5 +1,6 @@
 # IMPORTS ######################################################################
 from typing import Any
+from ..CustomLogger import CustomLogger
 from .RoutineGOfSC import RoutineGOfSC
 from sklearn.neighbors import KNeighborsClassifier
 # SCRIPTS ######################################################################
@@ -10,6 +11,7 @@ class RoutineGOfKNN(RoutineGOfSC) :
         foldername : str, 
         ranges_of_configs : dict[str:list[Any]],
         n_samples : int,
+        logger : CustomLogger,
         extra_GA_parameters : dict = {}
         ) -> None:
         """
@@ -19,7 +21,7 @@ class RoutineGOfKNN(RoutineGOfSC) :
             ranges_of_configs = ranges_of_configs,
             n_samples = n_samples,
             extra_GA_parameters = extra_GA_parameters,
-
+            logger = logger,
             classifier = KNeighborsClassifier,
             parameters_mapper = {
                 "n_neighbors" : self.__n_neighbors_mapper_function,

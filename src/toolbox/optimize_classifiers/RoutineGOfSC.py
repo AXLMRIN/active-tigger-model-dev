@@ -1,4 +1,5 @@
 # IMPORTS ######################################################################
+from ..CustomLogger import CustomLogger
 from .GeneticOptimiserForSklearnClassifier import GeneticOptimiserForSklearnClassifier
 from .DataHandlerForGOfSC import DataHandlerForGOfSC
 from typing import Any
@@ -20,6 +21,7 @@ class RoutineGOfSC:
         n_samples : int,
         parameters_mapper : dict,
         gene_space : dict,
+        logger : CustomLogger, 
         extra_GA_parameters : dict = {}) -> None:
         """
         """
@@ -29,6 +31,7 @@ class RoutineGOfSC:
         self.__n_samples : int  = n_samples
         self.__parameters_mapper : dict = parameters_mapper
         self.__gene_space : dict = gene_space
+        self.__logger : CustomLogger = logger
         self.__extra_GA_parameters : dict = extra_GA_parameters
         self.__results : list[dict[str:Any]] = []
     
@@ -73,6 +76,12 @@ class RoutineGOfSC:
         config_found : pd.DataFrame = all_configs.loc[condition, :]
         return config_found
     
+    def __print_config(self, config : tuple[Any, ...]) -> str:
+        output : str = ""
+        for name, value in zip(self.__ranges_of_configs.keys(), config):
+            output += f"{name} : {value}, "
+        return output
+    
     def run_all(self, iteration : int) -> None:
         """
         In the foldername we expect : 
@@ -98,7 +107,6 @@ class RoutineGOfSC:
             config_found : pd.DataFrame = self.__find_config(config_researched, all_configs)
             if len(config_found) > 0 : 
                 path = config_found.iloc[0]["path"]
-                print(f"{config_researched} : {path}")
 
                 data = DataHandlerForGOfSC(path, self.__n_samples)
 
@@ -132,8 +140,13 @@ class RoutineGOfSC:
                 del optimum, f1_max, optimisation_time, n_optim_iterations, optimiser, data
                 clean()
                 
+                # Logging
+                self.__logger((f"({self.__print_config(config_researched)}) "
+                    f"score {f1_max:.4f}; path : {path}"))
+                
             else :
-                print(f"{config_researched} : None found")
+                self.__logger((f"({self.__print_config(config_researched)}) "
+                    f"path : None"))
                 pass           
 
     def save_results(self, filename : str) -> None: 
@@ -150,14 +163,46 @@ class RoutineGOfSC:
                 df.to_csv(f"{filename}", index = False)
                 # Reinit results
                 self.__results = []
+        
+        # Logging
+        self.__logger((f"[RoutineGOfSC - {self.__classifier.__name__}]"
+                       "results - saved"))
             
+    def __print_info(self) -> str : 
+        """
+        """
+        output : str = f"[RoutineGOfSC] INFO :\n"
+        output += f"\t- Foldername : {self.__foldername}\n"
+        output += f"\t- Classifier : {self.__classifier}\n"
+        output += f"\t- n_samples : {self.__n_samples}\n"
+        
+        output += f"\t- Range of config :\n"
+        for name, range in self.__ranges_of_configs.items():
+            output += f"\t\t- {name} : {range}\n"
+        
+        output += f"\t- Gene space :\n"
+        for gene, space in self.__gene_space.items():
+            output += f"\t\t- {gene} : {space}\n"
+        
+        output += f"\tExtra GA parameters :\n"
+        for parameter, value in self.__extra_GA_parameters.items():
+            output += f"\t\t- {parameter} : {value}\n"
 
+        return output
+    
     def routine(self, filename : str, n_iterations : int = 1) -> None:
         """
         """
+        self.__logger(self.__print_info(), skip_line="before")
         for iteration in range(1, n_iterations + 1) : 
+            self.__logger((f"[RoutineGOfSC - {self.__classifier.__name__}] Routine "
+                f"start (iteration : {iteration})"))
+            
             self.run_all(iteration)
             self.save_results(filename)
+            
+            self.__logger((f"[RoutineGOfSC - {self.__classifier.__name__}] Routine "
+                f"finish (iteration : {iteration})"), skip_line = "after")
 
         
 
