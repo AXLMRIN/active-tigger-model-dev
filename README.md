@@ -9,16 +9,35 @@
 - **💻 Setup:** The repository contains an `environment.yml` file for easy setup. The pipeline can be run on CPU or (single) GPU.
 
 ## Setting up the environment 
+
 To set up the environment, use the `requirements.yml` file as such : 
+
 ```bash
 conda env create -f requirements.yml -n ENV_NAME
 ```
+
 Alternatively, you can create the environment manually by typing : 
+
 ```bash
 conda create -n ENV_NAME python=3.11
-pip install -qU transformers datasets 'accelerate>=0.26.0' mergedeep pygad kaleido flash_attn
-conda install pytorch scikit-learn plotly great_tables pandas
+conda activate ENV_NAME
+pip install -qU transformers datasets 'accelerate>=0.26.0' mergedeep pygad kaleido great-tables
+conda install pytorch scikit-learn plotly pandas
 ```
+
+And if you use GPUs:
+
+```bash
+pip install -qU flash_attn
+```
+
+## Libraries used
+
+- [Pandas](https://pandas.pydata.org/docs/), [Numpy](https://numpy.org/doc/2.3/) and [Scipy](https://docs.scipy.org/doc/scipy/): Used for common data management and statistic calculus.
+- [🤗 Hugging Face - transformers and datasets](https://huggingface.co/docs): This library is used to load data and train the embedding model.
+- [Scikit-learn](https://scikit-learn.org/stable/): Used to load, train and test classifiers used on embeddings.
+- [Pygad](https://pygad.readthedocs.io/en/latest/): Used to optimise the hyperparameters of the Scikit-learn classifiers.
+
 ## Parameters tested
 
 ```mermaid
@@ -41,14 +60,44 @@ timeline
     section <br>
         Step 5<br>Visualisation
 ```
-## Libraries used
+
 
 ## 
 
 ## The pipeline
 
 
-## The architecture
+## The data architecture
+
+```
+> ./
+    > 📔 data
+        > Your choice
+    
+    > 💻 src
+        > toolbox
+            > All classes and functions
+        > Example of routines
+
+    > 🚀 models
+        > model name prefix (FacebookAI)
+            > model name suffix (roberta-base)
+                > iteration (001)
+                > ...
+            > ...
+        > ...
+
+    > 📋 results
+        > ... Your choice
+    
+    > 📖 pers_logs
+        > ... Your choice
+    
+    > 📊 figures
+        > ... Your choice
+```
+
+
 
 
 [^1]: Computational Social Science.
