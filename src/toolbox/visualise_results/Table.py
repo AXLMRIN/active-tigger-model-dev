@@ -143,6 +143,16 @@ class Table :
             )
 
         )
+    
+    def return_fig(self) -> gt_table: 
+        """
+        """
+        return self.__fig
+
+    def save(self, filename : str) -> None : 
+        """
+        """
+        self.__fig.save(filename)
 
     def routine(self, alpha : float = 0.9) -> gt_table:
         self.preprocess(alpha)
@@ -150,7 +160,11 @@ class Table :
         return self.__fig
     
 def table_score_against_epoch_per_classifier_and_embedding_model(
-    data_baseline : pd.DataFrame, data_others : pd.DataFrame) -> Figure:
+    data_baseline : pd.DataFrame, data_others : pd.DataFrame, 
+    filename : str|None = None, return_figure : bool = False,
+    return_html : bool = False) -> gt_table|None:
+    """
+    """
     t = Table(
         data_baseline=data_baseline, 
         data_others = data_others,
@@ -161,4 +175,10 @@ def table_score_against_epoch_per_classifier_and_embedding_model(
         measure = "f1_macro",
         column_measure = "measure"
     )
-    return t.routine()
+    t.routine()
+    if return_figure : 
+        return t.return_fig()
+    if return_html:
+        return t.return_fig().as_raw_html()
+    if filename is not None:
+        t.save(filename)

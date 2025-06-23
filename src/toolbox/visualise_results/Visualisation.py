@@ -6,6 +6,14 @@ from . import LAYOUT
 from .figure_tools import multiple_figures_layout, generic_bar, generic_scatter_with_bands
 from ..general import SUL_string, get_band, auto_log_range, get_uniques_values, get_most_frequent_item
 from plotly.graph_objs._figure import Figure
+# CONSTANTS ####################################################################
+PLOTLY_SAVING_KWARGS = {
+    "full_html" : False,
+    "auto_play" : False,
+    "include_plotlyjs" : False, 
+    "include_mathjax" : False,
+    "config" : {"responsive" : True} # Not sure it works nor it's useful
+}
 # SCRIPTS ######################################################################
 class Visualisation :
     """
@@ -31,7 +39,7 @@ class Visualisation :
         self.__column_score : str = score_column
         self.__column_measure : str = column_measure
         self.__column_x_axis : str = x_axis_column
-        self.__fig = Figure(layout = LAYOUT) # LAYOUT is the general theme``
+        self.__fig : Figure = Figure(layout = LAYOUT) # LAYOUT is the general theme``
         
         (self.__list_of_frames, self.__list_of_traces) = (None,) * 2
 
@@ -182,14 +190,24 @@ class Visualisation :
         else:
             raise(TypeError,"type must be equal to 'bar' or 'scatter'")
     
+    def return_figure(self) -> Figure:
+        """
+        """
+        return self.__fig
+    
+    def save(self, filename : str) -> None : 
+        """
+        """
+        self.__fig.write_image(filename)
+
     def routine(self, alpha : float = 0.9, additional_xaxis_kwargs : dict = {}, 
                 figure_layout_kwargs : dict = {}) -> Figure:
         self.preprocess_data(alpha)
         self.build_figure(figure_layout_kwargs)
-        return self.__fig
     
 def plot_score_per_embedding_model_and_classifier(data_baseline : pd.DataFrame, 
-        data_others : pd.DataFrame) -> Figure:
+        data_others : pd.DataFrame, filename : str|None = None, 
+        return_html : bool = False, return_fig : bool = False) -> Figure|None:
     """
     """
     visu = Visualisation(
@@ -203,10 +221,19 @@ def plot_score_per_embedding_model_and_classifier(data_baseline : pd.DataFrame,
         measure = "f1_macro",
         column_measure = "measure"
     )
-    return visu.routine()
+    visu.routine()
+    if return_fig : 
+        return visu.return_figure()
+    if return_html: 
+        return visu.return_figure().to_html(**PLOTLY_SAVING_KWARGS)
+    if filename is not None : 
+        visu.save(filename)
+
+
 
 def plot_score_per_classifier_and_embedding_model(data_baseline : pd.DataFrame, 
-        data_others : pd.DataFrame) -> Figure:
+        data_others : pd.DataFrame, filename : str|None = None, 
+        return_html : bool = False, return_fig : bool = False) -> Figure|None:
     """
     """
     visu = Visualisation(
@@ -220,10 +247,18 @@ def plot_score_per_classifier_and_embedding_model(data_baseline : pd.DataFrame,
         measure = "f1_macro",
         column_measure = "measure"
     )
-    return visu.routine()
+    visu.routine()
+    if return_fig : 
+        return visu.return_figure()
+    if return_html: 
+        return visu.return_figure().to_html(**PLOTLY_SAVING_KWARGS)
+    if filename is not None : 
+        visu.save(filename)
 
 def plot_score_against_learning_rate_per_embedding_model_and_classifier(
-        data_baseline : pd.DataFrame, data_others : pd.DataFrame) -> Figure:
+    data_baseline : pd.DataFrame, data_others : pd.DataFrame,
+    filename : str|None = None, return_html : bool = False, 
+    return_fig : bool = False) -> Figure|None:
     """
     """
     visu = Visualisation(
@@ -237,4 +272,10 @@ def plot_score_against_learning_rate_per_embedding_model_and_classifier(
         measure = "f1_macro",
         column_measure = "measure"
     )
-    return visu.routine()
+    visu.routine()
+    if return_fig : 
+        return visu.return_figure()
+    if return_html: 
+        return visu.return_figure().to_html(**PLOTLY_SAVING_KWARGS)
+    if filename is not None : 
+        visu.save(filename)
