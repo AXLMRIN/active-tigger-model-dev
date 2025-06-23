@@ -18,7 +18,8 @@ class VisualiseAll :
         self.__filename_baseline : str = filename_baseline
         self.__filename_others : str = filename_others
 
-        (self.__baseline, self.__others, self.__figures) = (None, ) * 3
+        (self.__baseline, self.__others) = (None, ) * 2
+        self.__figures : dict[str:str] = {}
 
     def open_data(self) : 
         """
@@ -36,7 +37,6 @@ class VisualiseAll :
             "data_others" : self.__others,
             "return_html" : True
         }
-        self.__figures : dict[str:str] = {}
 
         self.__figures["Score par classifieur"] = \
             plot_score_per_embedding_model_and_classifier(**input)
@@ -47,12 +47,12 @@ class VisualiseAll :
         self.__figures["Table du score par nombre d'epochs"] = \
             table_score_against_epoch_per_classifier_and_embedding_model(**input)
     
-    def export_to_hmtl(self, foldername : str) -> None:
+    def export_to_hmtl(self, main_title : str, foldername : str) -> None:
         """
         """
         if not(os.path.exists(foldername)): os.makedirs(foldername)
 
-        jinja_data = {}
+        jinja_data = {"main_title" : main_title}
         for i,key in enumerate(self.__figures):
             jinja_data[f"title_{i}"] = key
             jinja_data[f"fig_{i}"] = self.__figures[key]
@@ -62,11 +62,11 @@ class VisualiseAll :
                 j2_template = Template(template_file.read())
                 output_file.write(j2_template.render(jinja_data))
             
-    def routine(self, foldername : str) -> None : 
+    def routine(self, main_title : str, foldername : str) -> None : 
         """
         """
         self.open_data()
         print(self.__baseline) #TODELETE
         print(self.__others) #TODELETE
         self.create_and_save_figures()
-        self.export_to_hmtl(foldername)
+        self.export_to_hmtl(main_title, foldername)
