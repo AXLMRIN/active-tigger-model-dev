@@ -2,6 +2,7 @@
 import json
 import pandas as pd
 from ..general import pretty_printing_dictionnary, shuffle_list
+from ..CustomLogger import CustomLogger
 from datasets import Dataset, DatasetDict, load_from_disk
 from collections.abc import Callable
 from pandas.api.typing import DataFrameGroupBy
@@ -12,12 +13,14 @@ class DataHandler :
     """
     """
 
-    def __init__(self, filename : str, text_column : str, label_column : str) : 
+    def __init__(self, filename : str, text_column : str, label_column : str, 
+        logger : CustomLogger) -> None : 
         """
         """
         self.__filename : str = filename
         self.__text_column : str = text_column
         self.__label_column : str = label_column
+        self.__logger = logger
 
         # Variables that will be define later
         (self.__df, self.len, self.columns, self.id2label, self.label2id, 
@@ -83,6 +86,12 @@ class DataHandler :
         self.n_labels : int = len(self.label2id)
             
         self.status["open"] = True
+        
+        # Logging
+        self.__logger((f"[DataHandler] Data openning - Done \n"
+            f"File : {self.__filename}\n"
+            f"{self.n_labels} labels ({list(self.label2id.keys())})\n"
+            f"{self.n_entries_per_label}"))
     
     def preprocess(self, function : Callable[[str], str] | None = None) -> None: 
         """
@@ -91,6 +100,9 @@ class DataHandler :
             pass
         else : 
             self.__df["TEXT"] = self.__df["TEXT"].apply(function)
+
+            # Logging
+            self.__logger("[DataHandler] Data preprocessing - Done")
         
         self.status["preprocess"] = True
     
@@ -114,7 +126,7 @@ class DataHandler :
             n_entries_available : int = self.len
         
         # Calculate the number of elements in the train, eval and test set
-        # With regard to the subset of ???
+        # With regard to the number of entries available (depends on the stratification)
         self.N_train : int = int(ratio_train * n_entries_available)
         self.N_eval : int  = int(ratio_eval  * n_entries_available)
         self.N_test : int  = n_entries_available - self.N_train - self.N_eval
@@ -135,6 +147,12 @@ class DataHandler :
         })
 
         self.status["split"] = True
+
+        # Logging
+        self.__logger((f"[DataHandler] Data encoding - Done\n"
+            f"Split dataset (with stratification {stratify_columns})\n"
+            f"N_train : {self.N_train}; N_eval : {self.N_eval}; "
+            f"N_test : {self.N_test}"))
     
     def encode(self, tokenizer, tokenizing_parameters : dict) :
         """
@@ -151,13 +169,16 @@ class DataHandler :
                 
                 input_ids_list.extend(tokens.input_ids)
                 attention_mask_list.extend(tokens.attention_mask)
-                labels_list.extend(self.make_labels_matrix(batch_of_rows["LABEL"]))
+                labels_list.extend(self.__make_labels_matrix(batch_of_rows["LABEL"]))
 
             self.__ds[ds_name] = self.__ds[ds_name].add_column("input_ids", input_ids_list)
             self.__ds[ds_name] = self.__ds[ds_name].add_column("attention_mask", attention_mask_list)
             self.__ds[ds_name] = self.__ds[ds_name].add_column("labels", labels_list)
         
         self.status["encoded"] = True
+        
+        # Logging
+        self.__logger("[DataHandler] Data encoding - Done")
     
     def debug_mode(self):
         """
@@ -168,8 +189,12 @@ class DataHandler :
             self.__ds["eval"].select(range(20))
         self.__ds["test"] = \
             self.__ds["test"].select(range(20))
+        
+        # Logging
+        self.__logger(("[DataHandler] DEBUG MODE, only 20 elements per split "
+                       "(train, eval, test)"))
 
-    def make_labels_matrix(self, labels) -> list[list[float]]:
+    def __make_labels_matrix(self, labels) -> list[list[float]]:
         """
         """
         return [
@@ -178,6 +203,8 @@ class DataHandler :
         ]
     
     def get_encoded_dataset(self, ds_name : str) -> Dataset :
+        """
+        """
         return self.__ds[ds_name] 
 
     def save_all(self, foldername : str) -> None:
@@ -203,6 +230,9 @@ class DataHandler :
         # Save the dataset
         self.__ds.save_to_disk(f"{foldername}/data")
 
+        # Logging
+        self.__logger("[DataHandler] Data configuration saved")
+
     def routine(self, 
         preprocess_function : Callable[[str], str]|None = None,
         ratio_train : float = 0.7, ratio_eval : float = 0.15,
@@ -210,6 +240,7 @@ class DataHandler :
         ) -> None: 
         """
         """
+        self.__logger("[DataHandler] Routine start ---")
         try : 
             self.open_data()
         except Exception as e:
@@ -224,6 +255,8 @@ class DataHandler :
             self.split(ratio_train, ratio_eval, stratify_columns)
         except Exception as e:
             raise ValueError(f"Data could not be split.\n\nError:\n{e}")
+        
+        self.__logger("[DataHandler] Routine finish ---")
     
     def debug(self):#TODELETE
         return self.__ds
