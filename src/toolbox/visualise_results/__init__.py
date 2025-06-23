@@ -16,8 +16,8 @@ LAYOUT = {
 
 COLORS = {
     "KNeighborsClassifier"    : "rgb(230,  57,  71)", 
-    "Random Forest"          : "rgb(255, 183,   3)", 
-    "MLPClassifier (slkearn)" : "rgb( 69, 123, 157)", 
+    "RandomForestClassifier"  : "rgb(255, 183,   3)", 
+    "MLPClassifier"           : "rgb( 69, 123, 157)", 
     "Baseline - HF Classifier": "rgb(144, 190, 109)", 
     
     'answerdotai/ModernBERT-base'   : "rgb(255,   0,  85)", 
