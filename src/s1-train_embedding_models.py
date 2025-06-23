@@ -1,10 +1,12 @@
-from toolbox import DataHandler, CustomTransformersPipeline, clean
+from toolbox import DataHandler, CustomTransformersPipeline, clean, CustomLogger
 
+DH, pipe = None, None
 try : 
     DH = DataHandler(
-        filename = "316_ideological_book_corpus/ibc.csv",
+        filename = "./data/316_ideological_book_corpus/ibc.csv",
         text_column = "sentence", 
-        label_column = "leaning"
+        label_column = "leaning",
+        logger = CustomLogger("./custom_logs")
     )
     DH.routine(stratify_columns="LABEL")
     pipe = CustomTransformersPipeline(data = DH, 
