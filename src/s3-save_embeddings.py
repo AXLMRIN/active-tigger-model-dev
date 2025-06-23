@@ -1,4 +1,6 @@
-from toolbox import ExportEmbeddingsForAllEpochs
+from toolbox import ExportEmbeddingsForAllEpochs, CustomLogger
 
-ExportEmbeddingsForAllEpochs("./models/FacebookAI/roberta-base/002").\
+logger = CustomLogger("./custom_logs")
+
+ExportEmbeddingsForAllEpochs("./models/FacebookAI/roberta-base/002", logger = logger).\
     routine()

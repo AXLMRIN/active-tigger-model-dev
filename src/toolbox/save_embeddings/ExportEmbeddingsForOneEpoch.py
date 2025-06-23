@@ -4,17 +4,19 @@ from transformers import AutoModelForSequenceClassification
 from torch import Tensor, no_grad, cat, save
 from torch.cuda import is_available as cuda_available
 from ..general import checkpoint_to_load, clean
+from ..CustomLogger import CustomLogger
 import os
 # SCRIPTS ######################################################################
 class ExportEmbeddingsForOneEpoch: 
     """
     """
-    def __init__(self, foldername: str, epoch : int, 
+    def __init__(self, foldername: str, epoch : int, logger : CustomLogger,
         device : str|None = None) -> None:
         """
         """
         self.__foldername : str = foldername
         self.__epoch : str = epoch
+        self.__logger : CustomLogger = logger
         self.__ds : DatasetDict = load_from_disk(f"{foldername}/data/")
 
         if device is None : 
@@ -63,6 +65,10 @@ class ExportEmbeddingsForOneEpoch:
         labels, embeddings = self.__get_embeddings(train_dataset)
         save(labels, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/train_labels.pt")
         save(embeddings, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/train_embeddings.pt")
+        
+        # Logging
+        self.__logger((f"(Epoch {self.__epoch}) Train embeddings saved. "
+                       f"Folder : {self.__foldername}/embeddings/epoch_{self.__epoch}/"))
 
     def export_test_embeddings(self):
         """
@@ -70,12 +76,18 @@ class ExportEmbeddingsForOneEpoch:
         labels, embeddings = self.__get_embeddings(self.__ds["test"])
         save(labels, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/test_labels.pt")
         save(embeddings, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/test_embeddings.pt")
-
+        
+        # Logging
+        self.__logger((f"(Epoch {self.__epoch}) Test embeddings saved. "
+                       f"Folder : {self.__foldername}/embeddings/epoch_{self.__epoch}/"))
+        
     def __delete_files(self) -> None:
         """
         """
-        print((f"WARNING: {self.__foldername}/{self.__checkpoint}/"
-               "(model.safetensors and optimizer.pt) are permanently deleted."))
+        # Logging
+        self.__logger((f"(Epoch {self.__epoch}) WARNING: {self.__foldername}/"
+                f"{self.__checkpoint}/(model.safetensors and optimizer.pt) will"
+                " be permanently deleted."))
         for file in ["model.safetensors", "optimizer.pt"]:
             try : 
                 os.remove(f"{self.__foldername}/{self.__checkpoint}/{file}")
