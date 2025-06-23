@@ -69,7 +69,9 @@ class DataHandler :
         self.__df : pd.DataFrame = pd.read_csv(f"{self.__filename}").\
             rename(replace_columns, axis = 1).\
             loc[:, ["TEXT", "LABEL", *extra_columns_to_keep]].\
+            dropna().\
             sample(frac = 1) # Shuffle
+
         self.len : int = len(self.__df)
         self.columns : list[str] = list(self.__df.columns)
 
