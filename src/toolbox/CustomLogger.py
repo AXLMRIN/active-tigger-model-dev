@@ -4,6 +4,7 @@ import ssl
 import smtplib
 from .secrets import EMAIL_FROM, EMAIL_TO, EMAIL_FROM_PWD, URL_ONYXIA
 import os
+from pandas import Timestamp
 # SCRIPTS ######################################################################
 class CustomLogger:
     def __init__(self, foldername : str = None):
@@ -16,7 +17,7 @@ class CustomLogger:
             with open(f"{self.foldername}/{type}.log", "w") as file : 
                 file.write(f"### {type} logs ###\n")
 
-    def __call__(self, message, printing : bool = False, type : str = "INFO"):
+    def __call__(self, message, printing : bool = False, type : str = "LOOP_INFO"):
         if printing:
             print(message)
 
@@ -24,7 +25,8 @@ class CustomLogger:
             self.initialise_log(type)
         
         with open(f"{self.foldername}/{type}.log", "a") as file:
-            file.write(f"[{type}] : {message}\n")
+            file.write(f"[{type}] ({Timestamp.now().strftime('%Y-%m-%d %X')}): "
+                      f"{message}\n")
 
     def notify_when_done(self, message : str = '') : 
         """send an email when finished"""
