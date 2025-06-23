@@ -1,7 +1,7 @@
 from toolbox import VisualiseAll
 
 
-VA = VisualiseAll(filename_baseline = "./results/debug/2025-06-14-TEST.csv", 
-    filename_others = "./results/debug/2025-06-17-TEST-RoutineKNN.csv",)
+VA = VisualiseAll(filename_baseline = "results/316_results/2025-06-23-Baseline.csv", 
+    filename_others = "results/316_results/2025-06-23-Sklearn_classifiers.csv",)
 
-VA.routine(foldername = "./figures/debug")
+VA.routine(main_title = "316",foldername = "./figures/316_results")
