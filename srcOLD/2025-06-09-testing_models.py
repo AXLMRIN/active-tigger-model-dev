@@ -50,7 +50,7 @@ for learning_rate in ["1e-06", "5e-05","1e-05", "0.0001"]:
             # Testing loop
             labels_true = []
             labels_pred = []
-            for batch in ds["test"].batch(16):
+            for batch in ds["test"].batch(64, drop_last_batch=False):
                 model_input = {
                     'input_ids' : Tensor(batch['input_ids']).\
                                     to(dtype = int).to(device="cuda"), 

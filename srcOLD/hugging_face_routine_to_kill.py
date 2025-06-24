@@ -29,7 +29,7 @@ try :
 
                 labels_true = []
                 labels_pred = []
-                for batch in ds.batch(16):
+                for batch in ds.batch(64, drop_last_batch=False):
                     result = inference_model(**{
                         'input_ids' : Tensor(batch['input_ids']).to(dtype = int).to(device=device), 
                         'attention_mask' : Tensor(batch['attention_mask']).to(dtype = int).to(device=device) 

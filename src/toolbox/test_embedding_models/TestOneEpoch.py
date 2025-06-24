@@ -48,7 +48,7 @@ class TestOneEpoch:
         labels_true : list[int] = []
         labels_pred : list[int] = []
 
-        for batch in self.__ds["test"].batch(16):
+        for batch in self.__ds["test"].batch(64, drop_last_batch=False):
             model_input = {
                 'input_ids' : Tensor(batch['input_ids']).\
                                 to(dtype = int).to(device=self.device), 

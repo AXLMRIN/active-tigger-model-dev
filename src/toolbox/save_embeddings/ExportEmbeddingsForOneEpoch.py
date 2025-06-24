@@ -37,7 +37,7 @@ class ExportEmbeddingsForOneEpoch:
             embeddings = None
             labels = None
 
-            for batch in dataset.batch(16): 
+            for batch in dataset.batch(64, drop_last_batch=False): 
                 batch_labels = Tensor(batch["labels"]).int().to(device=self.device)
                 model_input = {
                     key : Tensor(batch[key]).int().to(device=self.device)
