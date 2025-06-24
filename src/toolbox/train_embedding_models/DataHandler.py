@@ -164,7 +164,7 @@ class DataHandler :
             input_ids_list : list[list[int]] = []
             attention_mask_list : list[list[bool]] = []
             labels_list : list[list[bool]] = []
-            for batch_of_rows in self.__ds[ds_name].batch(64) :
+            for batch_of_rows in self.__ds[ds_name].batch(64,drop_last_batch=False) :
                 # row : {'text' : list[str], 'label' : list[str]} 
                 tokens = tokenizer(
                     batch_of_rows["TEXT"], **tokenizing_parameters)
