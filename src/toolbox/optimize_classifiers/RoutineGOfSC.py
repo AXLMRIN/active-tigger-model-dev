@@ -137,7 +137,7 @@ class RoutineGOfSC:
                     "iteration" : iteration
                 })
 
-                del optimum, f1_max, optimisation_time, n_optim_iterations, optimiser, data
+                del optimum, optimisation_time, n_optim_iterations, optimiser, data
                 clean()
                 
                 # Logging
