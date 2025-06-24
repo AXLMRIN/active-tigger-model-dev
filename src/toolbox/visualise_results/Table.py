@@ -101,21 +101,35 @@ class Table :
             
         self.__data_table_format = pd.DataFrame(data_table_format)
     
-    def build_table(self) -> None:
+    def __where_are_best_values(self) -> dict[str:list[int]] :
         """
         """
+        def interpret_cell(cell : str) -> float:
+            """
+            """
+            if cell == "NaN±NaN" : 
+                return 0
+            else : 
+                return float(cell.split("±")[0])
+        
         best_results : dict[str:list[int]] = {}
         for col in self.__list_of_columns : 
             best_results[col] = []
             for row in range(len(self.__data_table_format)):
                 value_cell = self.__data_table_format.iloc[row][col]
-                value_cell = float(value_cell.split("±")[0]) - float(value_cell.split("±")[1])
+                value_cell = interpret_cell(value_cell)
                 values_row = self.__data_table_format.iloc[row][self.__list_of_columns]
-                values_row = [float(value.split("±")[0]) - float(value.split("±")[1]) 
-                              for value in values_row]
+                values_row = [interpret_cell(value)for value in values_row]
                 max_values_row = max(values_row)
                 if  value_cell == max_values_row:
                     best_results[col].append(row)
+        
+        return best_results
+
+    def build_table(self) -> None:
+        """
+        """
+        best_results = self.__where_are_best_values()
 
         self.__fig = (
             GT(self.__data_table_format)
