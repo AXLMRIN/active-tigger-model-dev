@@ -77,35 +77,28 @@ class Table :
         # Only work with strings
         for column in data_M_and_CI : 
             #NOTE Raises an error that makes no sense
-            data_M_and_CI.loc[:,column] = data_M_and_CI.loc[:,column].apply(str)
+            data_M_and_CI.loc[:,column] = data_M_and_CI.loc[:,column].astype(str)
         
         self.__list_of_columns = SUL_string(data_M_and_CI[self.__column_column])
 
         data_table_format = []
         data_M_and_CI_grouped = data_M_and_CI.groupby([self.__column_group, self.__column_row], as_index = False)
         for (group, row), sub_df in data_M_and_CI_grouped:
-            try : 
-                data_table_format.append({
-                    self.__column_group : group,
-                    self.__column_row : row,
-                    **{
-                        column : sub_df.loc[
-                            sub_df[self.__column_column] == column,
-                            "text"
-                        ].item()
-                        for column in self.__list_of_columns
-                    }
-                })
-            except : 
-                # If there is no instance of group x row (such as embedding x classifier)
-                data_table_format.append({
-                    self.__column_group : group,
-                    self.__column_row : row,
-                    **{
-                        column : "NaN±NaN"
-                        for column in self.__list_of_columns
-                    }
-                })
+            table_row = {
+                self.__column_group : group,
+                self.__column_row : row
+            }
+            for column in self.__list_of_columns : 
+                # NOTE some data may not exist for all column so we need to 
+                # implement a try / error catching
+                try : 
+                    table_row[column] =  sub_df.\
+                        loc[sub_df[self.__column_column] == column,"text"].item()
+                except:
+                    table_row[column] = "NaN±NaN"
+            
+            data_table_format.append(table_row)
+            
         self.__data_table_format = pd.DataFrame(data_table_format)
     
     def build_table(self) -> None:
@@ -116,9 +109,10 @@ class Table :
             best_results[col] = []
             for row in range(len(self.__data_table_format)):
                 value_cell = self.__data_table_format.iloc[row][col]
-                value_cell = float(value_cell.split("±")[0])
+                value_cell = float(value_cell.split("±")[0]) - float(value_cell.split("±")[1])
                 values_row = self.__data_table_format.iloc[row][self.__list_of_columns]
-                values_row = [float(value.split("±")[0]) for value in values_row]
+                values_row = [float(value.split("±")[0]) - float(value.split("±")[1]) 
+                              for value in values_row]
                 max_values_row = max(values_row)
                 if  value_cell == max_values_row:
                     best_results[col].append(row)
@@ -182,6 +176,30 @@ def table_score_against_epoch_per_classifier_and_embedding_model(
         data_others = data_others,
         column_row = "classifier",
         column_column= "epoch",
+        column_group = "embedding_model",
+        column_score = "score",
+        measure = "f1_macro",
+        column_measure = "measure"
+    )
+    t.routine()
+    if return_figure : 
+        return t.return_fig()
+    if return_html:
+        return t.return_fig().as_raw_html()
+    if filename is not None:
+        t.save(filename)
+
+def table_score_against_learning_rate_per_classifier_and_embedding_model(
+    data_baseline : pd.DataFrame, data_others : pd.DataFrame, 
+    filename : str|None = None, return_figure : bool = False,
+    return_html : bool = False) -> gt_table|None:
+    """
+    """
+    t = Table(
+        data_baseline=data_baseline, 
+        data_others = data_others,
+        column_row = "classifier",
+        column_column= "learning_rate",
         column_group = "embedding_model",
         column_score = "score",
         measure = "f1_macro",
