@@ -69,7 +69,7 @@ def get_band(vec : list[float], type : str, alpha : float = 0.9) -> float :
     """
     mean = np.mean(vec)
     ## If vec == a * np.ones(n), returns an error.
-    if np.prod(vec - mean) == 0: 
+    if np.equal(vec, mean).all(): 
         if type == "lower" : return 0
         elif type == "upper" : return 0
         else : return np.nan
