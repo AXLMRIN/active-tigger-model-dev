@@ -4,7 +4,8 @@ import pandas as pd
 from .Visualisation import (plot_score_per_embedding_model_and_classifier,
     plot_score_per_classifier_and_embedding_model,
     plot_score_against_learning_rate_per_embedding_model_and_classifier)
-from .Table import (table_score_against_epoch_per_classifier_and_embedding_model)
+from .Table import (table_score_against_epoch_per_classifier_and_embedding_model,
+                    table_score_against_learning_rate_per_classifier_and_embedding_model)
 from jinja2 import Template
 # SCRIPTS ######################################################################
 class VisualiseAll : 
@@ -46,6 +47,8 @@ class VisualiseAll :
             plot_score_against_learning_rate_per_embedding_model_and_classifier(**input)
         self.__figures["Table du score par nombre d'epochs"] = \
             table_score_against_epoch_per_classifier_and_embedding_model(**input)
+        self.__figures["Table du score par learning rate"] = \
+            table_score_against_learning_rate_per_classifier_and_embedding_model(**input)
     
     def export_to_hmtl(self, main_title : str, foldername : str) -> None:
         """
