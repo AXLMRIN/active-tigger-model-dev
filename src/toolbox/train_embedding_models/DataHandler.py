@@ -62,7 +62,7 @@ class DataHandler :
             COMMUNICATION AND SECURITY
             - self.__logger (CustomLogger): will give information as the data is processed.
             - self.status (dict[str:bool]): dictionnary stating which function 
-                have been used, and what step in the routine had been completed
+                has been used, and what step in the routine had been completed
         """
         self.__filename : str = filename
         self.__text_column : str = text_column
@@ -403,6 +403,9 @@ class DataHandler :
         ) -> None: 
         """Routine used to open, preprocess and split data before the training.
         The encoding happens during the training.
+
+        The error catching is very coarse and only helps narrow down where the routine 
+        stopped. Needs an upgrade.
 
         Parameters:
         -----------
