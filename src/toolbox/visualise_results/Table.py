@@ -1,5 +1,6 @@
 # IMPORTS ######################################################################
 import pandas as pd
+import numpy as np
 from ..general import SUL_string, get_band, pretty_mean_and_ci
 from plotly.graph_objs._figure import Figure
 import plotly.graph_objects as go
@@ -82,18 +83,29 @@ class Table :
 
         data_table_format = []
         data_M_and_CI_grouped = data_M_and_CI.groupby([self.__column_group, self.__column_row], as_index = False)
-        for (color, row), sub_df in data_M_and_CI_grouped:
-            data_table_format.append({
-                self.__column_group : color,
-                self.__column_row : row,
-                **{
-                    column : sub_df.loc[
-                        sub_df[self.__column_column] == column,
-                        "text"
-                    ].item()
-                    for column in self.__list_of_columns
-                }
-            })
+        for (group, row), sub_df in data_M_and_CI_grouped:
+            try : 
+                data_table_format.append({
+                    self.__column_group : group,
+                    self.__column_row : row,
+                    **{
+                        column : sub_df.loc[
+                            sub_df[self.__column_column] == column,
+                            "text"
+                        ].item()
+                        for column in self.__list_of_columns
+                    }
+                })
+            except : 
+                # If there is no instance of group x row (such as embedding x classifier)
+                data_table_format.append({
+                    self.__column_group : group,
+                    self.__column_row : row,
+                    **{
+                        column : "NaN±NaN"
+                        for column in self.__list_of_columns
+                    }
+                })
         self.__data_table_format = pd.DataFrame(data_table_format)
     
     def build_table(self) -> None:
@@ -143,6 +155,16 @@ class Table :
             )
 
         )
+    
+    def return_fig(self) -> gt_table: 
+        """
+        """
+        return self.__fig
+
+    def save(self, filename : str) -> None : 
+        """
+        """
+        self.__fig.save(filename)
 
     def routine(self, alpha : float = 0.9) -> gt_table:
         self.preprocess(alpha)
@@ -150,7 +172,11 @@ class Table :
         return self.__fig
     
 def table_score_against_epoch_per_classifier_and_embedding_model(
-    data_baseline : pd.DataFrame, data_others : pd.DataFrame) -> Figure:
+    data_baseline : pd.DataFrame, data_others : pd.DataFrame, 
+    filename : str|None = None, return_figure : bool = False,
+    return_html : bool = False) -> gt_table|None:
+    """
+    """
     t = Table(
         data_baseline=data_baseline, 
         data_others = data_others,
@@ -161,4 +187,10 @@ def table_score_against_epoch_per_classifier_and_embedding_model(
         measure = "f1_macro",
         column_measure = "measure"
     )
-    return t.routine()
+    t.routine()
+    if return_figure : 
+        return t.return_fig()
+    if return_html:
+        return t.return_fig().as_raw_html()
+    if filename is not None:
+        t.save(filename)
