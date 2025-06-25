@@ -25,7 +25,9 @@ for model in MODELS :
                 filename = "./data/media_ideology_split.csv",
                 text_column = "content", 
                 label_column = "bias_text",
-                logger = logger
+                logger = logger,
+                tokenizer_max_length = 1e5, # Absurdly high so that the number of max_tokenizer is set to the model's limit
+                disable_tqdm = True
             )
             DH.routine(stratify_columns="LABEL")
 
