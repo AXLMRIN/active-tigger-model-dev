@@ -25,9 +25,7 @@ for model in MODELS :
                 filename = "./data/media_ideology_split.csv",
                 text_column = "content", 
                 label_column = "bias_text",
-                logger = logger,
-                tokenizer_max_length = 1e5, # Absurdly high so that the number of max_tokenizer is set to the model's limit
-                disable_tqdm = True
+                logger = logger
             )
             DH.routine(stratify_columns="LABEL")
 
@@ -36,7 +34,10 @@ for model in MODELS :
                 model_name       = model,
                 learning_rate    = learning_rate,
                 num_train_epochs = 5,
-                logger           = logger
+                logger           = logger,
+                tokenizer_max_length = 1e5, # Absurdly high so that the number of max_tokenizer is set to the model's limit
+                batch_size_device = 4,
+                total_batch_size = 32
             )
             pipe.routine(debug_mode = False)
 
