@@ -1,5 +1,8 @@
 # IMPORTS ######################################################################
-from .DataHandler import DataHandler
+import os
+from typing import Any
+from time import time
+
 from torch.cuda import is_available as cuda_available
 from transformers import (
     AutoTokenizer,
@@ -8,15 +11,23 @@ from transformers import (
     Trainer
 )
 from transformers.trainer_utils import TrainOutput
-from .functions import compute_metrics
-import os
-from ..general import pretty_number, pretty_printing_dictionnary, clean
-from time import time
+
 from ..CustomLogger import CustomLogger
+from ..general import pretty_number, pretty_printing_dictionnary, clean
+from .DataHandler import DataHandler
+from .functions import compute_metrics
 # SCRIPTS ######################################################################
 
 class CustomTransformersPipeline:
-    """
+    """Simple pipeline to load a model (from transformers.AutoModelForSequenceClassification)
+    and train it on the data collected with DataHandler.
+
+    The main features and functions:
+        - load the model and tokenizer
+        - train the model
+        - save the model name
+    
+    The routine function proceeds to all these steps.
     """
     def __init__(self, 
             data : DataHandler, 
@@ -35,7 +46,83 @@ class CustomTransformersPipeline:
             load_best_model_at_end : bool = True,
             disable_tqdm : bool = False
         ) -> None:
-        """
+        """Builds the CustomTransformersPipeline object.
+
+        Parameters:
+        -----------
+            DATA MANAGEMENT
+            - data (DataHandler): data used during the training.
+            - output_dir (str or None, default = None): If no output_dir provided, 
+                the routine will create a generit path.
+
+            MODEL
+            - model_name (str): name of the model to be loaded with 
+                transformers.AutoModelForSequenceClassification.from_pretrained.
+            - device (str or None, default = None): device to load the model on, 
+                can be 'cpu', 'cuda' or 'cuda:X'.
+            - tokenizer_max_length (int, default = 128): number of tokens per text,
+                all entries will be padded or truncated.
+            - total_batch_size (int, default = 64): number of elements per batch
+                (not the number of elements per device), this has an effect on 
+                the training as the more elements per batch the less sensitive
+                the gradient to outliers.
+            - batch_size_device (int, default = 8): number of elements per batch
+                loaded on the device at once. This has an effect on the GPU load
+                and the training time.
+            - load_best_model_at_end (bool, default = True): Training argument.
+            
+            TRAINING ARGUMENT
+            - num_train_epochs (int, default = 3): number of times the model sees
+                the whole train set. In general 3-5 are enough.
+            - learning_rate (float, default = 2e-5): the learning rate has a direct
+                impact on the model ability to learn. It monitors the A learning rate too small 
+                will not lead to any learning whereas if too large it will unlearn.
+            - weight_decay (float, default = 0.01): the weight decay has a direct 
+                impact on the model ability to generalise. The weight decay means 
+                a random part of the weights won't be updated to avoid over fitting. 
+            - warmup_ratio (float, default = 0.1): The warmup ratio has an impact
+                on the scheduler. It prevents from starting the training with too
+                high learning rates leading to models diverging. This parameter
+                is less discussed.
+            - optimizer (str, default = 'adamw_torch'): Has a direct impact on the 
+                model performances as it is the optimising algorithm updating the 
+                weights and biases of the model.
+
+            COMMUNICATION AND SECURITY
+            - logger (CustomLogger): will give information as the data is processed.
+            - disable_tqdm (bool, default = True): Training argument.
+        
+        Returns:
+        --------
+            /
+        
+        Inisialised variables:
+        ----------------------
+            DATA MANAGEMENT
+            - self.__data (DataHandler): data used during the training.
+            - self.output_dir (str or None, default = None): If no output_dir 
+                provided, the routine will create a generit path.
+            MODEL
+            - self.model_name (str): name of the model to be loaded with 
+                transformers.AutoModelForSequenceClassification.from_pretrained.
+            - self.device (str or None, default = None): device to load the model 
+                on, can be 'cpu', 'cuda' or 'cuda:X'.
+            - self.model (AutoModelForSequenceClassification): model loaded from 
+                Hugging Face by providing the model name.
+            - self.tokenizer (AutoTokenizer): tokenizer loaded from Hugging Face 
+                by providing the model name.
+            - self.tokenizing_parameters (dict[str:Any]): parameters for the 
+                tokenizer.
+            
+            TRAINING ARGUMENTS
+            - self.training_args (TrainingArguments): gather all parameters used
+                during training.
+
+            CUMMUNICATION AND SECURITY
+            - self.__logger(CustomLogger): will give information as the data is 
+                processed.
+            - self.status (dict[str:bool]): dictionnary stating which function 
+                has been used, and what step in the routine had been completed
         """
         self.__data : DataHandler = data
         self.model_name : str = model_name
@@ -48,7 +135,7 @@ class CustomTransformersPipeline:
         (self.model, self.tokenizer) = (None, )*2
 
         # Parameters 
-        self.tokenizing_parameters : dict = {
+        self.tokenizing_parameters : dict[str:Any] = {
             'padding' : 'max_length',
             'truncation' : True,
             'max_length' : tokenizer_max_length
@@ -111,41 +198,71 @@ class CustomTransformersPipeline:
             f"\t- Weight Decay : {self.training_args.weight_decay}\n"
             f"\t- Warmup Ratio : {self.training_args.warmup_ratio}\n"
             f"\t- Optimizer : {self.training_args.optim}\n"
-            f"\t- Output Directory : {self.training_args.output_dir}\n"
+            f"\t- Output Directory : {self.output_dir}\n"
         )
         return out
 
     def __save_model_name(self) -> None : 
+        """Saves a simple txt file because the model name doesn't appear in the
+        files saved during the training.
+
+        Parameters:
+        -----------
+            /
+        
+        Returns:
+        --------
+            /
         """
-        """
-        with open(f"{self.training_args.output_dir}/model_name.txt", "w") as file:
+        with open(f"{self.output_dir}/model_name.txt", "w") as file:
             file.write(self.model_name)
 
-    def load_tokenizer_and_model(self, skip_model : bool = False) -> None:
+    def load_tokenizer_and_model(self) -> None:
+        """Load the model and tokenizer from Hugging Face with the model name 
+        (self.model_name). Also updates the tokenizer max length to match the model
+        max_position_embeddings argument.
+
+        Parameters:
+        -----------
+            /
+        
+        Returns:
+        --------
+            /
+        """
         # Load tokenizer and model
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)   
 
-        if not skip_model: # TODELETE
-            self.model = AutoModelForSequenceClassification.from_pretrained(
-                self.model_name,
-                problem_type = "multi_label_classification",
-                num_labels   = self.__data.n_labels,
-                id2label     = self.__data.id2label,
-                label2id     = self.__data.label2id).\
-                to(device = self.device)
-            
-            # update the max_length 
-            self.tokenizing_parameters["max_length"] = min(
-                self.tokenizing_parameters["max_length"],
-                self.model.config.max_position_embeddings
-            )
+        self.model = AutoModelForSequenceClassification.from_pretrained(
+            self.model_name,
+            problem_type = "multi_label_classification",
+            num_labels   = self.__data.n_labels,
+            id2label     = self.__data.id2label,
+            label2id     = self.__data.label2id).\
+            to(device = self.device)
         
-        self.status["loaded"] = True
-
+        # update the max_length 
+        self.tokenizing_parameters["max_length"] = min(
+            self.tokenizing_parameters["max_length"],
+            self.model.config.max_position_embeddings
+        )
+        
         # Logging
+        self.status["loaded"] = True
         self.__logger((f"[CustomTransformersPipeline] Model and Tokenizer loading"
             " - Done"))
+    
     def train(self) -> TrainOutput:
+        """Runs the training and save the time.
+
+        Parameters:
+        -----------
+            /
+
+        Returns:
+        --------
+            TrainOutput
+        """
         trainer = Trainer(
             model = self.model,
             args = self.training_args,
@@ -163,8 +280,22 @@ class CustomTransformersPipeline:
             f"({t2 - t1:.0f} seconds)"))
         return output
     
-    def routine(self, debug_mode : bool = False):
-        """
+    def routine(self, debug_mode : bool = False) -> TrainOutput:
+        """Routine used to load the models, encode the data and runs the training.
+        Finally, it saves the model name and clean the model off the device.
+
+        The error catching is very coarse and only helps narrow down where the routine 
+        stopped. Needs an upgrade.
+
+        Parameters: 
+        -----------
+            - debug_mode (bool, default = False): if True, uses 
+                DataHandler.debug_mode to run the routine on a much train smaller
+                set.
+        
+        Returns:
+        --------
+            TrainOutput
         """
         self.__logger("[CustomTransformersPipeline] Routine start ---", 
             skip_line="before")
@@ -206,7 +337,7 @@ class CustomTransformersPipeline:
                               f"\n\nError:\n{e}"))
         ###
         try:
-            self.__data.save_all(self.training_args.output_dir)
+            self.__data.save_all(self.output_dir)
         except Exception as e:
             del self.model, self.__data, self.tokenizer
             clean()
