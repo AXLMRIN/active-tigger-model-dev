@@ -159,7 +159,6 @@ class DataHandler :
     def encode(self, tokenizer, tokenizing_parameters : dict) :
         """
         """
-        
         for ds_name in ["train","eval", "test"] : 
             input_ids_list : list[list[int]] = []
             attention_mask_list : list[list[bool]] = []
