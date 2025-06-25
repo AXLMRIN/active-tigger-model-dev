@@ -21,7 +21,7 @@ class RoutineGOfKNN(RoutineGOfSC) :
             ranges_of_configs = ranges_of_configs,
             n_samples = n_samples,
             extra_GA_parameters = extra_GA_parameters,
-            logger = logger,
+
             classifier = KNeighborsClassifier,
             parameters_mapper = {
                 "n_neighbors" : self.__n_neighbors_mapper_function,
@@ -35,6 +35,7 @@ class RoutineGOfKNN(RoutineGOfSC) :
                 ]
             },
 
+            logger = logger
         )
     def __n_neighbors_mapper_function(self, value):
         return int(value)
