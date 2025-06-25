@@ -1,5 +1,6 @@
 # IMPORTS ######################################################################
 from typing import Any
+from ..CustomLogger import CustomLogger
 from .RoutineGOfSC import RoutineGOfSC
 from sklearn.ensemble import RandomForestClassifier
 # SCRIPTS ######################################################################
@@ -10,6 +11,7 @@ class RoutineGOfRF(RoutineGOfSC) :
         foldername : str, 
         ranges_of_configs : dict[str:list[Any]],
         n_samples : int,
+        logger : CustomLogger,
         extra_GA_parameters : dict = {}
         ) -> None:
         """
@@ -23,27 +25,29 @@ class RoutineGOfRF(RoutineGOfSC) :
             classifier = RandomForestClassifier,
             parameters_mapper = {
                 "n_estimators" : self.__n_estimators_mapper_function,
-                "criterion" : self.__criterion_mapper_function,
-                "max_depth" : self.__max_depth_mapper_function
+                # "criterion" : self.__criterion_mapper_function,
+                # "max_depth" : self.__max_depth_mapper_function
             },
             gene_space = {
-                'num_genes' : 3,
+                'num_genes' : 1,
                 "gene_space" : [
                     {'low' : 10, 'high' : 1000, 'step' : 110},
-                    [0,1,2],
-                    [30, 60, 90]
+                    # [0,1,2],
+                    # [30, 60, 90]
                 ]
-            }
+            },
+
+            logger = logger
         )
 
-    def __n_estimators_mapper_function(value):
+    def __n_estimators_mapper_function(self, value):
         return int(value)
     
-    def __criterion_mapper_function(value):
+    def __criterion_mapper_function(self, value):
         crits = ["gini", "entropy", "log_loss"]
         return crits[int(value)]
     
-    def __max_depth_mapper_function(value):
+    def __max_depth_mapper_function(self, value):
         return int(value)
     
     def routine(self,filename : str, n_iterations : int) -> None :
