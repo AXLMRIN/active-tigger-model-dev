@@ -41,7 +41,7 @@ class DataHandler :
 
         Inisialised variables:
         ----------------------
-            DATACOLLECTION
+            DATA COLLECTION
             - self.__filename (str): full path to the file.
             - self.__text column (str): column for the text data, will be replaced by TEXT.
             - self.__label column (str): column for the labels, will be replaced by LABEL.
@@ -49,7 +49,7 @@ class DataHandler :
             - self.len (int): size of the __df.
             - self.columns (list[str]): columns of the __df
             
-            MODELTRAINING
+            MODEL TRAINING
             - self.n_labels (int): number of labels
             - self.id2label (dict[int:str]): binder label indices to text labels
             - self.label2id (dict[str:int]): binder text labels to label indices
