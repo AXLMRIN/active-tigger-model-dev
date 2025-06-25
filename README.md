@@ -21,8 +21,8 @@ Alternatively, you can create the environment manually by typing :
 ```bash
 conda create -n ENV_NAME python=3.11
 conda activate ENV_NAME
-pip install -qU transformers datasets 'accelerate>=0.26.0' mergedeep pygad kaleido great-tables selenium
-conda install pytorch scikit-learn plotly pandas
+pip install -qU 'transformers==4.52.4' 'datasets==3.6.0' 'accelerate==1.8.1' 'mergedeep==1.3.4' 'pygad==3.4.0' 'kaleido==1.0.0' 'great-tables==0.17.0' 'selenium==4.33.0'
+conda install 'pytorch==2.7.1' 'scikit-learn==1.7.0' 'plotly==6.1.2' 'pandas==2.3.0'
 ```
 
 And if you use GPUs:
