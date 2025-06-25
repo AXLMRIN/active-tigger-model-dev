@@ -137,12 +137,12 @@ class RoutineGOfSC:
                     "iteration" : iteration
                 })
 
-                del optimum, optimisation_time, n_optim_iterations, optimiser, data
+                del optimum, n_optim_iterations, optimiser, data
                 clean()
                 
                 # Logging
                 self.__logger((f"({self.__print_config(config_researched)}) "
-                    f"score {f1_max:.4f}; path : {path}"))
+                    f"score {f1_max:.4f}; optimisation time {optimisation_time:.0f}; path : {path}"))
                 
             else :
                 self.__logger((f"({self.__print_config(config_researched)}) "
