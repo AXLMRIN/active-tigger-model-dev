@@ -39,7 +39,7 @@ class TestOneEpoch:
             - epoch (int): number of epochs of training, will choose what checkpoint
                 to load. Epoch 0 = no training.
             - logger (CustomLogger): will give information as the data is processed.
-            - device (str or None, default = None): device to load the model on, 
+            - device (str or None, default = None): device to load the model on.
                 can be 'cpu', 'cuda' or 'cuda:X'.
             - batch_size (int): the batch size used during the testing.
 
@@ -87,19 +87,21 @@ class TestOneEpoch:
         else :
             self.device = device
 
+        # Choose what checkpoint to load, and load the model
+        self.__checkpoint : str = checkpoint_to_load(foldername, epoch)
+        self.__model = AutoModelForSequenceClassification.\
+            from_pretrained(f"{foldername}/{self.__checkpoint}").\
+            to(device = self.device)
+
         # Load the training args to retrieve return afterwards.
         self.__training_args : TrainingArguments = load(
-            f"{foldername}/{checkpoint}/training_args.bin", weights_only=False)
+            f"{foldername}/{self.__checkpoint}/training_args.bin", 
+            weights_only=False
+        )
         
-        # Load the model
+        # Load the model name
         with open(f"{foldername}/model_name.txt", "r") as file:
             self.__model_name : str = file.read()
-
-        # Choose what checkpoint to load, and load the model
-        checkpoint : str = checkpoint_to_load(foldername, epoch)
-        self.__model = AutoModelForSequenceClassification.\
-            from_pretrained(f"{foldername}/{checkpoint}").\
-            to(device = self.device)
 
         self.__metric : str = "f1_macro"
 
