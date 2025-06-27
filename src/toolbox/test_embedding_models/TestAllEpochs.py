@@ -19,7 +19,7 @@ class TestAllEpochs:
     def run_tests(self, device : str|None = None, additional_tags : dict = {}):
         """
         """
-        for epoch in range(self.__n_epochs) : 
+        for epoch in range(1, self.__n_epochs + 1) :
             self.__results.append(
                 TestOneEpoch(foldername = self.__foldername, epoch = epoch, 
                     logger = self.__logger, device = device).\
