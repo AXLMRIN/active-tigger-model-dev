@@ -44,8 +44,6 @@ class TestAllEpochs:
         ----------------------
             - self.__foldername (str): full path to the checkpoints (saved during 
                 training)Equivalent to output_dir from CustomTransformersPipeline.
-            - self.__logger (CustomLogger): will give information as the data is 
-                processed.
             - self.__n_epochs (int): number of epochs during the training.
             - self.__results (lict[dict[str:Any]]): list of the results to be saved.
             - self.__device (str or None, default = None): the batch size used
