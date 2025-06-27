@@ -50,6 +50,9 @@ class TestAllEpochs:
             - self.__results (lict[dict[str:Any]]): list of the results to be saved.
             - self.__device (str or None, default = None): the batch size used
                 during the testing.
+            - self.__logger (CustomLogger): will give information as the data is 
+                processed.
+            - self.__batch_size (int): the batch size used during the testing.
         """
         self.__foldername : str = foldername
         self.__logger : CustomLogger = logger
