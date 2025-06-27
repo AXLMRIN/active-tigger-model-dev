@@ -13,21 +13,26 @@ from ..CustomLogger import CustomLogger
 # SCRIPTS ######################################################################
 class TestOneEpoch: 
     """TestOneEpoch is an object that loads a model after n epochs of training 
-    and evaluate it's performances. It meant to work with the files created during 
+    and evaluate it's performances. It is meant to work with the files created during 
     the CustomTransformersPipeline routine.
 
     The main features and functions are:
-        - load a model after n epochs of training.
-        - load encoded data and labels (test set)
-        - classify entries and evaluate performances
-        - return a dictionnary resuming the performances and metadata describing
+        - Load a model after n epochs of training.
+        - Load encoded data and labels (test set)
+        - Classify entries and evaluate performances
+        - Return a dictionnary resuming the performances and metadata describing
         the training.
 
     The routine function proceeds to all these steps.   
     """
     # UPGRADE make possible to change the measure
-    def __init__(self, foldername: str, epoch : int, logger : CustomLogger,
-        device : str|None = None, batch_size : int = 64) -> None:
+    def __init__(self, 
+        foldername: str, 
+        epoch : int, 
+        logger : CustomLogger,
+        device : str|None = None, 
+        batch_size : int = 64
+        ) -> None:
         """Builds the TestOneEpoch object.
 
         Possible UPDATE: change the measure to use.
@@ -41,7 +46,7 @@ class TestOneEpoch:
             - logger (CustomLogger): will give information as the data is processed.
             - device (str or None, default = None): device to load the model on.
                 can be 'cpu', 'cuda' or 'cuda:X'.
-            - batch_size (int): the batch size used during the testing.
+            - batch_size (int, default = 64): the batch size used during the testing.
 
         Returns:
         --------
@@ -59,7 +64,11 @@ class TestOneEpoch:
                 training)Equivalent to output_dir from CustomTransformersPipeline.
             - self.__epoch (int): number of epochs of training, will choose what 
                 checkpoint to load. Epoch 0 = no training.
+            - self.__checkpoint (str): checkpoint in the folder corresponding to 
+                the epoch we want to test.
             - self.__model (AutoModelForSequenceClassification): model loaded.
+            - device (str or None, default = None): device to load the model on, 
+                can be 'cpu', 'cuda' or 'cuda:X'.
             - self.__batch_size (int): the batch size used during the testing.
             
             METADATA 
@@ -74,7 +83,6 @@ class TestOneEpoch:
             COMMUNICATION AND SECURITY
             - self.__logger (CustomLogger): will give information as the data is 
                 processed.
-            
         """
         self.__foldername : str = foldername
         self.__epoch : str = epoch
