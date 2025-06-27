@@ -15,7 +15,7 @@ class DataHandler :
     """DataHandler is an object that collects and process data before training 
     models with CustomTransformersPipeline (based on AutoModelForSequenceClassification).
 
-    The main features and functions : 
+    The main features and functions: 
         - collects the data and retrieve the labels
         - allows preprocessing texts
         - splits data (train, eval, test), with possible stratification
