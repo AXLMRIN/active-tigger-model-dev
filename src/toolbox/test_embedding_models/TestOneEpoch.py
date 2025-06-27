@@ -144,7 +144,8 @@ class TestOneEpoch:
         self.__score = f1_score(labels_true, labels_pred, average='macro')
 
         # Logging
-        self.__logger(f"(Epoch {self.__epoch}) Testing - Done (score : {self.__score})")
+        self.__logger((f"(Epoch {self.__epoch} - checkpoint {self.__checkpoint}) "
+                       f"Testing - Done (score : {self.__score})"))
         
     def return_result(self, additional_tags : dict[str:Any] = {}) -> dict:
         """Builds a dictionnary mixing the results and metadata from the training
