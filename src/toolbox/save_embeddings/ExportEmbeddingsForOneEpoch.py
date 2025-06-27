@@ -114,8 +114,8 @@ class ExportEmbeddingsForOneEpoch:
 
         Returns:
         --------
-            tuple[Tensor,Tensor] : A Tensor for the embeddings and a Tensor 
-                for the labels.
+            - Tensor : A Tensor for the labels 
+            - Tensor : A Tensor for the embeddings 
         """
         with no_grad():
             embeddings = None
