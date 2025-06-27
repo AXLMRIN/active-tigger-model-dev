@@ -17,6 +17,7 @@ class ExportEmbeddingsForOneEpoch:
         self.__foldername : str = foldername
         self.__epoch : str = epoch
         self.__logger : CustomLogger = logger
+        self.__batch_size : int = batch_size
         self.__ds : DatasetDict = load_from_disk(f"{foldername}/data/")
 
         if device is None : 
@@ -37,7 +38,7 @@ class ExportEmbeddingsForOneEpoch:
             embeddings = None
             labels = None
 
-            for batch in dataset.batch(4, drop_last_batch=False): 
+            for batch in dataset.batch(self.__batch_size, drop_last_batch=False): 
                 batch_labels = Tensor(batch["labels"]).int().to(device=self.device)
                 model_input = {
                     key : Tensor(batch[key]).int().to(device=self.device)
