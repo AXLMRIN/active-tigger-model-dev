@@ -157,7 +157,8 @@ class ExportEmbeddingsForOneEpoch:
         save(embeddings, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/train_embeddings.pt")
         
         # Logging
-        self.__logger((f"(Epoch {self.__epoch}) Train embeddings saved. "
+        self.__logger((f"(Epoch {self.__epoch}, checkpoint {self.__checkpoint}) "
+                       "Train embeddings saved. "
                        f"Folder : {self.__foldername}/embeddings/epoch_{self.__epoch}/"))
 
     def export_test_embeddings(self):
@@ -177,7 +178,8 @@ class ExportEmbeddingsForOneEpoch:
         save(embeddings, f"{self.__foldername}/embeddings/epoch_{self.__epoch}/test_embeddings.pt")
         
         # Logging
-        self.__logger((f"(Epoch {self.__epoch}) Test embeddings saved. "
+        self.__logger((f"(Epoch {self.__epoch}, checkpoint {self.__checkpoint}) "
+                       "Test embeddings saved. "
                        f"Folder : {self.__foldername}/embeddings/epoch_{self.__epoch}/"))
         
     def __delete_files(self) -> None:
