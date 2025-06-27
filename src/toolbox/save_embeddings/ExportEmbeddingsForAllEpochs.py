@@ -13,14 +13,20 @@ class ExportEmbeddingsForAllEpochs:
         self.__logger = logger
         self.__n_epochs : int = len(
             [f for f in os.listdir(foldername) if f.startswith("checkpoint")])
+        self.__batch_size : int = batch_size
 
     def export_all(self, device : str|None = None, 
         delete_files_after_routine : bool = False) -> None:
         """
         """
         for epoch in range(1, self.__n_epochs + 1) :
-            ExportEmbeddingsForOneEpoch(foldername = self.__foldername, 
-                    epoch = epoch, logger = self.__logger, device = device).\
+            ExportEmbeddingsForOneEpoch(
+                foldername = self.__foldername, 
+                epoch = epoch, 
+                logger = self.__logger, 
+                device = device,
+                batch_size = self.__batch_size
+            ).\
                 routine(delete_files_after_routine)
     
     def routine(self, device : str|None = None, 
