@@ -200,7 +200,7 @@ class ExportEmbeddingsForOneEpoch:
                 os.remove(f"{self.__foldername}/{self.__checkpoint}/{file}")
             except Exception as e:
                 print((f"File {self.__foldername}/{self.__checkpoint}/{file} "
-                       "could not be deleted because : \n{e}"))
+                       f"could not be deleted because : \n{e}"))
 
 
     def routine(self, delete_files_after_routine : bool = False) -> None:
