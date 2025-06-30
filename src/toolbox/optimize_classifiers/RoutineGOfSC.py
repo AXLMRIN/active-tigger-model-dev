@@ -22,7 +22,8 @@ class RoutineGOfSC:
         parameters_mapper : dict,
         gene_space : dict,
         logger : CustomLogger, 
-        extra_GA_parameters : dict = {}) -> None:
+        extra_GA_parameters : dict = {}
+        ) -> None:
         """
         """
         self.__foldername : str = foldername
