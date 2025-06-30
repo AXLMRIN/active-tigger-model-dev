@@ -43,7 +43,7 @@ conda install pytorch scikit-learn plotly pandas
 
 ### Step 1: Train an embedding model
 
-With the class `DataHandler`, we open a csv file, preprocessa and split data (possible stratification) into a train, eval and test set.
+With the class `DataHandler`, we open a csv file, preprocess and split data (possible stratification) into a train, eval and test set.
 
 > **Parameters to set:** data, preprocessing, stratification.
 
@@ -98,7 +98,7 @@ With the `Table` object, we can create tables by giving a csv file with the base
 
 > **Parameters to set:** 
 
-With the `Table` object, we can create tables by giving a csv file with the baseline results (ie the results of Step 2), a csv file with other results (ie the results of Step 4) and up to 3 columns ("trace" for different colors, "frame" to split subplots and "x_axis" to specify the x axis). If "x_axis" is given, the plot will be a line plot, however, if it isn't it will be a barplot. The program will evaluate the mean and the confidence intervals for each point.  
+With the `Visualisation` object, we can create plots by giving a csv file with the baseline results (ie the results of Step 2), a csv file with other results (ie the results of Step 4) and up to 3 columns ("trace" for different colors, "frame" to split subplots and "x_axis" to specify the x axis). If "x_axis" is given, the plot will be a line plot, however, if it isn't it will be a barplot. The program will evaluate the mean and the confidence intervals for each point.  
 
 > **Parameters to set:** 
 
