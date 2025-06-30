@@ -13,7 +13,13 @@
 To set up the environment, use the `requirements.yml` file as such : 
 
 ```bash
-conda env create -f requirements.yml -n ENV_NAME
+conda env create -f requirements_linux.yml -n ENV_NAME
+```
+
+or
+
+```bash
+conda env create -f requirements_mac.yml -n ENV_NAME
 ```
 
 Alternatively, you can create the environment manually by typing : 
@@ -21,15 +27,10 @@ Alternatively, you can create the environment manually by typing :
 ```bash
 conda create -n ENV_NAME python=3.11
 conda activate ENV_NAME
-pip install -qU 'transformers==4.52.4' 'datasets==3.6.0' 'accelerate==1.8.1' 'mergedeep==1.3.4' 'pygad==3.4.0' 'kaleido==1.0.0' 'great-tables==0.17.0' 'selenium==4.33.0'
-conda install 'pytorch==2.7.1' 'scikit-learn==1.7.0' 'plotly==6.1.2' 'pandas==2.3.0'
+pip install -qU transformers datasets accelerate mergedeep pygad kaleido great-tables selenium
+conda install pytorch scikit-learn plotly pandas
 ```
 
-And if you use GPUs:
-
-```bash
-pip install flash-attn==2.7.3 --no-build-isolation
-```
 
 ## Libraries used
 
@@ -38,66 +39,98 @@ pip install flash-attn==2.7.3 --no-build-isolation
 - [Scikit-learn](https://scikit-learn.org/stable/): Used to load, train and test classifiers used on embeddings.
 - [Pygad](https://pygad.readthedocs.io/en/latest/): Used to optimise the hyperparameters of the Scikit-learn classifiers.
 
-## Parameters tested
-
-```mermaid
----
-config:
-  logLevel: 'debug'
-  theme: 'forest'
----
-timeline
-    title The parameters explored during the pipeline
-    section Parameters of the embedding model
-        Step 1<br>Train embedding model: Embedding model<br>(name): Number of epochs: Learning rate: Weight decay: Optimizer: Tokenizer max length: Total batch size
-
-        Step 2<br>Test embedding model: Measure
-        
-        Step 3<br>Save embeddings
-    
-    section Parameters of the classifier
-        Step 4<br>Optimise scikit-learn classifiers: Classifier (sklearn): Number of samples: Hyper parameters to optimise and their optimisation space 
-    section <br>
-        Step 5<br>Visualisation
-```
-
-
-## 
-
 ## The pipeline
 
+### Step 1: Train an embedding model
+
+With the class `DataHandler`, we open a csv file, preprocessa and split data (possible stratification) into a train, eval and test set.
+
+> **Parameters to set:** data, preprocessing, stratification.
+
+With the class `CustomTransformersPipeline` load the model and tokenizer, encode the test, eval and train set and then train the embedding model with the classic hugging face API.
+
+> **Parameters to set:** embedding model, context window size, number of epochs, optimizer, learning rate, weight decay, warmup ratio.
+
+**What is saved during this step:** 
+
+- Full checkpoint during the training (for each epoch). Files saved in `./models/model/name/iteration_XXX/checkpoint-XXX`.
+- the model name in `./models/model/iteration_XXX/name`.
+- the encoded train, eval and test set are saved in `./models/model/name/iteration_XXX/data`
+
+### Step 2: Test the model after each epoch
+
+With the `TestAllEpochs` object, we load the model after each epoch and the encoded data previously saved and test the model on the test set.
+
+> **Parameters to set:** 
+
+**What is saved during this step:**
+
+- A csv file of the results in `./results`
+
+### Step 3: Export the embeddings
+
+With the `ExportEmbeddingsForAllEpochs` object, we load the model after each epoch and the encoded data previously saved, we concatenate the train and eval set and embed all entries. It is possible to delete the heavy files from each checkpoint after the embeddings are exported.
+
+> **Parameters to set:** 
+
+**What is saved during this step:**
+
+- The embeddings (for the train and test set) in `./models/model/name/iteration_XXX/embeddings`.
+- The labels (for the train and test set) in `./models/model/name/iteration_XXX/embeddings`.
+
+### Step 4: Optimise scikit-learn classifiers
+
+With the `DataHandlerForGOfSC` object, we load the embeddings and labels (for the train and test set) previously saved.
+
+> **Parameters to set:**
+
+With the `RoutineGOfSC` object _(Routine Genetic Optimisation for Scikit-learn Classifiers)_, we maximise f1-macro on the test set by optimising the hyperparameters of scikit-learn classifiers with a genetic algorithm. Two presets are available (`RoutineGOfKNN`, `RoutineGOfRF`) for optimising a KNN and a Random Forest classifier.
+
+> **Parameters to set:** hyperparameters (gene) space, other parameters related to the genetic algorithm.
+
+**What is saved during this step:**
+
+- a csv file of the score and the optimised hyperparameters in `./results/`.
+
+### Step 5: Visualise your results
+
+With the `Table` object, we can create tables by giving a csv file with the baseline results (ie the results of Step 2), a csv file with other results (ie the results of Step 4) and at least 2 columns ("row" and "column" columns). The program will evaluate the mean and the confidence intervals for each cell.  
+
+> **Parameters to set:** 
+
+With the `Table` object, we can create tables by giving a csv file with the baseline results (ie the results of Step 2), a csv file with other results (ie the results of Step 4) and up to 3 columns ("trace" for different colors, "frame" to split subplots and "x_axis" to specify the x axis). If "x_axis" is given, the plot will be a line plot, however, if it isn't it will be a barplot. The program will evaluate the mean and the confidence intervals for each point.  
+
+> **Parameters to set:** 
+
+**What is saved during this step:**
+
+- as many visualisations as you like, all saved in `./figures` as an html or png.
 
 ## The data architecture
 
-```
-> ./
-    > 📔 data
-        > Your choice
+
+- **./**
+    - **📔 data**
+        - Your choice
     
-    > 💻 src
-        > toolbox
-            > All classes and functions
-        > Example of routines
+    - **💻 src**
+        - toolbox
+            - All classes and functions
+        - Example of routines
 
-    > 🚀 models
-        > model name prefix (FacebookAI)
-            > model name suffix (roberta-base)
-                > iteration (001)
-                > ...
-            > ...
-        > ...
+    - **🚀 models**
+        - model name prefix (ex: FacebookAI)
+            - model name suffix (ex: roberta-base)
+                - iteration (ex: 001)
+                - ...
 
-    > 📋 results
-        > ... Your choice
+    - **📋 results**
+        - ... Your choice
     
-    > 📖 pers_logs
-        > ... Your choice
+    - **📖 pers_logs**
+        - ... Your choice
     
-    > 📊 figures
-        > ... Your choice
-```
-
-
-
+    - **📊 figures**
+        - ... Your choice
 
 [^1]: Computational Social Science.
