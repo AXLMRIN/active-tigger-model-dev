@@ -6,7 +6,7 @@
 - **🎯 Goal:** Exploring the impact of hyperparameter tuning and classifying techniques on text classification performances. 
 - **🗂️ Framework:** The classification tasks were chosen to fit in the CSS[^1] context. The tasks were gathered by [Ziems et al. (2024)](https://direct.mit.edu/coli/article/50/1/237/118498/Can-Large-Language-Models-Transform-Computational).
 - **⚙️ How:** Proposing a pipeline allowing users to choose a set of parameters to test and visualise the results for further analysis. The pipeline uses state of the art libraries such as 🤗 Hugging Face transformers, PyTorch and Scikit-learn.
-- **💻 Setup:** The repository contains an `environment.yml` file for easy setup. The pipeline can be run on CPU or (single) GPU.
+- **💻 Setup:** The repository contains an `environment.yml` file for easy setup. The pipeline can be run on CPU or GPU.
 
 ## Setting up the environment 
 
